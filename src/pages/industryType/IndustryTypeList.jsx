@@ -1,49 +1,51 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {
-  fetchIndustryTypes,
-  deleteIndustryType,
-  updateIndustryType,
-} from "../../redux/industryTypeSlice";
+import { fetchIndustryTypes, deleteIndustryType, updateIndustryType } from "../../redux/industryTypeSlice";
 
 import PageLayoutWithTable from "../../components/PageLayoutWithTable";
 import IndustryTypeManager from "./IndustryTypeManager";
 import IndustryTypeEditModal from "./IndustryTypeEditModal";
+import { useGetAllIndustries } from "../../hooks/useIndustry";
+import industryStore from "../../store/industryStore";
 
 const IndustryTypeList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { items: industryTypes, loading, error } = useSelector(
-    (state) => state.industryTypes
-  );
+  // const { items: industryTypes, loading, error } = useSelector(
+  //   (state) => state.industryTypes
+  // );
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const {
+    data: industryTypes,
+    isLoading: loading,
+    isError: error,
+  } = useGetAllIndustries({
+    search: searchTerm,
+  });
+
+  const allIndustries = industryStore((state) => state.allIndustries);
+  console.log("All Industries", allIndustries);
 
   // console.log(industryTypes, "industryTypes");
 
-  const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingIndustry, setEditingIndustry] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
 
-
   const token = "your-token";
   const tenantId = "tenant123";
-
-  useEffect(() => {
-    dispatch(fetchIndustryTypes({ token, tenantId }));
-  }, [dispatch]);
 
   const filteredIndustryTypes = useMemo(() => {
     if (!searchTerm.trim()) return industryTypes;
 
     const term = searchTerm.toLowerCase();
-    return industryTypes.filter(
+    return industryTypes?.filter(
       (item) =>
-        item.industry_name?.toLowerCase().includes(term) ||
-        item.industry_unique_id?.toLowerCase().includes(term)
+        item.industry_name?.toLowerCase().includes(term) || item.industry_unique_id?.toLowerCase().includes(term)
     );
   }, [industryTypes, searchTerm]);
-
 
   const handleUpdate = async (formData) => {
     if (!editingIndustry) return;
@@ -95,9 +97,7 @@ const IndustryTypeList = () => {
       key: "industry_unique_id",
       label: "UNIQUE ID",
       render: (value) => (
-        <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-          {value}
-        </span>
+        <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">{value}</span>
       ),
     },
     {
@@ -110,10 +110,9 @@ const IndustryTypeList = () => {
       label: "STATUS",
       render: (value) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${value
-            ? "bg-green-100 text-green-800"
-            : "bg-red-100 text-red-800"
-            }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${
+            value ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+          }`}
         >
           {value ? "Active" : "Inactive"}
         </span>
@@ -137,28 +136,17 @@ const IndustryTypeList = () => {
         onDelete={handleDelete}
         error={error}
         itemsPerPage={8}
-        excludeColumns={[
-          "_id",
-          "__v",
-          "tenant_id",
-          "createdAt",
-          "updatedAt",
-          "created_by",
-          "updated_by",
-        ]}
-        emptyMessage={
-          <div className="text-center py-10 text-gray-500">
-            No industry types found.
-          </div>
-        }
+        excludeColumns={["_id", "__v", "tenant_id", "createdAt", "updatedAt", "created_by", "updated_by"]}
+        emptyMessage={<div className="text-center py-10 text-gray-500">No industry types found.</div>}
       />
 
       {showAddModal && (
-        <div className="fixed inset-0 glass-container:
+        <div
+          className="fixed inset-0 glass-container:
 bg-white/20 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg
- bg-opacity-60 bg-opacity-40 flex items-center justify-center x-60 z-50">
+ bg-opacity-60 bg-opacity-40 flex items-center justify-center x-60 z-50"
+        >
           <div className="">
-
             <button
               onClick={() => setShowAddModal(false)}
               className="absolute right-5 top-5 text-gray-700 hover:text-red-600 text-3xl"
@@ -167,8 +155,8 @@ bg-white/20 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg
             </button>
 
             <IndustryTypeManager onCancel={() => setShowAddModal(false)} />
-          </div>  
-         </div>
+          </div>
+        </div>
       )}
 
       {/* Edit Modal */}

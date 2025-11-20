@@ -1,19 +1,13 @@
-import axios from "axios";
+import axiosInstance from "../axios/axiosInstance";
 
-const BASE_URL = "api/industryType";
+const BASE_URL = "/industryType";
 
 // GET ALL
-export const getAllIndustryApi = async (token, tenantId, params) => {
+export const getAllIndustryApi = async (params = {}) => {
   try {
     // console.log("Calling API with params:", params);
 
-    const response = await axios.get(`${BASE_URL}/search`, {
-      params: params || {}, // ensure it is always an object
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "x-tenant-id": tenantId,
-      },
-    });
+    const response = await axiosInstance.get(`${BASE_URL}/search?${params}`);
 
     return response;
   } catch (error) {
@@ -23,18 +17,13 @@ export const getAllIndustryApi = async (token, tenantId, params) => {
 };
 
 // CREATE
-export const createIndustryApi = (formData, token, tenantId) => {
+export const createIndustryApi = (formData) => {
   try {
     const obj = Object.fromEntries(formData.entries());
     // console.log(obj);
     // console.log(token, tenantId);
 
-    return axios.post(`${BASE_URL}/`, formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "x-tenant-id": tenantId,
-      },
-    });
+    return axiosInstance.post(`${BASE_URL}/`, formData);
   } catch (error) {
     console.error("CREATE INDUSTRY ERROR:", error);
     throw error;
@@ -42,14 +31,9 @@ export const createIndustryApi = (formData, token, tenantId) => {
 };
 
 // DELETE
-export const deleteIndustryApi = (uniqueId, token, tenantId) => {
+export const deleteIndustryApi = (uniqueId) => {
   try {
-    return axios.delete(`${BASE_URL}/delete/${uniqueId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "x-tenant-id": tenantId,
-      },
-    });
+    return axiosInstance.delete(`${BASE_URL}/delete/${uniqueId}`);
   } catch (error) {
     console.error("DELETE INDUSTRY ERROR:", error);
     throw error;
@@ -57,15 +41,9 @@ export const deleteIndustryApi = (uniqueId, token, tenantId) => {
 };
 
 // UPDATE
-export const updateIndustryApi = (uniqueId, formData, token, tenantId) => {
+export const updateIndustryApi = (uniqueId, formData) => {
   try {
-    return axios.put(`${BASE_URL}/${uniqueId}`, formData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "x-tenant-id": tenantId,
-        "Content-Type": "multipart/form-data",
-      },
-    });
+    return axiosInstance.put(`${BASE_URL}/${uniqueId}`, formData);
   } catch (error) {
     console.error("UPDATE INDUSTRY ERROR:", error);
     throw error;
