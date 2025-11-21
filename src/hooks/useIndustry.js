@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { createIndustryApi, getAllIndustryApi } from "../ApiServices/industryService";
+import { createIndustryApi, deleteIndustryApi, getAllIndustryApi, updateIndustryApi } from "../ApiServices/industryService";
 
 export const useGetAllIndustries = ({ search = "", page = 1, limit = 10 }) => {
   const queryKey = ["industries", search || "", page, limit];
@@ -23,8 +23,34 @@ export const useCreateIndustry = () => {
       toast.success("Industry created successfully");
       queryClient.invalidateQueries(["industries"]);
     },
-    onError: () => {
-      toast.error("Failed to create industry");
+    onError: (error) => {
+      toast.error("Failed to create industry", error.message);
     },
   });
 };
+
+export const useUpdateIndustry = () => {
+  return useMutation({
+    mutationFn: (id, data) => updateIndustryApi(id, data),
+    onSuccess: () => {
+      toast.success("Industry updated successfully");
+    },
+    onError: (error) => {
+      toast.error("Failed to update industry", error.message);
+    },
+  });
+};
+
+export const useDeleteIndustry = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id) => deleteIndustryApi(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["industries"]);
+      toast.success("Industry deleted successfully");
+    },
+    onError: (error) => {
+      toast.error("Failed to delete industry", error.message);
+    },
+  });
+}

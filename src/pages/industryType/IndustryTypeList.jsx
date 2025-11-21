@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { deleteIndustryType, fetchIndustryTypes, updateIndustryType } from "../../redux/industryTypeSlice";
 
 import PageLayoutWithTable from "../../components/PageLayoutWithTable";
-import { useGetAllIndustries } from "../../hooks/useIndustry";
+import { useDeleteIndustry, useGetAllIndustries, useUpdateIndustry } from "../../hooks/useIndustry";
 import IndustryTypeEditModal from "./IndustryTypeEditModal";
 import IndustryTypeManager from "./IndustryTypeManager";
 
@@ -23,54 +23,29 @@ const IndustryTypeList = () => {
   } = useGetAllIndustries({
     search: searchTerm,
   });
+  const { mutateAsync: updateIndustry, isPending: isUpdating } = useUpdateIndustry();
+  const { mutateAsync: deleteIndustry } = useDeleteIndustry();
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingIndustry, setEditingIndustry] = useState(null);
-  const [isUpdating, setIsUpdating] = useState(false);
+  // const [isUpdating, setIsUpdating] = useState(false);
 
   const token = "your-token";
   const tenantId = "tenant123";
 
   const handleUpdate = async (formData) => {
     if (!editingIndustry) return;
-    setIsUpdating(true);
-    try {
-      await dispatch(
-        updateIndustryType({
-          originalId: editingIndustry.industry_unique_id,
-          updatedData: formData,
-          token,
-          tenantId,
-        })
-      ).unwrap();
-
-      // Refresh list
-      await dispatch(fetchIndustryTypes({ token, tenantId }));
-
-      // Navigate first (safer), then close modal
-      navigate("/industryTypeList");
-      setEditingIndustry(null);
-    } catch (err) {
-      console.error("Update failed", err);
-      alert("Update failed");
-    } finally {
-      setIsUpdating(false);
-    }
+    // setIsUpdating(true);
+    await updateIndustry(editingIndustry.industry_unique_id, formData);
   };
   const handleEdit = useCallback((item) => {
     setEditingIndustry(item);
   }, []);
 
   const handleDelete = useCallback(
-    (item) => {
+    async (item) => {
       if (window.confirm(`Delete ${item.industry_name}?`)) {
-        dispatch(
-          deleteIndustryType({
-            uniqueId: item.industry_unique_id,
-            token,
-            tenantId,
-          })
-        );
+        await deleteIndustry(item.industry_unique_id);
       }
     },
     [dispatch]
