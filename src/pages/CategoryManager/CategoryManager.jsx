@@ -1,14 +1,20 @@
 // src/pages/CategoryManager/CategoryManager.jsx
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createCategory } from "../../redux/categorySlice";
 import DynamicForm from "../../components/DynamicForm";
 import FormActionButtons from "../../components/FormActionButtons";
+import { createCategory } from "../../redux/categorySlice";
+import { useGetAllIndustries } from "../../hooks/useIndustry";
 
 const CategoryManager = ({ onCancel }) => {
   const dispatch = useDispatch();
-  const { items: industryTypes = [] } = useSelector((state) => state.industryTypes || {});
+  // const { items: industryTypes = [] } = useSelector((state) => state.industryTypes || {});
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const { data: industryTypes } = useGetAllIndustries({
+    search: searchTerm,
+  });
   const [form, setForm] = useState({
     industry_unique_id: "",
     category_unique_id: "",
@@ -17,9 +23,7 @@ const CategoryManager = ({ onCancel }) => {
     is_active: true,
   });
 
-  const [attributes, setAttributes] = useState([
-    { name: "", code: "", description: "", units: "", is_active: true },
-  ]);
+  const [attributes, setAttributes] = useState([{ name: "", code: "", description: "", units: "", is_active: true }]);
 
   const [showAttributes, setShowAttributes] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
@@ -28,25 +32,22 @@ const CategoryManager = ({ onCancel }) => {
   const tenantId = "tenant123";
   const token = localStorage.getItem("token") || "your-jwt-token";
 
-  useEffect(() => {
-    if (successMsg) {
-      const timer = setTimeout(() => onCancel?.(), 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [successMsg, onCancel]);
+  // useEffect(() => {
+  //   if (successMsg) {
+  //     const timer = setTimeout(() => onCancel?.(), 1500);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [successMsg, onCancel]);
 
-  useEffect(() => {
-    if (failedMsg) {
-      const timer = setTimeout(() => setFailedMsg(""), 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [failedMsg]);
+  // useEffect(() => {
+  //   if (failedMsg) {
+  //     const timer = setTimeout(() => setFailedMsg(""), 4000);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [failedMsg]);
 
   const addAttribute = () => {
-    setAttributes((prev) => [
-      ...prev,
-      { name: "", code: "", description: "", units: "", is_active: true },
-    ]);
+    setAttributes((prev) => [...prev, { name: "", code: "", description: "", units: "", is_active: true }]);
   };
 
   const handleAttributeChange = (index, key, value) => {
@@ -80,10 +81,7 @@ const CategoryManager = ({ onCancel }) => {
         if (!attr.name.trim()) return;
         formData.append(`attributes[${i}][name]`, attr.name);
         formData.append(`attributes[${i}][code]`, attr.code);
-        formData.append(
-          `attributes[${i}][slug]`,
-          attr.name.toLowerCase().replace(/\s+/g, "-")
-        );
+        formData.append(`attributes[${i}][slug]`, attr.name.toLowerCase().replace(/\s+/g, "-"));
         formData.append(`attributes[${i}][description]`, attr.description);
         formData.append(`attributes[${i}][units]`, attr.units || "N/A");
         formData.append(`attributes[${i}][is_active]`, attr.is_active);
@@ -107,24 +105,32 @@ const CategoryManager = ({ onCancel }) => {
         setShowAttributes(false);
       })
       .catch((err) => {
-        const msg =
-          err?.response?.data?.message ||
-          err?.message ||
-          "Failed to create category.";
+        const msg = err?.response?.data?.message || err?.message || "Failed to create category.";
         setFailedMsg(msg);
       });
   };
 
+  const formattedIndustryTypes = industryTypes?.map((i) => ({
+    label: `${i.industry_name} #${i.industry_unique_id}`,
+    value: i.industry_unique_id,
+  }));
+
   const categoryFields = [
     {
       key: "industry_unique_id",
-      label: "Select Industry",
-      type: "select",
-      options: industryTypes.map((ind) => ({
-        value: ind.industry_unique_id,
-        label: `${ind.industry_name} — ${ind.industry_unique_id}`,
-      })),
-      required: true,
+      label: "Industry",
+      type: "search",
+      onSearch: (searchTerm) => {
+        setSearchTerm(searchTerm);
+        setShowDropdown(true);
+      },
+      results: showDropdown ? formattedIndustryTypes : [],
+      clearResults: () => {
+        setSearchTerm("");
+        setShowDropdown(false);
+      },
+      onSelect: (value) => setForm((prev) => ({ ...prev, industry_unique_id: value.value })),
+      options: formattedIndustryTypes,
     },
     {
       key: "category_name",
@@ -160,12 +166,9 @@ const CategoryManager = ({ onCancel }) => {
       {/* Form Body */}
       <div className="p-8 bg-gray-50/50 max-h-[85vh] overflow-y-auto">
         <form onSubmit={handleSubmit} className="space-y-10">
-
           {/* Category Details */}
           <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
-            <h3 className="text-2xl font-semibold text-gray-800 mb-6">
-              Category Details
-            </h3>
+            <h3 className="text-2xl font-semibold text-gray-800 mb-6">Category Details</h3>
             <DynamicForm fields={categoryFields} formData={form} setFormData={setForm} />
           </div>
 
@@ -183,9 +186,7 @@ const CategoryManager = ({ onCancel }) => {
             ) : (
               <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-2xl font-semibold text-gray-800">
-                    Attributes
-                  </h3>
+                  <h3 className="text-2xl font-semibold text-gray-800">Attributes</h3>
                   <button
                     type="button"
                     onClick={() => {
@@ -208,45 +209,34 @@ const CategoryManager = ({ onCancel }) => {
 
                 <div className="space-y-6">
                   {attributes.map((attr, index) => (
-                    <div
-                      key={index}
-                      className="border border-gray-300 rounded-xl p-6 bg-gray-50"
-                    >
+                    <div key={index} className="border border-gray-300 rounded-xl p-6 bg-gray-50">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <input
                           type="text"
                           placeholder="Attribute Name (e.g. Screen Size)"
                           value={attr.name}
-                          onChange={(e) =>
-                            handleAttributeChange(index, "name", e.target.value)
-                          }
+                          onChange={(e) => handleAttributeChange(index, "name", e.target.value)}
                           className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                         />
                         <input
                           type="text"
                           placeholder="Code (e.g. SCRN)"
                           value={attr.code}
-                          onChange={(e) =>
-                            handleAttributeChange(index, "code", e.target.value)
-                          }
+                          onChange={(e) => handleAttributeChange(index, "code", e.target.value)}
                           className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                         />
                         <input
                           type="text"
                           placeholder="Description (optional)"
                           value={attr.description}
-                          onChange={(e) =>
-                            handleAttributeChange(index, "description", e.target.value)
-                          }
+                          onChange={(e) => handleAttributeChange(index, "description", e.target.value)}
                           className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                         />
                         <input
                           type="text"
                           placeholder="Units (e.g. inches, GB)"
                           value={attr.units}
-                          onChange={(e) =>
-                            handleAttributeChange(index, "units", e.target.value)
-                          }
+                          onChange={(e) => handleAttributeChange(index, "units", e.target.value)}
                           className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                         />
                       </div>
@@ -256,9 +246,7 @@ const CategoryManager = ({ onCancel }) => {
                           <input
                             type="checkbox"
                             checked={attr.is_active}
-                            onChange={(e) =>
-                              handleAttributeChange(index, "is_active", e.target.checked)
-                            }
+                            onChange={(e) => handleAttributeChange(index, "is_active", e.target.checked)}
                             className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
                           />
                           <span className="text-gray-700 font-medium">Active</span>
