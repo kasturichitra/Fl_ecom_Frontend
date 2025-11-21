@@ -9,8 +9,7 @@ import IndustryTypeEditModal from "./IndustryTypeEditModal";
 import IndustryTypeManager from "./IndustryTypeManager";
 
 const IndustryTypeList = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  // const dispatch = useDispatch();
   // const { items: industryTypes, loading, error } = useSelector(
   //   (state) => state.industryTypes
   // );
@@ -23,33 +22,35 @@ const IndustryTypeList = () => {
   } = useGetAllIndustries({
     search: searchTerm,
   });
-  const { mutateAsync: updateIndustry, isPending: isUpdating } = useUpdateIndustry();
+
+  const { mutateAsync: updateIndustry, isPending: isUpdating } = useUpdateIndustry({
+    onSettled: () => setEditingIndustry(false),
+  });
+
   const { mutateAsync: deleteIndustry } = useDeleteIndustry();
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingIndustry, setEditingIndustry] = useState(null);
   // const [isUpdating, setIsUpdating] = useState(false);
 
-  const token = "your-token";
-  const tenantId = "tenant123";
-
   const handleUpdate = async (formData) => {
     if (!editingIndustry) return;
     // setIsUpdating(true);
-    await updateIndustry(editingIndustry.industry_unique_id, formData);
+    await updateIndustry({
+      id: editingIndustry.industry_unique_id,
+      data: formData,
+    });
   };
+
   const handleEdit = useCallback((item) => {
     setEditingIndustry(item);
   }, []);
 
-  const handleDelete = useCallback(
-    async (item) => {
-      if (window.confirm(`Delete ${item.industry_name}?`)) {
-        await deleteIndustry(item.industry_unique_id);
-      }
-    },
-    [dispatch]
-  );
+  const handleDelete = useCallback(async (item) => {
+    if (window.confirm(`Delete ${item.industry_name}?`)) {
+      await deleteIndustry(item.industry_unique_id);
+    }
+  }, []);
 
   const columns = [
     {
