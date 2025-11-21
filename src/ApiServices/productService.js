@@ -1,6 +1,6 @@
 import axiosInstance from "../axios/axiosInstance";
 
-const BASE_URL = "api/products";
+const BASE_URL = "/products";
 
 // =========================== GET ALL ===========================
 export const getAllProductsApi = (params = {}) => {

@@ -4,54 +4,30 @@ import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-import {
-  fetchProducts,
-  deleteProduct,
-  updateProduct,
-} from "../../redux/productSlice";
+import { fetchProducts, deleteProduct, updateProduct } from "../../redux/productSlice";
 
 import PageLayoutWithTable from "../../components/PageLayoutWithTable";
 import ProductManager from "./ProductManager";
 import ProductEditModal from "./ProductEditModal";
+import { useGetAllProducts } from "../../hooks/useProduct";
 
 const ProductList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { items: products, loading, error } = useSelector(
-    (state) => state.products
-  );
-
   const [searchTerm, setSearchTerm] = useState("");
+
+  const {
+    data: products,
+    isLoading: loading,
+    isError: error,
+  } = useGetAllProducts({
+    searchTerm,
+  });
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
-
-
-  // Demo login
-  const token = "your-token";
-  const tenantId = "tenant123";
-
-  // Load on mount
-  useEffect(() => {
-    dispatch(fetchProducts({ token, tenantId }));
-  }, [dispatch]);
-
-  // Search
-  const filteredProducts = useMemo(() => {
-    if (!searchTerm.trim()) return products;
-
-    const t = searchTerm.toLowerCase();
-
-    return products.filter(
-      (item) =>
-        item.product_name?.toLowerCase().includes(t) ||
-        item.product_unique_id?.toLowerCase().includes(t) ||
-        item.category_unique_id?.toLowerCase().includes(t)
-    );
-  }, [products, searchTerm]);
-
-  console.log(filteredProducts, "filteredProducts")
 
   // UPDATE handler
   const handleUpdate = async (formData) => {
@@ -142,7 +118,7 @@ const ProductList = () => {
       header: "Gender *",
       key: "gender",
       width: 20,
-    }
+    },
   ];
   return (
     <>
@@ -153,7 +129,7 @@ const ProductList = () => {
         onAddClick={() => setShowAddModal(true)}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
-        tableData={filteredProducts}
+        tableData={products}
         columns={columns}
         loading={loading}
         onEdit={handleEdit}
@@ -171,17 +147,15 @@ const ProductList = () => {
           "product_images",
           "product_attributes",
         ]}
-        emptyMessage={
-          <div className="text-center py-10 text-gray-500">
-            No products found.
-          </div>
-        }
+        emptyMessage={<div className="text-center py-10 text-gray-500">No products found.</div>}
       />
 
       {/* ADD MODAL */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-white/30 backdrop-blur-lg border border-white/20 
-        shadow-xl flex items-center justify-center z-50">
+        <div
+          className="fixed inset-0 bg-white/30 backdrop-blur-lg border border-white/20 
+        shadow-xl flex items-center justify-center z-50"
+        >
           <div className="relative">
             <button
               onClick={() => setShowAddModal(false)}
