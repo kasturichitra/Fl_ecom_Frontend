@@ -1,19 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { getAllIndustryApi } from "../ApiServices/industryService";
 
-export const useGetAllIndustries = ({ search }) => {
+export const useGetAllIndustries = ({ search = "", page = 1, limit = 10 }) => {
+  const queryKey = ["industries", search || "", page, limit];
+
   return useQuery({
-    queryKey: ["industries", search],
-    queryFn: () =>
-      getAllIndustryApi({
-        search,
-      }),
+    queryKey,
+    queryFn: () => getAllIndustryApi({ search, page, limit }),
     select: (res) => res.data.data,
-    // staleTime: 60 * 1000, // 1 minute
-    onSuccess: (industries) => {
-      // Direct Zustand update without component, without useEffect
-      console.log("useGetAllIndustries", industries);
-      useIndustryStore.getState().setAllIndustries(industries);
-    },
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
+    refetchOnMount: false,
   });
 };

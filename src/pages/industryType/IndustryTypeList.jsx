@@ -1,13 +1,12 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useCallback, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { fetchIndustryTypes, deleteIndustryType, updateIndustryType } from "../../redux/industryTypeSlice";
+import { deleteIndustryType, fetchIndustryTypes, updateIndustryType } from "../../redux/industryTypeSlice";
 
 import PageLayoutWithTable from "../../components/PageLayoutWithTable";
-import IndustryTypeManager from "./IndustryTypeManager";
-import IndustryTypeEditModal from "./IndustryTypeEditModal";
 import { useGetAllIndustries } from "../../hooks/useIndustry";
-import industryStore from "../../store/industryStore";
+import IndustryTypeEditModal from "./IndustryTypeEditModal";
+import IndustryTypeManager from "./IndustryTypeManager";
 
 const IndustryTypeList = () => {
   const dispatch = useDispatch();
@@ -25,27 +24,12 @@ const IndustryTypeList = () => {
     search: searchTerm,
   });
 
-  const allIndustries = industryStore((state) => state.allIndustries);
-  console.log("All Industries", allIndustries);
-
-  // console.log(industryTypes, "industryTypes");
-
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingIndustry, setEditingIndustry] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
 
   const token = "your-token";
   const tenantId = "tenant123";
-
-  const filteredIndustryTypes = useMemo(() => {
-    if (!searchTerm.trim()) return industryTypes;
-
-    const term = searchTerm.toLowerCase();
-    return industryTypes?.filter(
-      (item) =>
-        item.industry_name?.toLowerCase().includes(term) || item.industry_unique_id?.toLowerCase().includes(term)
-    );
-  }, [industryTypes, searchTerm]);
 
   const handleUpdate = async (formData) => {
     if (!editingIndustry) return;
@@ -129,7 +113,7 @@ const IndustryTypeList = () => {
         onAddClick={() => setShowAddModal(true)}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
-        tableData={filteredIndustryTypes}
+        tableData={industryTypes}
         columns={columns}
         loading={loading}
         onEdit={handleEdit}
