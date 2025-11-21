@@ -11,7 +11,7 @@ import { useCreateBrand } from "../../hooks/useBrand";
 const BrandManager = () => {
   const dispatch = useDispatch();
 
-  const { mutateAsync: createBrand } = useCreateBrand()
+  const { mutateAsync: createBrand } = useCreateBrand();
 
   const categories = useSelector((state) => state.categories?.items || []);
   const token = useSelector((state) => state.auth?.token);
@@ -34,17 +34,13 @@ const BrandManager = () => {
   const validate = () => {
     const e = {};
 
-    if (!form.categories.length)
-      e.categories = "Select at least one category";
+    if (!form.categories.length) e.categories = "Select at least one category";
 
-    if (!form.brand_name.trim())
-      e.brand_name = "Brand name is required";
+    if (!form.brand_name.trim()) e.brand_name = "Brand name is required";
 
-    if (!form.brand_unique_id.trim())
-      e.brand_unique_id = "Brand Unique ID is required";
+    if (!form.brand_unique_id.trim()) e.brand_unique_id = "Brand Unique ID is required";
 
-    if (!form.brand_image)
-      e.brand_image = "Brand image is required";
+    if (!form.brand_image) e.brand_image = "Brand image is required";
 
     setErrors(e);
 
@@ -53,7 +49,7 @@ const BrandManager = () => {
 
   useEffect(() => {
     console.error("Errors", errors);
-  }, [errors])
+  }, [errors]);
 
   // -----------------------------------------
   // SUBMIT BRAND
@@ -63,28 +59,22 @@ const BrandManager = () => {
 
     if (!validate()) return;
 
-
     console.log(form);
 
     const { categories, ...rest } = form;
 
     const formData = objectToFormData({ ...rest });
     console.log("Form categories", form.categories);
-    console.log(form.categories)
 
+    // formData.append("categories", JSON.stringify(form.categories));
 
-    console.log()
+    form.categories.forEach((id) => {
+      formData.append("categories[]", id);
+    });
 
-   formData.append("categories", `[${form.categories.map(id => `"${id}"`).join(", ")}]`);
+    // formData.append("categories", finalString);
 
-   console.log("Actual value:", formData.get("categories"));
-
-
-    
-
-    console.log("Form Data", formData)
-
-    await createBrand(formData)
+    await createBrand(formData);
 
     setForm({
       categories: [],
@@ -135,56 +125,30 @@ const BrandManager = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-10">
-      <h2 className="text-2xl font-bold text-blue-600 text-center mb-6">
-        Add New Brand
-      </h2>
+      <h2 className="text-2xl font-bold text-blue-600 text-center mb-6">Add New Brand</h2>
 
       <form onSubmit={handleCreateBrand} className="space-y-6">
-
         {/* ---------------- Category Selector -------------- */}
         <div>
           <CategorySelector
             categories={categories}
             selected={form.categories}
-            setSelected={(values) =>
-              setForm({ ...form, categories: values })
-            }
+            setSelected={(values) => setForm({ ...form, categories: values })}
           />
-          {errors.categories && (
-            <p className="text-red-500 text-sm">{errors.categories}</p>
-          )}
+          {errors.categories && <p className="text-red-500 text-sm">{errors.categories}</p>}
         </div>
 
         {/* ---------------- Dynamic Form Fields -------------- */}
-        <DynamicForm
-          fields={formFields}
-          formData={form}
-          setFormData={setForm}
-          errors={errors}
-        />
+        <DynamicForm fields={formFields} formData={form} setFormData={setForm} errors={errors} />
 
         {/* ---------------- Image Upload -------------- */}
         <div>
-          <label className="block text-gray-700 font-semibold mb-1">
-            Brand Image
-          </label>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="w-full border p-2 rounded-md"
-          />
+          <label className="block text-gray-700 font-semibold mb-1">Brand Image</label>
+          <input type="file" accept="image/*" onChange={handleImageChange} className="w-full border p-2 rounded-md" />
 
-          {imagePreview && (
-            <img
-              src={imagePreview}
-              className="w-28 h-28 mt-3 rounded-md border object-cover"
-            />
-          )}
+          {imagePreview && <img src={imagePreview} className="w-28 h-28 mt-3 rounded-md border object-cover" />}
 
-          {errors.brand_image && (
-            <p className="text-red-500 text-sm">{errors.brand_image}</p>
-          )}
+          {errors.brand_image && <p className="text-red-500 text-sm">{errors.brand_image}</p>}
         </div>
 
         {/* ---------------- Action Buttons -------------- */}

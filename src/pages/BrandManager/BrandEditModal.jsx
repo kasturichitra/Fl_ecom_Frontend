@@ -4,11 +4,19 @@ import { updateBrand } from "../../redux/brandSlice";
 import CategorySelector from "../../components/CategorySelector";
 import EditModalLayout from "../../components/EditModalLayout";
 import DynamicForm from "../../components/DynamicForm";
+import { useUpdateBrand } from "../../hooks/useBrand";
 
-const BrandEditModal = ({ brand, onClose, onSuccess }) => {
+const BrandEditModal = ({ brand, onClose, setEditingBrand ,onSuccess, onSubmit }) => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.categories.items || []);
   const { token, tenantId } = useSelector((state) => state.auth || {});
+
+  const { mutateAsync: updateBrand, isPending: isUpdating } = useUpdateBrand({
+    onSettled: () => {
+      setIsLoading(false);
+      setEditingBrand(null);
+    },
+  });
 
   const [form, setForm] = useState({
     categories: brand.categories || [],
@@ -25,10 +33,7 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
   // Load initial image
   useEffect(() => {
     if (brand.brand_image) {
-      const fullUrl = `${process.env.REACT_APP_API_URL}/${brand.brand_image.replace(
-        /\\/g,
-        "/"
-      )}`;
+      const fullUrl = `${process.env.REACT_APP_API_URL}/${brand.brand_image.replace(/\\/g, "/")}`;
       setImagePreview(fullUrl);
     }
   }, [brand.brand_image]);
@@ -62,10 +67,10 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
 
     const fd = new FormData();
 
-    form.categories.forEach((id) => fd.append("category_unique_ids[]", id));
+    form.categories.forEach((id) => fd.append("categories[]", id));
 
     fd.append("brand_name", form.brand_name);
-    fd.append("brand_unique_id", form.brand_unique_id);
+    // fd.append("brand_unique_id", form.brand_unique_id);
     fd.append("brand_description", form.brand_description || "");
 
     if (form.brand_image && typeof form.brand_image !== "string") {
@@ -77,19 +82,42 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
     }
 
     try {
-      await dispatch(
-        updateBrand({
-          uniqueId: brand._id,
-          formData: fd,
-          token,
-          tenantId,
-        })
-      ).unwrap();
+      console.log("before update");
 
-      onSuccess?.();
-      onClose();
+      // console.log()
+      await updateBrand({
+        id: brand._id,
+        data: fd,
+      });
+
+      setEditingBrand(null)
+
+
+
+      console.log("after update");
+
+      //     const handleUpdate = async (formData) => {
+      //   if (!editingIndustry) return;
+      //   // setIsUpdating(true);
+      //   await updateIndustry({
+      //     id: editingIndustry.industry_unique_id,
+      //     data: formData,
+      //   });
+      // };
+
+      // await dispatch(
+      //   updateBrand({
+      //     uniqueId: brand._id,
+      //     formData: fd,
+      //     token,
+      //     tenantId,
+      //   })
+      // ).unwrap();
+
+      // onSuccess?.();
+      // onClose();
     } catch (err) {
-      alert("Update failed: " + (err.message || "Please try again"));
+      // alert("Update failed: " + (err.message || "Please try again"));
     } finally {
       setIsLoading(false);
     }
@@ -145,9 +173,7 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
           selected={form.categories}
           setSelected={(vals) => setForm({ ...form, categories: vals })}
         />
-        {errors.categories && (
-          <p className="text-red-500 text-sm mt-2">{errors.categories}</p>
-        )}
+        {errors.categories && <p className="text-red-500 text-sm mt-2">{errors.categories}</p>}
       </div>
 
       {/* ⭐ Dynamic Form Handles all other fields */}

@@ -1,6 +1,7 @@
 import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createBrandApi, getAllBrandApi, updateBrandApi } from "../ApiServices/brandService";
+import { createBrandApi, deleteBrandApi, getAllBrandApi, updateBrandApi } from "../ApiServices/brandService";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export const useGetAllBrands = ({ searchTerm = "", page = 1, limit = 10 }) => {
   const queryKey = ["brands", searchTerm || "", page, limit];
@@ -14,6 +15,8 @@ export const useGetAllBrands = ({ searchTerm = "", page = 1, limit = 10 }) => {
     refetchOnMount: false,
   });
 };
+
+
 
 export const useCreateBrand = () => {
   const queryClient = useQueryClient();
@@ -29,19 +32,38 @@ export const useCreateBrand = () => {
   });
 };
 
+export const useUpdateBrand = (options = {}) => {
 
-export const useUpdateBrand = () =>{
+  const navigate = useNavigate()
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn : (id,data) => updateBrandApi(id, data),
-    onSuccess : () =>{
+    //  console.log("Updating brand with:", id, data);
+    mutationFn: ({ id, data }) => {
+      console.log("Updating brand with:", id, data);
+      return updateBrandApi(id, data);
+    },
+    onSuccess: () => {
       toast.success("Brand updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["brands"] });
+      // navigate('/brands')
+    },
+    onError: () => {
+      toast.error("Failed to update brand");
+    },
+    // onSettled: () => options.onSettled?.(), 
+  });
+};
 
-
+export const useDeleteBrand = () =>{
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn : (id) => deleteBrandApi(id),
+    onSuccess : () =>{
+      toast.success("Brand deleted successfully")
       queryClient.invalidateQueries({queryKey : ["brands"]})
     },
     onError : () =>{
-      toast.error("Failed to update brand")
+      toast.error("Failed to delete")
     }
   })
 }
