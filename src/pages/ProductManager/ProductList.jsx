@@ -7,10 +7,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { fetchProducts, updateProduct } from "../../redux/productSlice";
 
 import PageLayoutWithTable from "../../components/PageLayoutWithTable";
+import { useGetAllCategories } from "../../hooks/useCategory";
 import { useDeleteProduct, useGetAllProducts } from "../../hooks/useProduct";
 import ProductEditModal from "./ProductEditModal";
 import ProductManager from "./ProductManager";
-import { useGetAllCategories } from "../../hooks/useCategory";
 
 const ProductList = () => {
   const dispatch = useDispatch();
@@ -19,7 +19,7 @@ const ProductList = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [search, setSearch] = useState(""); // this only search xl download model search
-  const [sugstion,setSuggstion]=useState("")
+  // const [sugstion,setSuggstion]=useState("")
   const {
     data: products,
     isLoading: loading,
@@ -29,6 +29,12 @@ const ProductList = () => {
   });
   const { data: categories } = useGetAllCategories({ search: search });
 
+    const formattedCategories = categories?.map((i) => ({
+    label: `${i.category_name}`,
+    value: i.category_unique_id,
+  }));
+
+  
   const { mutate: deleteProduct, isPending } = useDeleteProduct();
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -138,12 +144,10 @@ const ProductList = () => {
         DownloadHandler={DownloadHandler}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        categories={categories}
+        formattedCategories={formattedCategories}
         setSearch={setSearch}
         search={search}
         modelInputPlaceholder="Search products name"
-        sugstion={sugstion}
-        setSuggstion={setSuggstion}
         excludeColumns={[
           "_id",
           "__v",
@@ -176,7 +180,6 @@ const ProductList = () => {
           </div>
         </div>
       )}
-
       {/* EDIT MODAL */}
       {editingProduct && (
         <ProductEditModal

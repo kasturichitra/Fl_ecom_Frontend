@@ -32,8 +32,9 @@ const PageLayoutWithTable = ({
   categories,
   setSearch,
   search,
-  sugstion,
-  setSuggstion,
+  // sugstion,
+  // setSuggstion,
+  formattedCategories
 }) => {
   return (
     <div className="min-h-screen bg-gray-50 py-10">
@@ -77,7 +78,7 @@ const PageLayoutWithTable = ({
             {
               pathname === "/productList" && (
                 <div className="ml-4">
-                  <DownloadXLExcel isOpen={isOpen} setIsOpen={setIsOpen} modelInputPlaceholder={modelInputPlaceholder} Data={categories} setSearch={setSearch}search={search} sugstion={sugstion} setSuggstion={setSuggstion} />
+                  <DownloadXLExcel isOpen={isOpen} setIsOpen={setIsOpen} modelInputPlaceholder={modelInputPlaceholder} formattedCategories={formattedCategories} setSearch={setSearch}search={search}  />
                 </div>
               ) 
             }
