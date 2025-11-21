@@ -22,3 +22,7 @@ export const updateProductApi = (id, data) => {
 export const deleteProductApi = (id) => {
   return axiosInstance.delete(`${BASE_URL}/${id}`);
 };
+
+export const downloadProductsExcelApi = (id) => {
+  return axiosInstance.get(`products/excel-template/${id}`);
+};
