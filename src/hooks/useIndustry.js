@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { createIndustryApi, getAllIndustryApi } from "../ApiServices/industryService";
+import {
+  createIndustryApi,
+  deleteIndustryApi,
+  getAllIndustryApi,
+  updateIndustryApi,
+} from "../ApiServices/industryService";
 
 export const useGetAllIndustries = ({ search = "", page = 1, limit = 10 }) => {
   const queryKey = ["industries", search || "", page, limit];
@@ -10,7 +15,7 @@ export const useGetAllIndustries = ({ search = "", page = 1, limit = 10 }) => {
     queryFn: () => getAllIndustryApi({ search, page, limit }),
     select: (res) => res.data.data,
     staleTime: 10 * 60 * 1000,
-    cacheTime: 30 * 60 * 1000,  
+    cacheTime: 30 * 60 * 1000,
     refetchOnMount: false,
   });
 };
@@ -23,8 +28,37 @@ export const useCreateIndustry = () => {
       toast.success("Industry created successfully");
       queryClient.invalidateQueries(["industries"]);
     },
-    onError: () => {
-      toast.error("Failed to create industry");
+    onError: (error) => {
+      toast.error("Failed to create industry", error.message);
+    },
+  });
+};
+
+export const useUpdateIndustry = (options = {}) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }) => updateIndustryApi(id, data),
+    onSuccess: () => {
+      toast.success("Industry updated successfully");
+      queryClient.invalidateQueries(["industries"]);
+    },
+    onError: (error) => {
+      toast.error("Failed to update industry", error.message);
+    },
+    onSettled: () => options.onSettled?.(),
+  });
+};
+
+export const useDeleteIndustry = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id) => deleteIndustryApi(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["industries"]);
+      toast.success("Industry deleted successfully");
+    },
+    onError: (error) => {
+      toast.error("Failed to delete industry", error.message);
     },
   });
 };
