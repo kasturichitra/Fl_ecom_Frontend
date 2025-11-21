@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
-import { deleteCategory, fetchCategories } from "../../redux/categorySlice";
 
+import toast from "react-hot-toast";
 import PageLayoutWithTable from "../../components/PageLayoutWithTable";
 import { useCategoryDelete, useGetAllCategories } from "../../hooks/useCategory.js";
 import CategoryEditModal from "./CategoryEditModal";
@@ -28,31 +28,14 @@ const CategoryListManager = () => {
     setEditingCategory(null);
   }, []);
 
-  const handleDelete = (id) => {
-  deleteCategory(id, {
-    onSuccess: () => toast.success("Category deleted successfully"),
-  });
-};
+  const handleDelete = (targetcategory) => {
+    const { category_unique_id } = targetcategory;
+    deleteCategory(
+      { uniqueId: category_unique_id }
+    );
+  };
 
-  // const handleDelete = useCallback(
-  //   (category) => {
-  //     if (!window.confirm(`Delete "${category.category_name}"?`)) return;
 
-  //     dispatch(
-  //       deleteCategory({
-  //         uniqueId: category.category_unique_id,
-  //         token,
-  //         tenantId,
-  //       })
-  //     )
-  //       .unwrap()
-  //       .then(() => {
-  //         dispatch(fetchCategories({ token, tenantId }));
-  //       })
-  //       .catch(() => alert("Failed to delete category"));
-  //   },
-  //   [dispatch, token, tenantId]
-  // );
 
   const columns = [
     {

@@ -43,8 +43,10 @@ export const createCategoryApi = async (formData, token, tenantId) => {
  * DELETE: /category/deleteCategory/:id
  * -----------------------------------------
  */
-export const deleteCategoryApi = async (uniqueId, token, tenantId) => {
- return await axiosInstance.delete(`${BASE_URL}/${uniqueId ?? ""}`);
+export const deleteCategoryApi = async (uniqueId) => {
+  console.log(uniqueId,'category unique id in services file');
+  
+  return await axiosInstance.delete(`${BASE_URL}/${uniqueId ?? ""}`);
 };
 
 /**
