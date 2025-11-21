@@ -1,13 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { createBrand } from "../../redux/brandSlice";
 
 import DynamicForm from "../../components/DynamicForm";
 import CategorySelector from "../../components/CategorySelector";
 import FormActionButtons from "../../components/FormActionButtons";
+import { objectToFormData } from "../../utils/ObjectToFormData";
+import { useCreateBrand } from "../../hooks/useBrand";
 
 const BrandManager = () => {
   const dispatch = useDispatch();
+
+  const { mutateAsync: createBrand } = useCreateBrand()
 
   const categories = useSelector((state) => state.categories?.items || []);
   const token = useSelector((state) => state.auth?.token);
@@ -43,34 +47,44 @@ const BrandManager = () => {
       e.brand_image = "Brand image is required";
 
     setErrors(e);
+
     return Object.keys(e).length === 0;
   };
+
+  useEffect(() => {
+    console.error("Errors", errors);
+  }, [errors])
 
   // -----------------------------------------
   // SUBMIT BRAND
   // -----------------------------------------
-  const handleCreateBrand = (e) => {
+  const handleCreateBrand = async (e) => {
     e.preventDefault();
 
     if (!validate()) return;
 
-    const formData = new FormData();
 
-    formData.append("categories", JSON.stringify(form.categories));
-    formData.append("brand_name", form.brand_name);
-    formData.append("brand_unique_id", form.brand_unique_id);
-    formData.append("brand_description", form.brand_description);
-    formData.append("brand_image", form.brand_image);
+    console.log(form);
 
-    dispatch(
-      createBrand({
-        token,
-        tenantId,
-        formData,
-      })
-    );
+    const { categories, ...rest } = form;
 
-    alert("Brand created successfully!");
+    const formData = objectToFormData({ ...rest });
+    console.log("Form categories", form.categories);
+    console.log(form.categories)
+
+
+    console.log()
+
+   formData.append("categories", `[${form.categories.map(id => `"${id}"`).join(", ")}]`);
+
+   console.log("Actual value:", formData.get("categories"));
+
+
+    
+
+    console.log("Form Data", formData)
+
+    await createBrand(formData)
 
     setForm({
       categories: [],
