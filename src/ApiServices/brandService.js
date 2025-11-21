@@ -1,46 +1,29 @@
 import axios from "axios";
+import axiosInstance from "../axios/axiosInstance";
 
-const BASE_URL = "/api/brands";
+const BASE_URL = "/brands";
 
-/* --------------------------
-   COMMON HEADERS
---------------------------- */
-const getHeaders = (token, tenantId, isMultipart = false) => ({
-  Authorization: `Bearer ${token ?? ""}`,
-  "x-tenant-id": tenantId ?? "",
-  ...(isMultipart ? { "Content-Type": "multipart/form-data" } : {}),
-});
 
-/* --------------------------
-   GET ALL BRANDS
-   GET /brand/getAll
---------------------------- */
-export const getAllBrandApi = async (token, tenantId) => {
-  console.log(token,tenantId)
-  try {
-    return await axios.get(`${BASE_URL}/`, {
-      headers: getHeaders(token, tenantId),
-    });
-  } catch (err) {
-    console.error("❌ GetAll Brand API Error:", err.response?.data ?? err);
-    throw err;
-  }
-};
+export const getAllBrandApi = (params = {}) => {
+  const queryString = new URLSearchParams(params).toString()
+  return axiosInstance.get(`${BASE_URL}${queryString ? `?${queryString}` : ""} `)
+}
 
-/* --------------------------
-   CREATE BRAND
-   POST /brand/create
---------------------------- */
-export const createBrandApi = async (formData, token, tenantId) => {
-  try {
-    return await axios.post(`${BASE_URL}/`, formData, {
-      headers: getHeaders(token, tenantId, true),
-    });
-  } catch (err) {
-    console.error("❌ Create Brand API Error:", err.response?.data ?? err);
-    throw err;
-  }
-};
+
+export const createBrandApi = (formData) =>{
+  return axiosInstance.post(`${BASE_URL}/`,formData)
+}
+
+// export const createBrandApi = async (formData, token, tenantId) => {
+//   try {
+//     return await axios.post(`${BASE_URL}/`, formData, {
+//       headers: getHeaders(token, tenantId, true),
+//     });
+//   } catch (err) {
+//     console.error("❌ Create Brand API Error:", err.response?.data ?? err);
+//     throw err;
+//   }
+// };
 
 /* --------------------------
    UPDATE BRAND
