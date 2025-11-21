@@ -1,46 +1,24 @@
-// src/ApiServices/productService.js
-import axios from "axios";
+import axiosInstance from "../axios/axiosInstance";
 
 const BASE_URL = "api/products";
 
 // =========================== GET ALL ===========================
-export const getAllProductsApi = (token, tenantId) => {
-  return axios.get(`${BASE_URL}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "x-tenant-id": tenantId,
-    },
-  });
+export const getAllProductsApi = (params = {}) => {
+  const queryString = new URLSearchParams(params).toString();
+  return axiosInstance.get(`${BASE_URL}${queryString ? `?${queryString}` : ""}`);
 };
 
 // =========================== CREATE (JSON Body) ===========================
-export const createProductApi = (body, token, tenantId) => {
-  return axios.post(`${BASE_URL}`, body, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "x-tenant-id": tenantId,
-      "Content-Type": "application/json",
-    },
-  });
+export const createProductApi = (data) => {
+  return axiosInstance.post(`${BASE_URL}`, data);
 };
 
 // =========================== UPDATE (multipart/form-data) ===========================
-export const updateProductApi = (id, formData, token, tenantId) => {
-  return axios.put(`${BASE_URL}/${id}`, formData, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "x-tenant-id": tenantId,
-      "Content-Type": "multipart/form-data",
-    },
-  });
+export const updateProductApi = (id, data) => {
+  return axiosInstance.put(`${BASE_URL}/${id}`, data);
 };
 
 // =========================== DELETE ===========================
-export const deleteProductApi = (id, token, tenantId) => {
-  return axios.delete(`${BASE_URL}/${id}`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "x-tenant-id": tenantId,
-    },
-  });
+export const deleteProductApi = (id) => {
+  return axiosInstance.delete(`${BASE_URL}/${id}`);
 };
