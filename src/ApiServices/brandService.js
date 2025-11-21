@@ -23,37 +23,21 @@ export const createBrandApi = (formData) => {
 //   }
 // };
 
-/* --------------------------
-   UPDATE BRAND
-   PUT /brand/update/:id
---------------------------- */
-// export const updateBrandApi = async (uniqueId, formData, token, tenantId) => {
-//   console.log(uniqueId)
-//   try {
-//     return await axios.put(`${BASE_URL}/${uniqueId}`, formData, {
-//       headers: getHeaders(token, tenantId, true),
-//     });
-//   } catch (err) {
-//     console.error("❌ Update Brand API Error:", err.response?.data ?? err);
-//     throw err;
-//   }
-// };
-
 export const updateBrandApi = async (uniqueId, formData) => {
   return await axiosInstance.put(`${BASE_URL}/${uniqueId}`, formData);
 };
 
-/* --------------------------
-   DELETE BRAND
-   DELETE /brand/delete/:id
---------------------------- */
-export const deleteBrandApi = async (uniqueId, token, tenantId) => {
-  try {
-    return await axios.delete(`${BASE_URL}/delete/${uniqueId}`, {
-      headers: getHeaders(token, tenantId),
-    });
-  } catch (err) {
-    console.error("❌ Delete Brand API Error:", err.response?.data ?? err);
-    throw err;
-  }
-};
+// export const deleteBrandApi = async (uniqueId, token, tenantId) => {
+//   try {
+//     return await axios.delete(`${BASE_URL}/delete/${uniqueId}`, {
+//       headers: getHeaders(token, tenantId),
+//     });
+//   } catch (err) {
+//     console.error("❌ Delete Brand API Error:", err.response?.data ?? err);
+//     throw err;
+//   }
+// };
+
+export const deleteBrandApi = async(uniqueId) =>{
+  return await axiosInstance.delete(`${BASE_URL}/delete/${uniqueId}`)
+}
