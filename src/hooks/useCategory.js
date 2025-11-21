@@ -17,9 +17,13 @@ export const useGetAllCategories = ({ search = "", page = 1, limit = 10 }) => {
 export const useCategoryUpdate = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ uniqueId, paload }) => updateCategoryApi(uniqueId, paload),
+    mutationFn: ({ uniqueId, payload }) => updateCategoryApi(uniqueId, payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast.success("Category updated successfully");
+    },
+    onError: () => {
+      toast.error("Failed to update category");
     },
   });
 };

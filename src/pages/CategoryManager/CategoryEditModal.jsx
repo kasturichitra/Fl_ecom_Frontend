@@ -6,19 +6,17 @@ import EditModalLayout from "../../components/EditModalLayout";
 import { updateCategory } from "../../redux/categorySlice";
 
 import { useGetAllIndustries } from "../../hooks/useIndustry";
+import { useCategoryUpdate } from "../../hooks/useCategory";
+import { updateCategoryApi } from "../../ApiServices/categoryService";
 
 const CategoryEditModal = ({ category, onClose, onSuccess }) => {
-  const dispatch = useDispatch();
-  // const industryTypes = useSelector((state) => state.industryTypes?.items ?? []);
-
   const [searchTerm, setSearchTerm] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const { data: industryTypes } = useGetAllIndustries({
     search: searchTerm,
   });
 
-  const token = localStorage.getItem("token") || "";
-  const tenantId = "tenant123";
+  const { mutateAsync: updateCategory, isPending: isLoading } = useCategoryUpdate();
 
   // ------------------------------
   // MAIN FORM DATA
@@ -34,7 +32,6 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
   });
 
   const [attributes, setAttributes] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
 
   // Load Category Data into Form
   useEffect(() => {
@@ -115,7 +112,6 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
 
     const fd = new FormData();
     fd.append("category_name", formData.category_name);
@@ -138,23 +134,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
       });
     });
 
-    try {
-      await dispatch(
-        updateCategory({
-          uniqueId: category.category_unique_id,
-          formData: fd,
-          token,
-          tenantId,
-        })
-      ).unwrap();
-
-      onSuccess?.();
-      onClose();
-    } catch (err) {
-      alert("Failed to update category: " + err.message);
-    } finally {
-      setIsLoading(false);
-    }
+    await updateCategory({ uniqueId: category.category_unique_id, payload: fd });
   };
 
   // ------------------------------
@@ -176,9 +156,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
         setSearchTerm(searchTerm);
         setShowDropdown(true);
       },
-      results: showDropdown
-        ? formattedIndustryTypes
-        : [],
+      results: showDropdown ? formattedIndustryTypes : [],
       clearResults: () => {
         setSearchTerm("");
         setShowDropdown(false);

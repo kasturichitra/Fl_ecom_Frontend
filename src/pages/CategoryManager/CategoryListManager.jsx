@@ -8,17 +8,12 @@ import CategoryEditModal from "./CategoryEditModal";
 import CategoryManager from "./CategoryManager";
 
 const CategoryListManager = () => {
-  const dispatch = useDispatch();
-
   const [searchTerm, setSearchTerm] = useState("");
   const [editingCategory, setEditingCategory] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
 
   const { data: categories, isLoading: loading, isError: error } = useGetAllCategories({ search: searchTerm });
   const { mutate: deleteCategory, isPending } = useCategoryDelete();
-  const tenantId = "tenant123";
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MTE4YjA3YzRmNjM2OTY1OWRiNTU3ZSIsImlhdCI6MTc2MzExMjQxOCwiZXhwIjoxNzY1NzA0NDE4fQ.SkiLEPCmg4HEQAIMoBT4C-JTS09J8BYR2eivRJxlAas";
 
   const handleEdit = useCallback((category) => {
     setEditingCategory(category);
@@ -30,12 +25,8 @@ const CategoryListManager = () => {
 
   const handleDelete = (targetcategory) => {
     const { category_unique_id } = targetcategory;
-    deleteCategory(
-      { uniqueId: category_unique_id }
-    );
+    deleteCategory({ uniqueId: category_unique_id });
   };
-
-
 
   const columns = [
     {
