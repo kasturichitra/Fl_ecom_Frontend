@@ -1,35 +1,18 @@
 import axios from "axios";
+import axiosInstance from "../axios/axiosInstance.js";
 
-const BASE_URL = "/api/category";
+const BASE_URL = "/category";
 
-
-/**
- * -----------------------------------------
- * 🟦 Create Standard Headers
- * Uses: token ?? "", tenantId ?? ""
- * -----------------------------------------
- */
 const getHeaders = (token, tenantId, isMultipart = false) => ({
   Authorization: `Bearer ${token ?? ""}`,
   "x-tenant-id": tenantId ?? "",
   ...(isMultipart ? { "Content-Type": "multipart/form-data" } : {}),
 });
 
-/**
- * -----------------------------------------
- * 🟦 GET ALL CATEGORIES
- * GET: /category/getAll
- * -----------------------------------------
- */
-export const getAllCategoryApi = async (token, tenantId) => {
-  try {
-    return await axios.get(`${BASE_URL}/`, {
-      headers: getHeaders(token, tenantId),
-    });
-  } catch (err) {
-    console.error("❌ Get All Category API Error:", err?.response?.data ?? err);
-    throw err;
-  }
+export const getAllCategoryApi = async (params = {}) => {
+  const queryString = new URLSearchParams(params).toString();
+  const res = await axiosInstance.get(`${BASE_URL}?${queryString}`);
+  return res;
 };
 
 /**
@@ -44,15 +27,12 @@ export const createCategoryApi = async (formData, token, tenantId) => {
   console.log(token, tenantId);
 
   try {
-    const data =  await axios.post(`${BASE_URL}/`, formData, {
+    const data = await axios.post(`${BASE_URL}/`, formData, {
       headers: getHeaders(token, tenantId, true),
     });
-    console.log(data)
+    console.log(data);
   } catch (err) {
-    console.error(
-      "❌ Create Category API Error:",
-      err?.response?.data ?? err
-    );
+    console.error("❌ Create Category API Error:", err?.response?.data ?? err);
     throw err;
   }
 };
@@ -63,23 +43,10 @@ export const createCategoryApi = async (formData, token, tenantId) => {
  * DELETE: /category/deleteCategory/:id
  * -----------------------------------------
  */
-export const deleteCategoryApi = async (uniqueId, token, tenantId) => {
-  console.log(uniqueId, token, tenantId);
-
-  try {
-    return await axios.delete(
-      `${BASE_URL}/${uniqueId ?? ""}`,
-      {
-        headers: getHeaders(token, tenantId),
-      }
-    );
-  } catch (err) {
-    console.error(
-      "❌ Delete Category API Error:",
-      err?.response?.data ?? err
-    );
-    throw err;
-  }
+export const deleteCategoryApi = async (uniqueId) => {
+  console.log(uniqueId,'category unique id in services file');
+  
+  return await axiosInstance.delete(`${BASE_URL}/${uniqueId ?? ""}`);
 };
 
 /**
@@ -89,25 +56,6 @@ export const deleteCategoryApi = async (uniqueId, token, tenantId) => {
  * -----------------------------------------
  */
 // http://10.1.1.156:3000/category/ME1
-export const updateCategoryApi = async (
-  uniqueId,
-  formData,
-  token,
-  tenantId
-) => {
-  try {
-    return await axios.put(
-      `${BASE_URL}/${uniqueId ?? ""}`,
-      formData,
-      {
-        headers: getHeaders(token, tenantId, true),
-      }
-    );
-  } catch (err) {
-    console.error(
-      "❌ Update Category API Error:",
-      err?.response?.data ?? err
-    );
-    throw err;
-  }
+export const updateCategoryApi = async (uniqueId, payload) => {
+  return await axiosInstance.put(`${BASE_URL}/${uniqueId ?? ""}`, payload);
 };
