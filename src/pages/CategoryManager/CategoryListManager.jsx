@@ -30,12 +30,8 @@ const CategoryListManager = () => {
 
   const handleDelete = (targetcategory) => {
     const { category_unique_id } = targetcategory;
-    deleteCategory(
-      { uniqueId: category_unique_id }
-    );
+    deleteCategory({ uniqueId: category_unique_id });
   };
-
-
 
   const columns = [
     {
