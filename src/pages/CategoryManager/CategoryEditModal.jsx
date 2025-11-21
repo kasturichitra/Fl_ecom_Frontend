@@ -1,13 +1,10 @@
 // src/components/CategoryEditModal.jsx
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 import DynamicForm from "../../components/DynamicForm";
 import EditModalLayout from "../../components/EditModalLayout";
-import { updateCategory } from "../../redux/categorySlice";
 
-import { useGetAllIndustries } from "../../hooks/useIndustry";
 import { useCategoryUpdate } from "../../hooks/useCategory";
-import { updateCategoryApi } from "../../ApiServices/categoryService";
+import { useGetAllIndustries } from "../../hooks/useIndustry";
 
 const CategoryEditModal = ({ category, onClose, onSuccess }) => {
   const [searchTerm, setSearchTerm] = useState("");
