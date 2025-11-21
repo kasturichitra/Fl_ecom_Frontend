@@ -5,9 +5,17 @@ import DynamicForm from "../../components/DynamicForm";
 import EditModalLayout from "../../components/EditModalLayout";
 import { updateCategory } from "../../redux/categorySlice";
 
+import { useGetAllIndustries } from "../../hooks/useIndustry";
+
 const CategoryEditModal = ({ category, onClose, onSuccess }) => {
   const dispatch = useDispatch();
-  const industryTypes = useSelector((state) => state.industryTypes?.items ?? []);
+  // const industryTypes = useSelector((state) => state.industryTypes?.items ?? []);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const { data: industryTypes } = useGetAllIndustries({
+    search: searchTerm,
+  });
 
   const token = localStorage.getItem("token") || "";
   const tenantId = "tenant123";
@@ -153,16 +161,30 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
   // DYNAMIC FORM FIELDS
   // ------------------------------
 
+  // Format accordingly how the dynamic form is expecting
+  const formattedIndustryTypes = industryTypes?.map((i) => ({
+    label: `${i.industry_name} #${i.industry_unique_id}`,
+    value: i.industry_unique_id,
+  }));
+
   const dynamicFields = [
     {
       key: "industry_unique_id",
       label: "Industry",
-      type: "select",
-      required: true,
-      options: industryTypes.map((i) => ({
-        label: `${i.industry_name} #${i.industry_unique_id}`,
-        value: i.industry_unique_id,
-      })),
+      type: "search",
+      onSearch: (searchTerm) => {
+        setSearchTerm(searchTerm);
+        setShowDropdown(true);
+      },
+      results: showDropdown
+        ? formattedIndustryTypes
+        : [],
+      clearResults: () => {
+        setSearchTerm("");
+        setShowDropdown(false);
+      },
+      onSelect: (value) => setFormData((prev) => ({ ...prev, industry_unique_id: value.value })),
+      options: formattedIndustryTypes,
     },
     {
       key: "category_name",
@@ -259,9 +281,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
                 <input
                   placeholder="Description"
                   value={attr.description}
-                  onChange={(e) =>
-                    handleAttributeChange(idx, "description", e.target.value)
-                  }
+                  onChange={(e) => handleAttributeChange(idx, "description", e.target.value)}
                   className="border p-3 rounded-lg"
                 />
               </div>
@@ -270,9 +290,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
                 <input
                   type="checkbox"
                   checked={attr.is_active}
-                  onChange={(e) =>
-                    handleAttributeChange(idx, "is_active", e.target.checked)
-                  }
+                  onChange={(e) => handleAttributeChange(idx, "is_active", e.target.checked)}
                   className="w-5 h-5"
                 />
                 <span>Active Attribute</span>
