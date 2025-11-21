@@ -21,22 +21,22 @@ const DynamicTable = ({
     (col) => !excludeColumns.includes(col.key)
   );
 
-  const sortedData = useMemo(() => {
-    if (!sortable || !sortConfig.key) return data;
-    const sorted = [...data].sort((a, b) => {
-      if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === "asc" ? -1 : 1;
-      if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === "asc" ? 1 : -1;
-      return 0;
-    });
-    return sorted;
-  }, [data, sortConfig, sortable]);
+  // const sortedData = useMemo(() => {
+  //   if (!sortable || !sortConfig.key) return data;
+  //   const sorted = [...data].sort((a, b) => {
+  //     if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === "asc" ? -1 : 1;
+  //     if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === "asc" ? 1 : -1;
+  //     return 0;
+  //   });
+  //   return sorted;
+  // }, [data, sortConfig, sortable]);
 
   const paginatedData = useMemo(() => {
     const start = currentPage * itemsPerPage;
-    return sortedData.slice(start, start + itemsPerPage);
-  }, [sortedData, currentPage, itemsPerPage]);
+    return data?.slice(start, start + itemsPerPage);
+  }, [data, currentPage, itemsPerPage]);
 
-  const pageCount = Math.ceil(sortedData.length / itemsPerPage);
+  const pageCount = Math.ceil(data.length / itemsPerPage);
 
   const handleSort = (key) => {
     if (!sortable) return;

@@ -11,21 +11,25 @@ import {
 import PageLayoutWithTable from "../../components/PageLayoutWithTable";
 import BrandManager from "./BrandManager";
 import BrandEditModal from "./BrandEditModal";
+import { useGetAllBrands } from "../../hooks/useBrand";
 
 const BrandListManager = () => {
   const dispatch = useDispatch();
 
 
-  const { items, loading, error } = useSelector((state) => state.brands);
-  const categories = useSelector((state) => state.categories?.items || []);
+  // const { items, loading, error } = useSelector((state) => state.brands);
+  // const categories = useSelector((state) => state.categories?.items || []);
 
 
-  const brands =
-    Array.isArray(items) &&
-    items.length > 0 &&
-    Array.isArray(items[0].brands)
-      ? items[0].brands
-      : [];
+
+
+
+  // const brands =
+  //   Array.isArray(items) &&
+  //   items.length > 0 &&
+  //   Array.isArray(items[0].brands)
+  //     ? items[0].brands
+  //     : [];
 
   // console.log(brands,"brands")    
 
@@ -45,11 +49,20 @@ const BrandListManager = () => {
   }, [refreshBrands]);
 
 
-  const filteredBrands = brands.filter((brand) =>
-    (brand?.brand_name || "")
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  );
+  // const filteredBrands = brands.filter((brand) =>
+  //   (brand?.brand_name || "")
+  //     .toLowerCase()
+  //     .includes(searchTerm.toLowerCase())
+  // );
+
+
+  const {
+    data: brandsData,
+    isLoading: loading,
+    isError: error,
+  } = useGetAllBrands({
+    searchTerm
+  })
 
 
   const handleEdit = (brand) => {
@@ -110,6 +123,8 @@ const BrandListManager = () => {
     },
   ];
 
+  console.log("brands Data",brandsData)
+
 
   return (
     <>
@@ -120,7 +135,7 @@ const BrandListManager = () => {
         onAddClick={() => setShowAddModal(true)}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
-        tableData={filteredBrands}
+        tableData={brandsData?.brands}
         columns={columns}
         loading={loading}
         onEdit={handleEdit}
