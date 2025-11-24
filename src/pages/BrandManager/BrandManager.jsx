@@ -1,106 +1,119 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createBrand } from "../../redux/brandSlice";
+import { useCreateBrand } from "../../hooks/useBrand";
 
 import DynamicForm from "../../components/DynamicForm";
 import CategorySelector from "../../components/CategorySelector";
 import FormActionButtons from "../../components/FormActionButtons";
-import { objectToFormData } from "../../utils/ObjectToFormData";
-import { useCreateBrand } from "../../hooks/useBrand";
+
+// ------------------------
+// FIXED: Better Object → FormData
+// ------------------------
+const objectToFormData = (obj) => {
+  const formData = new FormData();
+
+  Object.entries(obj).forEach(([key, value]) => {
+    if (value === undefined || value === null) return;
+
+    if (Array.isArray(value)) {
+      value.forEach((item) => formData.append(`${key}[]`, item));
+    } else {
+      formData.append(key, value);
+    }
+  });
+
+  return formData;
+};
 
 const BrandManager = () => {
   const dispatch = useDispatch();
-
   const { mutateAsync: createBrand } = useCreateBrand();
 
   const categories = useSelector((state) => state.categories?.items || []);
-  const token = useSelector((state) => state.auth?.token);
-  const tenantId = "tenant123";
 
   const [form, setForm] = useState({
     categories: [],
     brand_name: "",
     brand_unique_id: "",
     brand_description: "",
-    brand_image: null,
+    brand_image: "",
   });
 
   const [errors, setErrors] = useState({});
-  const [imagePreview, setImagePreview] = useState(null);
+  const [imagePreview, setImagePreview] = useState([]);
 
-  // -----------------------------------------
-  // VALIDATE
-  // -----------------------------------------
+  // -------------------------
+  // Validation
+  // -------------------------
   const validate = () => {
     const e = {};
 
-    if (!form.categories.length) e.categories = "Select at least one category";
-
     if (!form.brand_name.trim()) e.brand_name = "Brand name is required";
-
     if (!form.brand_unique_id.trim()) e.brand_unique_id = "Brand Unique ID is required";
 
-    if (!form.brand_image) e.brand_image = "Brand image is required";
-
     setErrors(e);
-
     return Object.keys(e).length === 0;
   };
 
-  useEffect(() => {
-    console.error("Errors", errors);
-  }, [errors]);
-
-  // -----------------------------------------
-  // SUBMIT BRAND
-  // -----------------------------------------
+  // -------------------------
+  // Submit Handler
+  // -------------------------
   const handleCreateBrand = async (e) => {
     e.preventDefault();
-
     if (!validate()) return;
 
-    console.log(form);
+    const { categories, brand_image, ...rest } = form;
 
-    const { categories, ...rest } = form;
+    // Convert non-image fields
+    const formData = objectToFormData(rest);
 
-    const formData = objectToFormData({ ...rest });
-    console.log("Form categories", form.categories);
+    formData.append("brand_image", brand_image);
+    // Add image files
+    // brand_image.forEach((file) => {
+    // });
 
-    // formData.append("categories", JSON.stringify(form.categories));
+    // Convert category IDs -> JSON string
+    const formattedCategories = `[${categories.map((id) => `"${id}"`).join(", ")}]`;
+    formData.append("categories", formattedCategories);
 
-    form.categories.forEach((id) => {
-      formData.append("categories[]", id);
-    });
+    // console.log("brandImage", form.brand_image);
+    // for (let pair of formData.entries()) {
+    //   console.log(pair[0] + ": ", pair[1]);
+    // }
 
-    // formData.append("categories", finalString);
-
+    // return;
+    // process.exit(1)
     await createBrand(formData);
 
+    // Reset Form
     setForm({
       categories: [],
       brand_name: "",
       brand_unique_id: "",
       brand_description: "",
-      brand_image: null,
+      brand_image: "",
     });
 
-    setImagePreview(null);
+    setImagePreview([]);
   };
 
-  // -----------------------------------------
-  // HANDLE IMAGE
-  // -----------------------------------------
+  // -------------------------
+  // Image Handler
+  // -------------------------
   const handleImageChange = (e) => {
     const file = e.target.files[0];
+
     if (file) {
       setForm({ ...form, brand_image: file });
-      setImagePreview(URL.createObjectURL(file));
+
+      // Preview is an array
+      setImagePreview([URL.createObjectURL(file)]);
     }
   };
 
-  // -----------------------------------------
-  // Dynamic Form Fields
-  // -----------------------------------------
+  // -------------------------
+  // Form Fields
+  // -------------------------
   const formFields = [
     {
       key: "brand_name",
@@ -128,30 +141,30 @@ const BrandManager = () => {
       <h2 className="text-2xl font-bold text-blue-600 text-center mb-6">Add New Brand</h2>
 
       <form onSubmit={handleCreateBrand} className="space-y-6">
-        {/* ---------------- Category Selector -------------- */}
-        <div>
-          <CategorySelector
-            categories={categories}
-            selected={form.categories}
-            setSelected={(values) => setForm({ ...form, categories: values })}
-          />
-          {errors.categories && <p className="text-red-500 text-sm">{errors.categories}</p>}
-        </div>
+        {/* Category Selector */}
+        <CategorySelector
+          categories={categories}
+          selected={form.categories}
+          setSelected={(values) => setForm({ ...form, categories: values })}
+        />
+        {errors.categories && <p className="text-red-500 text-sm">{errors.categories}</p>}
 
-        {/* ---------------- Dynamic Form Fields -------------- */}
+        {/* Dynamic Inputs */}
         <DynamicForm fields={formFields} formData={form} setFormData={setForm} errors={errors} />
 
-        {/* ---------------- Image Upload -------------- */}
+        {/* Image Upload */}
         <div>
           <label className="block text-gray-700 font-semibold mb-1">Brand Image</label>
           <input type="file" accept="image/*" onChange={handleImageChange} className="w-full border p-2 rounded-md" />
 
-          {imagePreview && <img src={imagePreview} className="w-28 h-28 mt-3 rounded-md border object-cover" />}
-
-          {errors.brand_image && <p className="text-red-500 text-sm">{errors.brand_image}</p>}
+          {/* Preview */}
+          {imagePreview.length > 0 &&
+            imagePreview.map((src, index) => (
+              <img key={index} src={src} className="w-28 h-28 mt-3 rounded-md border object-cover" />
+            ))}
         </div>
 
-        {/* ---------------- Action Buttons -------------- */}
+        {/* Action Buttons */}
         <FormActionButtons
           submitLabel="Add Brand"
           onCancel={() => {
@@ -160,9 +173,9 @@ const BrandManager = () => {
               brand_name: "",
               brand_unique_id: "",
               brand_description: "",
-              brand_image: null,
+              brand_image: [],
             });
-            setImagePreview(null);
+            setImagePreview([]);
           }}
         />
       </form>

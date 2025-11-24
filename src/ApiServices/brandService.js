@@ -9,7 +9,11 @@ export const getAllBrandApi = (params = {}) => {
 };
 
 export const createBrandApi = (formData) => {
-  return axiosInstance.post(`${BASE_URL}/`, formData);
+  return axiosInstance.post(`${BASE_URL}/`, formData,{
+    headers : {
+      "Content-Type" : "multipart/form-data"
+    }
+  });
 };
 
 // export const createBrandApi = async (formData, token, tenantId) => {

@@ -22,6 +22,7 @@ const CategorySelector = ({ categories, selected, setSelected }) => {
         }
         className="basic-multi-select"
         classNamePrefix="select"
+        required = {false}
       />
     </div>
   );

@@ -37,7 +37,6 @@ export const useUpdateBrand = (options = {}) => {
   const navigate = useNavigate()
   const queryClient = useQueryClient();
   return useMutation({
-    //  console.log("Updating brand with:", id, data);
     mutationFn: ({ id, data }) => {
       console.log("Updating brand with:", id, data);
       return updateBrandApi(id, data);
@@ -45,12 +44,10 @@ export const useUpdateBrand = (options = {}) => {
     onSuccess: () => {
       toast.success("Brand updated successfully");
       queryClient.invalidateQueries({ queryKey: ["brands"] });
-      // navigate('/brands')
     },
     onError: () => {
       toast.error("Failed to update brand");
     },
-    // onSettled: () => options.onSettled?.(), 
   });
 };
 

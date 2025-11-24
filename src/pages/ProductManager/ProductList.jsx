@@ -163,6 +163,10 @@ const ProductList = () => {
         setShowExcelDropdown={setShowExcelDropdown}
         handleExcelCategorySelect={handleExcelCategorySelect}
         modelInputPlaceholder="Search products name"
+        clearResults={setSearch}//clear search results
+        onChange={setSearch} // update search value
+        onSelect={(item) => setSearch(item.label)}//set the search value
+        onSearch={(val) => setSearch(val)} //trigger API search
         excludeColumns={[
           "_id",
           "__v",
