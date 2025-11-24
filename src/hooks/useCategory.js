@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { deleteCategoryApi, getAllCategoryApi, updateCategoryApi } from "../ApiServices/categoryService.js";
+import { createCategoryApi, deleteCategoryApi, getAllCategoryApi, updateCategoryApi } from "../ApiServices/categoryService.js";
 import toast from "react-hot-toast";
 
 export const useGetAllCategories = ({ search = "", page = 1, limit = 10 }) => {
@@ -11,6 +11,22 @@ export const useGetAllCategories = ({ search = "", page = 1, limit = 10 }) => {
     staleTime: 5 * 60 * 1000, // 5 min  before data is considered stale
     cacheTime: 20 * 60 * 1000, // 20 min after which unused data is garbage collected
     refetchOnMount: false, // do not refetch on component remount
+  });
+};
+
+export const useCreateCategory = (options = {}) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => createCategoryApi(data),
+    onSuccess: () => {
+      toast.success("Category created successfully");
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      options?.onSuccess?.(); 
+    },
+    onError: () => {
+      toast.error("Failed to create category");
+    },
+    onSettled: () => options.onSettled?.(),
   });
 };
 
