@@ -8,7 +8,7 @@ import { fetchProducts, updateProduct } from "../../redux/productSlice";
 
 import PageLayoutWithTable from "../../components/PageLayoutWithTable";
 import { useGetAllCategories } from "../../hooks/useCategory";
-import { useDeleteProduct, useGetAllProducts } from "../../hooks/useProduct";
+import { useDeleteProduct, useDownloadProductExcel, useGetAllProducts } from "../../hooks/useProduct";
 import ProductEditModal from "./ProductEditModal";
 import ProductManager from "./ProductManager";
 
@@ -18,6 +18,8 @@ const ProductList = () => {
   const { pathname } = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [excelSearchTerm, setExcelSearchTerm] = useState("");
+  const [showExcelDropdown, setShowExcelDropdown] = useState(false);
   // const [sugstion,setSuggstion]=useState("")
   const {
     data: products,
@@ -32,12 +34,35 @@ const ProductList = () => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const { data: categories } = useGetAllCategories();
+  const { data: categories } = useGetAllCategories({
+    search: excelSearchTerm,
+  });
 
   const formattedCategories = categories?.map((cat) => ({
     value: cat.category_unique_id,
     label: cat.category_name,
   }));
+
+  const { mutateAsync: downloadExcel } = useDownloadProductExcel();
+
+  const handleExcelCategorySelect = async (item) => {
+    const uniqueId = item.value;
+    const response = await downloadExcel({ uniqueId });
+
+    // console.log("Excel data:", data);
+
+    const blob = new Blob([response.data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = "products.xlsx";
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
 
   // UPDATE handler
   const handleUpdate = async (formData) => {
@@ -144,6 +169,11 @@ const ProductList = () => {
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         excelDropdownData={formattedCategories}
+        excelSearchTerm={excelSearchTerm}
+        setExcelSearchTerm={setExcelSearchTerm}
+        showExcelDropdown={showExcelDropdown}
+        setShowExcelDropdown={setShowExcelDropdown}
+        handleExcelCategorySelect={handleExcelCategorySelect}
         modelInputPlaceholder="Search products name"
         excludeColumns={[
           "_id",

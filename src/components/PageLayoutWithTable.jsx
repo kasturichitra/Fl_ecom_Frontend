@@ -27,9 +27,12 @@ const PageLayoutWithTable = ({
   isOpen,
   setIsOpen,
   modelInputPlaceholder,
-  // sugstion,
-  // setSuggstion,
   excelDropdownData,
+  excelSearchTerm,
+  setExcelSearchTerm,
+  showExcelDropdown,
+  setShowExcelDropdown,
+  handleExcelCategorySelect, 
 }) => {
   return (
     <div className="min-h-screen bg-gray-50 py-10">
@@ -77,6 +80,11 @@ const PageLayoutWithTable = ({
                   setIsOpen={setIsOpen}
                   modelInputPlaceholder={modelInputPlaceholder}
                   data={excelDropdownData}
+                  searchTerm={excelSearchTerm}
+                  setSearchTerm={setExcelSearchTerm}
+                  showDropdown={showExcelDropdown}
+                  setShowDropdown={setShowExcelDropdown}
+                  handleSelect={handleExcelCategorySelect}
                 />
               </div>
             )}

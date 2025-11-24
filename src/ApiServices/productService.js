@@ -24,5 +24,7 @@ export const deleteProductApi = (id) => {
 };
 
 export const downloadProductsExcelApi = (id) => {
-  return axiosInstance.get(`products/excel-template/${id}`);
+  return axiosInstance.get(`products/excel-template/${id}`, {
+    responseType: "blob",
+  });
 };
