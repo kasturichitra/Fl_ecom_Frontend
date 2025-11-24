@@ -4,7 +4,6 @@ import DynamicTable from "./DynamicTable";
 import { FaFileDownload } from "react-icons/fa";
 import DownloadXLExcel from "./xlDownloadModel.jsx";
 
-
 const PageLayoutWithTable = ({
   title,
   subtitle,
@@ -29,12 +28,12 @@ const PageLayoutWithTable = ({
   isOpen,
   setIsOpen,
   modelInputPlaceholder,
-  categories,
-  setSearch,
   search,
-  // sugstion,
-  // setSuggstion,
-  formattedCategories
+  formattedCategories,
+  clearResults,
+  onChange,
+  onSearch,
+  onSelect
 }) => {
   return (
     <div className="min-h-screen bg-gray-50 py-10">
@@ -68,20 +67,28 @@ const PageLayoutWithTable = ({
                   className="bg-white text-indigo-600 cursor-pointer font-bold px-6 py-3 
               rounded-lg shadow-lg hover:bg-indigo-50 transition 
               transform hover:scale-105 flex items-center gap-2"
-              onClick={DownloadHandler}
+                  onClick={DownloadHandler}
                 >
-                  <FaFileDownload  />
+                  <FaFileDownload />
                   XL
                 </button>
               </div>
             )}
-            {
-              pathname === "/productList" && (
-                <div className="ml-4">
-                  <DownloadXLExcel isOpen={isOpen} setIsOpen={setIsOpen} modelInputPlaceholder={modelInputPlaceholder} formattedCategories={formattedCategories} setSearch={setSearch}search={search}  />
-                </div>
-              ) 
-            }
+            {pathname === "/productList" && (
+              <div className="ml-4">
+                <DownloadXLExcel
+                  isOpen={isOpen}
+                  setIsOpen={setIsOpen}
+                  modelInputPlaceholder={modelInputPlaceholder}
+                  search={search}
+                  formattedCategories={formattedCategories}
+                  clearResults={clearResults}
+                  onChange={onChange}
+                  onSearch={onSearch}
+                  onSelect={onSelect}
+                />
+              </div>
+            )}
           </div>
 
           {/* Table */}

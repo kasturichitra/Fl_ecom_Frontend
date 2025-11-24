@@ -19,7 +19,7 @@ const ProductList = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [search, setSearch] = useState(""); // this only search xl download model search
-  // const [sugstion,setSuggstion]=useState("")
+  const [showDropdown, setShowDropdown] = useState(false);
   const {
     data: products,
     isLoading: loading,
@@ -29,12 +29,11 @@ const ProductList = () => {
   });
   const { data: categories } = useGetAllCategories({ search: search });
 
-    const formattedCategories = categories?.map((i) => ({
+  const formattedCategories = categories?.map((i) => ({
     label: `${i.category_name}`,
     value: i.category_unique_id,
   }));
 
-  
   const { mutate: deleteProduct, isPending } = useDeleteProduct();
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -144,10 +143,13 @@ const ProductList = () => {
         DownloadHandler={DownloadHandler}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        formattedCategories={formattedCategories}
-        setSearch={setSearch}
-        search={search}
+        formattedCategories={formattedCategories?.length ? formattedCategories : []}
+        search={search}// this value of the search input
         modelInputPlaceholder="Search products name"
+        clearResults={setSearch}//clear search results
+        onChange={setSearch} // update search value
+        onSelect={(item) => setSearch(item.label)}//set the search value
+        onSearch={(val) => setSearch(val)} //trigger API search
         excludeColumns={[
           "_id",
           "__v",
