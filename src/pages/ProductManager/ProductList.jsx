@@ -13,8 +13,6 @@ import ProductEditModal from "./ProductEditModal";
 import ProductManager from "./ProductManager";
 
 const ProductList = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { pathname } = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -46,7 +44,7 @@ const ProductList = () => {
   const { mutateAsync: updateProduct, isPending: isUpdatingProduct } = useUpdateProduct({
     onSettled: () => {
       setEditingProduct(null);
-    }
+    },
   });
   const { mutateAsync: downloadExcel } = useDownloadProductExcel();
 
@@ -163,10 +161,6 @@ const ProductList = () => {
         setShowExcelDropdown={setShowExcelDropdown}
         handleExcelCategorySelect={handleExcelCategorySelect}
         modelInputPlaceholder="Search products name"
-        clearResults={setSearch}//clear search results
-        onChange={setSearch} // update search value
-        onSelect={(item) => setSearch(item.label)}//set the search value
-        onSearch={(val) => setSearch(val)} //trigger API search
         excludeColumns={[
           "_id",
           "__v",
