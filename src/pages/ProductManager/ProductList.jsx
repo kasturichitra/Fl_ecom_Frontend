@@ -18,7 +18,6 @@ const ProductList = () => {
   const { pathname } = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [search, setSearch] = useState(""); // this only search xl download model search
   // const [sugstion,setSuggstion]=useState("")
   const {
     data: products,
@@ -27,18 +26,18 @@ const ProductList = () => {
   } = useGetAllProducts({
     searchTerm,
   });
-  const { data: categories } = useGetAllCategories({ search: search });
 
-    const formattedCategories = categories?.map((i) => ({
-    label: `${i.category_name}`,
-    value: i.category_unique_id,
-  }));
-
-  
   const { mutate: deleteProduct, isPending } = useDeleteProduct();
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
+
+  const { data: categories } = useGetAllCategories();
+
+  const formattedCategories = categories?.map((cat) => ({
+    value: cat.category_unique_id,
+    label: cat.category_name,
+  }));
 
   // UPDATE handler
   const handleUpdate = async (formData) => {
@@ -144,9 +143,7 @@ const ProductList = () => {
         DownloadHandler={DownloadHandler}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        formattedCategories={formattedCategories}
-        setSearch={setSearch}
-        search={search}
+        excelDropdownData={formattedCategories}
         modelInputPlaceholder="Search products name"
         excludeColumns={[
           "_id",
@@ -180,6 +177,7 @@ const ProductList = () => {
           </div>
         </div>
       )}
+
       {/* EDIT MODAL */}
       {editingProduct && (
         <ProductEditModal

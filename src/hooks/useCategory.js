@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createCategoryApi, deleteCategoryApi, getAllCategoryApi, updateCategoryApi } from "../ApiServices/categoryService.js";
 import toast from "react-hot-toast";
 
-export const useGetAllCategories = ({ search = "", page = 1, limit = 10 }) => {
+export const useGetAllCategories = ({ search = "", page = 1, limit = 10 } = {}) => {
   const queryKey = ["categories", search, page, limit];
   return useQuery({
     queryKey,

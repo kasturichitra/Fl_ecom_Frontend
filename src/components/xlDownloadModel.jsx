@@ -1,8 +1,13 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import SearchDropdown from "./SearchDropdown";
 
-export default function DownloadXLExcel({ isOpen, setIsOpen, modelInputPlaceholder, Data, search, setSearch,formattedCategories }) {
-  console.log(Data, "Data");
+export default function DownloadXLExcel({
+  isOpen,
+  setIsOpen,
+  modelInputPlaceholder,
+  data,
+}) {
+  const [showDropdown, setShowDropdown] = useState(false);
 
   return (
     <>
@@ -17,8 +22,9 @@ export default function DownloadXLExcel({ isOpen, setIsOpen, modelInputPlacehold
           <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Search</h2>
 
-           
-            <SearchDropdown value={search} placeholder={modelInputPlaceholder} results={formattedCategories} onChange={setSearch} onSelect="" />
+            <SearchDropdown
+              
+            />
             {/* Close Button */}
             <button
               onClick={() => setIsOpen(false)}
