@@ -10,7 +10,11 @@ export const getAllProductsApi = (params = {}) => {
 
 // =========================== CREATE (JSON Body) ===========================
 export const createProductApi = (data) => {
-  return axiosInstance.post(`${BASE_URL}`, data);
+  return axiosInstance.post(`${BASE_URL}`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    }
+  });
 };
 
 // =========================== UPDATE (multipart/form-data) ===========================

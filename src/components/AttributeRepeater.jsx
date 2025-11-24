@@ -15,11 +15,12 @@ const AttributeRepeater = ({
     }));
 
     setItems([...dbItems]);
-    if (onChange) onChange([...dbItems]);
+    // Don't call onChange here - this was causing the infinite loop!
   }, [predefined]);
 
   const updateItems = (newItems) => {
     setItems(newItems);
+    // Call onChange to update parent's ref
     if (onChange) onChange(newItems);
   };
 
@@ -35,7 +36,8 @@ const AttributeRepeater = ({
       {
         attribute_code: "",
         value: "",
-        placeholder: "Enter value",
+        placeholderValue: "Enter value",
+        placeholderCode: "Enter attribute code",
         type: "text",
         isPredefined: false, // User-generated
       },

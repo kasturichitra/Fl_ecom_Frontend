@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useDispatch } from "react-redux";
 import DynamicForm from "../../components/DynamicForm";
 import { createProduct } from "../../redux/productSlice";
@@ -6,9 +6,13 @@ import { useGetAllCategories, useGetCategoryByUniqueId } from "../../hooks/useCa
 import { useGetAllBrands } from "../../hooks/useBrand";
 import AttributeRepeater from "../../components/AttributeRepeater";
 import ScrollWrapper from "../../components/ui/ScrollWrapper";
+import FormActionButtons from "../../components/FormActionButtons";
+import { useCreateProduct } from "../../hooks/useProduct";
+import { objectToFormData } from "../../utils/ObjectToFormData";
 
-const ProductManager = () => {
-  const dispatch = useDispatch();
+const ProductManager = ({ onCancel }) => {
+  // Ref to get attributes from AttributeRepeater
+  const attributesRef = useRef([]);
 
   // Required fields only
   const initialForm = {
@@ -28,11 +32,9 @@ const ProductManager = () => {
     stock_quantity: "",
     min_order_limit: "",
     gender: "",
-    product_attributes: [],
   };
 
   const [form, setForm] = useState(initialForm);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [categorySearchTerm, setCategorySearchTerm] = useState("");
   const [brandSearchTerm, setBrandSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -60,13 +62,20 @@ const ProductManager = () => {
   const { data: selectedCategoryItem } = useGetCategoryByUniqueId(selectedCategory);
 
   const selectedCategoryAttributes = selectedCategoryItem?.attributes || [];
-  
+
   const dbAttributes = selectedCategoryAttributes.map((attr) => ({
     attribute_code: attr.code,
     value: "",
     placeholderValue: `Enter ${attr.name}`,
     type: "text",
   }));
+
+  const { mutateAsync: createProduct, isPending: isSubmitting } = useCreateProduct({
+    onSuccess: () => {
+      onCancel();
+      setForm(initialForm);
+    }
+  });
 
   // --------------------------
   // REQUIRED FIELD LIST
@@ -125,21 +134,18 @@ const ProductManager = () => {
       key: "product_description",
       label: "Product Description",
       type: "textarea",
-      required: true,
       placeholder: "e.g., Premium Cotton Bedsheet",
     },
     {
       key: "product_color",
       label: "Product Color",
       type: "text",
-      required: true,
       placeholder: "e.g., White",
     },
     {
       key: "product_size",
       label: "Product Size",
       type: "text",
-      required: true,
       placeholder: "e.g., 3x4",
     },
     {
@@ -207,55 +213,65 @@ const ProductManager = () => {
     },
   ];
 
-  // --------------------------
+  // CALLBACK: Update attributes ref
+  const handleAttributesChange = (attributes) => {
+    attributesRef.current = attributes;
+  };
+
   // FORM SUBMIT
-  // --------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
-    try {
-      const finalData = {
-        ...form,
-        price: parseFloat(form.price),
-        stock_quantity: parseInt(form.stock_quantity),
-        min_order_limit: parseInt(form.min_order_limit),
-      };
+    // Get current attributes from the ref
+    const currentAttributes = attributesRef.current;
 
-      await dispatch(createProduct(finalData)).unwrap();
+    // Filter out empty attributes and format them according to schema
+    const validAttributes = currentAttributes
+      .filter((attr) => attr.attribute_code && attr.value)
+      .map((attr) => ({
+        attribute_code: attr.attribute_code,
+        value: attr.value,
+      }));
 
-      alert("Product created successfully!");
-      setForm(initialForm);
-    } catch (err) {
-      alert("Failed to create product: " + (err.message || "Please try again"));
-    } finally {
-      setIsSubmitting(false);
-    }
+    const { product_image, product_attributes, ...rest } = form;
+
+    const formData = objectToFormData(rest);
+    formData.append("product_image", product_image);
+    formData.append("product_attributes", JSON.stringify(validAttributes));
+
+    await createProduct(formData);
   };
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white rounded-2xl shadow-xl">
-      <ScrollWrapper maxHeight="600px">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800">Create Product</h1>
-          <p className="text-gray-600 mt-2">Fill the required fields to create a product.</p>
-        </div>
+      <ScrollWrapper maxHeight="800px">
+        <form onSubmit={handleSubmit}>
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-800">Create Product</h1>
+            <p className="text-gray-600 mt-2">Fill the required fields to create a product.</p>
+          </div>
 
-        <DynamicForm
-          fields={productFields}
-          formData={form}
-          setFormData={setForm}
-          onSubmit={handleSubmit}
-          buttonLabel={isSubmitting ? "Saving..." : "Create Product"}
-          disabled={isSubmitting}
-          className="grid grid-cols-2 max-w-6xl"
-        />
+          {/* Dynamic Form for all product fields */}
+          <DynamicForm
+            fields={productFields}
+            formData={form}
+            setFormData={setForm}
+            onSubmit={handleSubmit}
+            buttonLabel={isSubmitting ? "Saving..." : "Create Product"}
+            disabled={isSubmitting}
+            className="grid grid-cols-2 max-w-6xl"
+          />
 
-        <AttributeRepeater
-          label="Product Attributes"
-          predefined={dbAttributes}
-          onChange={(values) => console.log("values", values)}
-        />
+          {/* Attribute Repeater - automatically shows DB attributes + allows custom ones */}
+          <AttributeRepeater label="Product Attributes" predefined={dbAttributes} onChange={handleAttributesChange} />
+
+          {/* Form Action Buttons */}
+          <FormActionButtons
+            onCancel={onCancel}
+            submitLabel={isSubmitting ? "Creating..." : "Create Product"}
+            disabled={isSubmitting}
+          />
+        </form>
       </ScrollWrapper>
     </div>
   );

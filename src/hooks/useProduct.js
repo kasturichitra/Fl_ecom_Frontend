@@ -1,5 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { deleteProductApi, downloadProductsExcelApi, getAllProductsApi, updateProductApi } from "../ApiServices/productService";
+import {
+  createProductApi,
+  deleteProductApi,
+  downloadProductsExcelApi,
+  getAllProductsApi,
+  updateProductApi,
+} from "../ApiServices/productService";
 import toast from "react-hot-toast";
 
 export const useGetAllProducts = ({ searchTerm = "", page = 1, limit = 10 } = {}) => {
@@ -10,6 +16,21 @@ export const useGetAllProducts = ({ searchTerm = "", page = 1, limit = 10 } = {}
     select: (res) => res.data.data,
     staleTime: 60 * 1000,
     refetchOnMount: false,
+  });
+};
+
+export const useCreateProduct = (options = {}) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => createProductApi(data),
+    onSuccess: () => {
+      toast.success("Product created successfully");
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      options?.onSuccess?.();
+    },
+    onError: () => {
+      toast.error("Failed to create product");
+    },
   });
 };
 
