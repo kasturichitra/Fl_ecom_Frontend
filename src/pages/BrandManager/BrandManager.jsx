@@ -6,9 +6,7 @@ import DynamicForm from "../../components/DynamicForm";
 import CategorySelector from "../../components/CategorySelector";
 import FormActionButtons from "../../components/FormActionButtons";
 
-// ------------------------
-// FIXED: Better Object → FormData
-// ------------------------
+
 const objectToFormData = (obj) => {
   const formData = new FormData();
 
@@ -42,9 +40,7 @@ const BrandManager = () => {
   const [errors, setErrors] = useState({});
   const [imagePreview, setImagePreview] = useState([]);
 
-  // -------------------------
-  // Validation
-  // -------------------------
+
   const validate = () => {
     const e = {};
 
@@ -55,34 +51,21 @@ const BrandManager = () => {
     return Object.keys(e).length === 0;
   };
 
-  // -------------------------
-  // Submit Handler
-  // -------------------------
+
   const handleCreateBrand = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
     const { categories, brand_image, ...rest } = form;
 
-    // Convert non-image fields
+
     const formData = objectToFormData(rest);
 
     formData.append("brand_image", brand_image);
-    // Add image files
-    // brand_image.forEach((file) => {
-    // });
 
-    // Convert category IDs -> JSON string
     const formattedCategories = `[${categories.map((id) => `"${id}"`).join(", ")}]`;
     formData.append("categories", formattedCategories);
 
-    // console.log("brandImage", form.brand_image);
-    // for (let pair of formData.entries()) {
-    //   console.log(pair[0] + ": ", pair[1]);
-    // }
-
-    // return;
-    // process.exit(1)
     await createBrand(formData);
 
     // Reset Form
@@ -97,23 +80,17 @@ const BrandManager = () => {
     setImagePreview([]);
   };
 
-  // -------------------------
-  // Image Handler
-  // -------------------------
   const handleImageChange = (e) => {
     const file = e.target.files[0];
 
     if (file) {
       setForm({ ...form, brand_image: file });
 
-      // Preview is an array
       setImagePreview([URL.createObjectURL(file)]);
     }
   };
 
-  // -------------------------
-  // Form Fields
-  // -------------------------
+
   const formFields = [
     {
       key: "brand_name",

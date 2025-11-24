@@ -13,33 +13,11 @@ import { useDeleteBrand, useGetAllBrands, useUpdateBrand } from "../../hooks/use
 const BrandListManager = () => {
   const dispatch = useDispatch();
 
-  // console.log("useHook")
-
-  // console.log("data")
-
-  // const { items, loading, error } = useSelector((state) => state.brands);
-  // const categories = useSelector((state) => state.categories?.items || []);
-
-  // const brands =
-  //   Array.isArray(items) &&
-  //   items.length > 0 &&
-  //   Array.isArray(items[0].brands)
-  //     ? items[0].brands
-  //     : [];
-
-  // console.log(brands,"brands")
-
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
 
-  // const { mutateAsync: updateBrand, isPending: isUpdating } = useUpdateBrand({
-  //   // onSettled: () => editingBrand(false),
-  // });
-
-  const {mutateAsync : deleteBrand} = useDeleteBrand()
-
-
+  const { mutateAsync: deleteBrand } = useDeleteBrand();
 
   const token = localStorage.getItem("token");
   const tenantId = "tenant123";
@@ -52,12 +30,6 @@ const BrandListManager = () => {
     refreshBrands();
   }, [refreshBrands]);
 
-  // const filteredBrands = brands.filter((brand) =>
-  //   (brand?.brand_name || "")
-  //     .toLowerCase()
-  //     .includes(searchTerm.toLowerCase())
-  // );
-
   const {
     data: brandsData,
     isLoading: loading,
@@ -66,12 +38,6 @@ const BrandListManager = () => {
     searchTerm,
   });
 
-  
-
-  // const handleEdit = (brand) => {
-  //   setEditingBrand(brand);
-  // };
-
   const handleEdit = async (brand) => {
     setEditingBrand(brand);
   };
@@ -79,17 +45,7 @@ const BrandListManager = () => {
   const handleDelete = async (brand) => {
     if (!window.confirm(`Delete brand "${brand.brand_name}"?`)) return;
 
-    // await dispatch(
-    //   deleteBrand({
-    //     uniqueId: brand.brand_unique_id,
-    //     token,
-    //     tenantId,
-    //   })
-    // );
-  
-    await deleteBrand(brand.brand_unique_id)
-
-    // refreshBrands();
+    await deleteBrand(brand.brand_unique_id);
   };
 
   const handleUpdate = async () => {
@@ -102,7 +58,6 @@ const BrandListManager = () => {
 
     console.log("before update");
 
-    // console.log()
     await updateBrand({
       id: brand._id,
       data: fd,
@@ -195,7 +150,7 @@ bg-white/20 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg
             >
               ×
             </button>
-            <BrandEditModal brand={editingBrand} onClose={handleCloseEditModal} setEditingBrand = {setEditingBrand} />
+            <BrandEditModal brand={editingBrand} onClose={handleCloseEditModal} setEditingBrand={setEditingBrand} />
           </div>
         </div>
       )}

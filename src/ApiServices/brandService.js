@@ -9,39 +9,21 @@ export const getAllBrandApi = (params = {}) => {
 };
 
 export const createBrandApi = (formData) => {
-  return axiosInstance.post(`${BASE_URL}/`, formData,{
-    headers : {
-      "Content-Type" : "multipart/form-data"
-    }
+  return axiosInstance.post(`${BASE_URL}/`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
   });
 };
 
-// export const createBrandApi = async (formData, token, tenantId) => {
-//   try {
-//     return await axios.post(`${BASE_URL}/`, formData, {
-//       headers: getHeaders(token, tenantId, true),
-//     });
-//   } catch (err) {
-//     console.error("❌ Create Brand API Error:", err.response?.data ?? err);
-//     throw err;
-//   }
-// };
-
 export const updateBrandApi = async (uniqueId, formData) => {
-  return await axiosInstance.put(`${BASE_URL}/${uniqueId}`, formData);
+  return await axiosInstance.put(`${BASE_URL}/${uniqueId}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
-// export const deleteBrandApi = async (uniqueId, token, tenantId) => {
-//   try {
-//     return await axios.delete(`${BASE_URL}/delete/${uniqueId}`, {
-//       headers: getHeaders(token, tenantId),
-//     });
-//   } catch (err) {
-//     console.error("❌ Delete Brand API Error:", err.response?.data ?? err);
-//     throw err;
-//   }
-// };
-
-export const deleteBrandApi = async(uniqueId) =>{
-  return await axiosInstance.delete(`${BASE_URL}/delete/${uniqueId}`)
-}
+export const deleteBrandApi = async (uniqueId) => {
+  return await axiosInstance.delete(`${BASE_URL}/delete/${uniqueId}`);
+};

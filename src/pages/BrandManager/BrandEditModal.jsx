@@ -6,7 +6,7 @@ import EditModalLayout from "../../components/EditModalLayout";
 import DynamicForm from "../../components/DynamicForm";
 import { useUpdateBrand } from "../../hooks/useBrand";
 
-const BrandEditModal = ({ brand, onClose, setEditingBrand ,onSuccess, onSubmit }) => {
+const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }) => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.categories.items || []);
   const { token, tenantId } = useSelector((state) => state.auth || {});
@@ -23,8 +23,11 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand ,onSuccess, onSubmit }
     brand_name: brand.brand_name || "",
     brand_unique_id: brand.brand_unique_id || "",
     brand_description: brand.brand_description || "",
-    brand_image: null,
+    brand_image: "",
   });
+
+  console.log(form.brand_image,"image")
+
 
   const [imagePreview, setImagePreview] = useState("");
   const [errors, setErrors] = useState({});
@@ -33,7 +36,8 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand ,onSuccess, onSubmit }
   // Load initial image
   useEffect(() => {
     if (brand.brand_image) {
-      const fullUrl = `${process.env.REACT_APP_API_URL}/${brand.brand_image.replace(/\\/g, "/")}`;
+      // const fullUrl = `${process.env.REACT_APP_API_URL}/${brand.brand_image.replace(/\\/g, "/")}`;
+      const fullUrl = ``;
       setImagePreview(fullUrl);
     }
   }, [brand.brand_image]);
@@ -90,9 +94,7 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand ,onSuccess, onSubmit }
         data: fd,
       });
 
-      setEditingBrand(null)
-
-
+      setEditingBrand(null);
 
       console.log("after update");
 
