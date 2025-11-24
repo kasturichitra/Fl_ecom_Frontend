@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createCategoryApi, deleteCategoryApi, getAllCategoryApi, updateCategoryApi } from "../ApiServices/categoryService.js";
+import { createCategoryApi, deleteCategoryApi, getAllCategoryApi, getCategoryByUniqueIdApi, updateCategoryApi } from "../ApiServices/categoryService.js";
 import toast from "react-hot-toast";
 
 export const useGetAllCategories = ({ search = "", page = 1, limit = 10 } = {}) => {
@@ -8,11 +8,24 @@ export const useGetAllCategories = ({ search = "", page = 1, limit = 10 } = {}) 
     queryKey,
     queryFn: () => getAllCategoryApi({ search, page, limit }),
     select: (res) => res.data.data,
-    staleTime: 5 * 60 * 1000, // 5 min  before data is considered stale
-    cacheTime: 20 * 60 * 1000, // 20 min after which unused data is garbage collected
-    refetchOnMount: false, // do not refetch on component remount
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 20 * 60 * 1000, 
+    refetchOnMount: false, 
   });
 };
+
+export const useGetCategoryByUniqueId = (uniqueId) => {
+  const queryKey = ["category", uniqueId];
+  return useQuery({
+    queryKey,
+    queryFn: () => getCategoryByUniqueIdApi(uniqueId),
+    select: (res) => res.data.data,
+    enabled: !!uniqueId,
+    staleTime: 5 * 60 * 1000,
+    cacheTime: 20 * 60 * 1000, 
+    refetchOnMount: false, 
+  });
+}
 
 export const useCreateCategory = (options = {}) => {
   const queryClient = useQueryClient();

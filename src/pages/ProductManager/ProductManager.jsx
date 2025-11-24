@@ -2,8 +2,10 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import DynamicForm from "../../components/DynamicForm";
 import { createProduct } from "../../redux/productSlice";
-import { useGetAllCategories } from "../../hooks/useCategory";
+import { useGetAllCategories, useGetCategoryByUniqueId } from "../../hooks/useCategory";
 import { useGetAllBrands } from "../../hooks/useBrand";
+import AttributeRepeater from "../../components/AttributeRepeater";
+import ScrollWrapper from "../../components/ui/ScrollWrapper";
 
 const ProductManager = () => {
   const dispatch = useDispatch();
@@ -33,7 +35,9 @@ const ProductManager = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [categorySearchTerm, setCategorySearchTerm] = useState("");
   const [brandSearchTerm, setBrandSearchTerm] = useState("");
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [showBrandDropdown, setShowBrandDropdown] = useState(false);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
 
   const { data: categories } = useGetAllCategories({
     search: categorySearchTerm,
@@ -42,11 +46,6 @@ const ProductManager = () => {
   const { data: brands } = useGetAllBrands({
     searchTerm: brandSearchTerm,
   });
-
-  console.log("Brand search term: ", brandSearchTerm);
-
-  console.log("brands", brands);
-  console.log("categories", categories);
 
   const formattedCategories = categories?.map((cat) => ({
     value: cat.category_unique_id,
@@ -58,52 +57,66 @@ const ProductManager = () => {
     label: brand.brand_name,
   }));
 
+  const { data: selectedCategoryItem } = useGetCategoryByUniqueId(selectedCategory);
+
+  const selectedCategoryAttributes = selectedCategoryItem?.attributes || [];
+  
+  const dbAttributes = selectedCategoryAttributes.map((attr) => ({
+    attribute_code: attr.code,
+    value: "",
+    placeholderValue: `Enter ${attr.name}`,
+    type: "text",
+  }));
+
   // --------------------------
   // REQUIRED FIELD LIST
   // --------------------------
   const productFields = [
     {
       key: "category_unique_id",
-      label: "Category Unique ID",
+      label: "Category Unique ID *",
       type: "search",
       onSearch: (searchTerm) => {
         setCategorySearchTerm(searchTerm);
-        setShowDropdown(true);
+        setShowCategoryDropdown(true);
       },
-      results: showDropdown ? formattedCategories : [],
+      results: showCategoryDropdown ? formattedCategories : [],
       clearResults: () => {
         setCategorySearchTerm("");
-        setShowDropdown(false);
+        setShowCategoryDropdown(false);
       },
-      onSelect: (value) => setForm((prev) => ({ ...prev, category_unique_id: value.value })),
+      onSelect: (value) => {
+        setForm((prev) => ({ ...prev, category_unique_id: value.value }));
+        setSelectedCategory(value.value);
+      },
       placeholder: "e.g., HF1",
     },
     {
       key: "brand_unique_id",
-      label: "Brand Unique ID",
+      label: "Brand Unique ID *",
       type: "search",
       onSearch: (searchTerm) => {
         setBrandSearchTerm(searchTerm);
-        setShowDropdown(true);
+        setShowBrandDropdown(true);
       },
-      results: showDropdown ? formattedBrands : [],
+      results: showBrandDropdown ? formattedBrands : [],
       clearResults: () => {
         setBrandSearchTerm("");
-        setShowDropdown(false);
+        setShowBrandDropdown(false);
       },
       onSelect: (value) => setForm((prev) => ({ ...prev, brand_unique_id: value.value })),
       placeholder: "e.g., apple1",
     },
     {
       key: "product_unique_id",
-      label: "Product Unique ID",
+      label: "Product Unique ID *",
       type: "text",
       required: true,
       placeholder: "e.g., HF1-002",
     },
     {
       key: "product_name",
-      label: "Product Name",
+      label: "Product Name *",
       type: "text",
       required: true,
       placeholder: "e.g., Premium Cotton Bedsheet",
@@ -131,7 +144,7 @@ const ProductManager = () => {
     },
     {
       key: "price",
-      label: "Price",
+      label: "Price *",
       type: "number",
       required: true,
       min: 0,
@@ -163,21 +176,21 @@ const ProductManager = () => {
     },
     {
       key: "stock_quantity",
-      label: "Stock Quantity",
+      label: "Stock Quantity *",
       type: "number",
       required: true,
       min: 0,
     },
     {
       key: "min_order_limit",
-      label: "Minimum Order Limit",
+      label: "Minimum Order Limit *",
       type: "number",
       required: true,
       min: 1,
     },
     {
       key: "gender",
-      label: "Gender",
+      label: "Gender *",
       type: "select",
       required: true,
       options: [
@@ -188,13 +201,9 @@ const ProductManager = () => {
     },
     {
       key: "product_image",
-      label: "Product Image",
+      label: "Product Image *",
       type: "file",
       required: true,
-    },
-    {
-      key: "product_attributes",
-      label: "Product Attributes",
     },
   ];
 
@@ -226,19 +235,28 @@ const ProductManager = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white rounded-2xl shadow-xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Update Product</h1>
-        <p className="text-gray-600 mt-2">Fill the required fields to create a product.</p>
-      </div>
+      <ScrollWrapper maxHeight="600px">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">Create Product</h1>
+          <p className="text-gray-600 mt-2">Fill the required fields to create a product.</p>
+        </div>
 
-      <DynamicForm
-        fields={productFields}
-        form={form}
-        setForm={setForm}
-        onSubmit={handleSubmit}
-        buttonLabel={isSubmitting ? "Saving..." : "Create Product"}
-        disabled={isSubmitting}
-      />
+        <DynamicForm
+          fields={productFields}
+          formData={form}
+          setFormData={setForm}
+          onSubmit={handleSubmit}
+          buttonLabel={isSubmitting ? "Saving..." : "Create Product"}
+          disabled={isSubmitting}
+          className="grid grid-cols-2 max-w-6xl"
+        />
+
+        <AttributeRepeater
+          label="Product Attributes"
+          predefined={dbAttributes}
+          onChange={(values) => console.log("values", values)}
+        />
+      </ScrollWrapper>
     </div>
   );
 };
