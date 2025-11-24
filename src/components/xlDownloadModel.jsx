@@ -1,8 +1,18 @@
 import React, { useState } from "react";
 import SearchDropdown from "./SearchDropdown";
 
-export default function DownloadXLExcel({ isOpen, setIsOpen, modelInputPlaceholder, Data, search, setSearch,formattedCategories }) {
-  console.log(Data, "Data");
+export default function DownloadXLExcel({
+  isOpen,
+  setIsOpen,
+  modelInputPlaceholder,
+  search,
+  formattedCategories,
+  clearResults,
+  onChange,
+  onSearch,
+  onSelect,
+}) {
+
 
   return (
     <>
@@ -17,8 +27,15 @@ export default function DownloadXLExcel({ isOpen, setIsOpen, modelInputPlacehold
           <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
             <h2 className="text-2xl font-bold text-gray-800 mb-4">Search</h2>
 
-           
-            <SearchDropdown value={search} placeholder={modelInputPlaceholder} results={formattedCategories} onChange={setSearch} onSelect="" />
+            <SearchDropdown
+              value={search}//value of the search input
+              placeholder={modelInputPlaceholder}//placeholder text
+              results={formattedCategories}//results to be displayed in the dropdown
+              onChange={onChange} // update search value
+              onSearch={onSearch} // trigger API search
+              onSelect={onSelect} //set the search value
+              clearResults={clearResults} //clear search results
+            />
             {/* Close Button */}
             <button
               onClick={() => setIsOpen(false)}
