@@ -116,7 +116,7 @@ const ProductManager = () => {
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white rounded-2xl shadow-xl">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Add New Product</h1>
+        <h1 className="text-3xl font-bold text-gray-800">Update Product</h1>
         <p className="text-gray-600 mt-2">
           Fill the required fields to create a product.
         </p>

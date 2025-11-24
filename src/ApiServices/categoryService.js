@@ -1,13 +1,6 @@
-import axios from "axios";
 import axiosInstance from "../axios/axiosInstance.js";
 
 const BASE_URL = "/category";
-
-const getHeaders = (token, tenantId, isMultipart = false) => ({
-  Authorization: `Bearer ${token ?? ""}`,
-  "x-tenant-id": tenantId ?? "",
-  ...(isMultipart ? { "Content-Type": "multipart/form-data" } : {}),
-});
 
 export const getAllCategoryApi = async (params = {}) => {
   const queryString = new URLSearchParams(params).toString();
@@ -21,20 +14,12 @@ export const getAllCategoryApi = async (params = {}) => {
  * POST: /category/addCategory
  * -----------------------------------------
  */
-export const createCategoryApi = async (formData, token, tenantId) => {
-  const obj = Object.fromEntries(formData.entries());
-  console.log(obj);
-  console.log(token, tenantId);
-
-  try {
-    const data = await axios.post(`${BASE_URL}/`, formData, {
-      headers: getHeaders(token, tenantId, true),
-    });
-    console.log(data);
-  } catch (err) {
-    console.error("❌ Create Category API Error:", err?.response?.data ?? err);
-    throw err;
-  }
+export const createCategoryApi = async (formData) => {
+  return await axiosInstance.post(`${BASE_URL}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    }
+  });
 };
 
 /**
@@ -44,8 +29,6 @@ export const createCategoryApi = async (formData, token, tenantId) => {
  * -----------------------------------------
  */
 export const deleteCategoryApi = async (uniqueId) => {
-  console.log(uniqueId,'category unique id in services file');
-  
   return await axiosInstance.delete(`${BASE_URL}/${uniqueId ?? ""}`);
 };
 

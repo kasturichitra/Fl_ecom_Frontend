@@ -1,22 +1,25 @@
 // src/pages/ProductManager/ProductList.jsx
 
-import React, { useState, useEffect, useMemo, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useState } from "react";
+import { useDispatch } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import { fetchProducts, deleteProduct, updateProduct } from "../../redux/productSlice";
+import { fetchProducts, updateProduct } from "../../redux/productSlice";
 
 import PageLayoutWithTable from "../../components/PageLayoutWithTable";
-import ProductManager from "./ProductManager";
+import { useGetAllCategories } from "../../hooks/useCategory";
+import { useDeleteProduct, useGetAllProducts } from "../../hooks/useProduct";
 import ProductEditModal from "./ProductEditModal";
-import { useGetAllProducts } from "../../hooks/useProduct";
+import ProductManager from "./ProductManager";
 
 const ProductList = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const { pathname } = useLocation();
+  const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [search, setSearch] = useState(""); // this only search xl download model search
+  const [showDropdown, setShowDropdown] = useState(false);
   const {
     data: products,
     isLoading: loading,
@@ -24,7 +27,14 @@ const ProductList = () => {
   } = useGetAllProducts({
     searchTerm,
   });
+  const { data: categories } = useGetAllCategories({ search: search });
 
+  const formattedCategories = categories?.map((i) => ({
+    label: `${i.category_name}`,
+    value: i.category_unique_id,
+  }));
+
+  const { mutate: deleteProduct, isPending } = useDeleteProduct();
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -61,21 +71,14 @@ const ProductList = () => {
     setEditingProduct(item);
   }, []);
 
-  // DELETE handler
-  const handleDelete = useCallback(
-    (item) => {
-      if (window.confirm(`Delete ${item.product_name}?`)) {
-        dispatch(
-          deleteProduct({
-            uniqueId: item.product_unique_id,
-            token,
-            tenantId,
-          })
-        );
-      }
-    },
-    [dispatch]
-  );
+  const handleDelete = (targetProduct) => {
+    const { product_unique_id } = targetProduct;
+    deleteProduct({ uniqueId: product_unique_id });
+  };
+
+  const DownloadHandler = () => {
+    setIsOpen((prev) => !prev);
+  };
 
   // TABLE COLUMNS
   const columns = [
@@ -136,6 +139,17 @@ const ProductList = () => {
         onDelete={handleDelete}
         error={error}
         itemsPerPage={8}
+        pathname={pathname}
+        DownloadHandler={DownloadHandler}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        formattedCategories={formattedCategories?.length ? formattedCategories : []}
+        search={search}// this value of the search input
+        modelInputPlaceholder="Search products name"
+        clearResults={setSearch}//clear search results
+        onChange={setSearch} // update search value
+        onSelect={(item) => setSearch(item.label)}//set the search value
+        onSearch={(val) => setSearch(val)} //trigger API search
         excludeColumns={[
           "_id",
           "__v",
@@ -168,7 +182,6 @@ const ProductList = () => {
           </div>
         </div>
       )}
-
       {/* EDIT MODAL */}
       {editingProduct && (
         <ProductEditModal
