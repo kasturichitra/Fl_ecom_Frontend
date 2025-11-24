@@ -8,7 +8,7 @@ import { fetchProducts, updateProduct } from "../../redux/productSlice";
 
 import PageLayoutWithTable from "../../components/PageLayoutWithTable";
 import { useGetAllCategories } from "../../hooks/useCategory";
-import { useDeleteProduct, useDownloadProductExcel, useGetAllProducts } from "../../hooks/useProduct";
+import { useDeleteProduct, useDownloadProductExcel, useGetAllProducts, useUpdateProduct } from "../../hooks/useProduct";
 import ProductEditModal from "./ProductEditModal";
 import ProductManager from "./ProductManager";
 
@@ -32,17 +32,22 @@ const ProductList = () => {
   const { mutate: deleteProduct, isPending } = useDeleteProduct();
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
-  const [isUpdating, setIsUpdating] = useState(false);
 
   const { data: categories } = useGetAllCategories({
     search: excelSearchTerm,
   });
 
+  // Format as { value: id, label: name } for the select dropdown component
   const formattedCategories = categories?.map((cat) => ({
     value: cat.category_unique_id,
     label: cat.category_name,
   }));
 
+  const { mutateAsync: updateProduct, isPending: isUpdatingProduct } = useUpdateProduct({
+    onSettled: () => {
+      setEditingProduct(null);
+    }
+  });
   const { mutateAsync: downloadExcel } = useDownloadProductExcel();
 
   const handleExcelCategorySelect = async (item) => {
@@ -67,28 +72,11 @@ const ProductList = () => {
   // UPDATE handler
   const handleUpdate = async (formData) => {
     if (!editingProduct) return;
-    setIsUpdating(true);
 
-    try {
-      await dispatch(
-        updateProduct({
-          originalId: editingProduct.product_unique_id,
-          updatedData: formData,
-          token,
-          tenantId,
-        })
-      ).unwrap();
-
-      await dispatch(fetchProducts({ token, tenantId }));
-
-      navigate("/productList");
-      setEditingProduct(null);
-    } catch (err) {
-      console.error(err);
-      alert("Update failed");
-    } finally {
-      setIsUpdating(false);
-    }
+    await updateProduct({
+      id: editingProduct.product_unique_id,
+      data: formData,
+    });
   };
 
   // EDIT handler

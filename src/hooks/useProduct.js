@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { deleteProductApi, downloadProductsExcelApi, getAllProductsApi } from "../ApiServices/productService";
+import { deleteProductApi, downloadProductsExcelApi, getAllProductsApi, updateProductApi } from "../ApiServices/productService";
 import toast from "react-hot-toast";
 
 export const useGetAllProducts = ({ searchTerm = "", page = 1, limit = 10 } = {}) => {
@@ -28,6 +28,21 @@ export const useDeleteProduct = () => {
         duration: 3000, // 3 second
       });
     },
+  });
+};
+
+export const useUpdateProduct = (options = {}) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ uniqueId, payload }) => updateProductApi(uniqueId, payload),
+    onSuccess: () => {
+      toast.success("Product updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+    },
+    onError: () => {
+      toast.error("Failed to update product");
+    },
+    onSettled: () => options.onSettled?.(),
   });
 };
 
