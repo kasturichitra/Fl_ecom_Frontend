@@ -5,6 +5,7 @@ import DynamicForm from "../../components/DynamicForm";
 import FormActionButtons from "../../components/FormActionButtons";
 import { createCategory } from "../../redux/categorySlice";
 import { useGetAllIndustries } from "../../hooks/useIndustry";
+import { useCreateCategory } from "../../hooks/useCategory";
 
 const CategoryManager = ({ onCancel }) => {
   const dispatch = useDispatch();
@@ -26,25 +27,20 @@ const CategoryManager = ({ onCancel }) => {
   const [attributes, setAttributes] = useState([{ name: "", code: "", description: "", units: "", is_active: true }]);
 
   const [showAttributes, setShowAttributes] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("");
-  const [failedMsg, setFailedMsg] = useState("");
 
-  const tenantId = "tenant123";
-  const token = localStorage.getItem("token") || "your-jwt-token";
-
-  // useEffect(() => {
-  //   if (successMsg) {
-  //     const timer = setTimeout(() => onCancel?.(), 1500);
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [successMsg, onCancel]);
-
-  // useEffect(() => {
-  //   if (failedMsg) {
-  //     const timer = setTimeout(() => setFailedMsg(""), 4000);
-  //     return () => clearTimeout(timer);
-  //   }
-  // }, [failedMsg]);
+  const { mutateAsync: createCategory } = useCreateCategory({
+    onSuccess: () => {
+      setForm({
+        industry_unique_id: "",
+        category_unique_id: "",
+        category_name: "",
+        image: null,
+        is_active: true,
+      });
+      setAttributes([{ name: "", code: "", description: "", units: "", is_active: true }]);
+      setShowAttributes(false);
+    },
+  });
 
   const addAttribute = () => {
     setAttributes((prev) => [...prev, { name: "", code: "", description: "", units: "", is_active: true }]);
@@ -62,15 +58,14 @@ const CategoryManager = ({ onCancel }) => {
     setAttributes((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSuccessMsg("");
-    setFailedMsg("");
 
     const formData = new FormData();
     formData.append("industry_unique_id", form.industry_unique_id);
     formData.append("category_unique_id", form.category_unique_id);
     formData.append("category_name", form.category_name);
+    console.log("Form image", form.image);
     if (form.image) formData.append("image", form.image);
     formData.append("is_active", form.is_active);
     formData.append("created_by", "Admin");
@@ -90,24 +85,7 @@ const CategoryManager = ({ onCancel }) => {
       });
     }
 
-    dispatch(createCategory({ formData, token, tenantId }))
-      .unwrap()
-      .then(() => {
-        setSuccessMsg(`Category "${form.category_name}" created successfully!`);
-        setForm({
-          industry_unique_id: "",
-          category_unique_id: "",
-          category_name: "",
-          image: null,
-          is_active: true,
-        });
-        setAttributes([{ name: "", code: "", description: "", units: "", is_active: true }]);
-        setShowAttributes(false);
-      })
-      .catch((err) => {
-        const msg = err?.response?.data?.message || err?.message || "Failed to create category.";
-        setFailedMsg(msg);
-      });
+    await createCategory(formData);
   };
 
   const formattedIndustryTypes = industryTypes?.map((i) => ({
@@ -280,17 +258,6 @@ const CategoryManager = ({ onCancel }) => {
           {/* ⬇⬇⬇ UPDATED SECTION — ONLY CHANGE YOU ASKED FOR ⬇⬇⬇ */}
           <FormActionButtons submitLabel="Create Category" onCancel={onCancel} />
           {/* ⬆⬆⬆ NOTHING ELSE MODIFIED ⬆⬆⬆ */}
-
-          {successMsg && (
-            <div className="p-4 bg-green-100 border border-green-400 text-green-800 rounded-lg text-center font-semibold animate-fade">
-              {successMsg}
-            </div>
-          )}
-          {failedMsg && (
-            <div className="p-4 bg-red-100 border border-red-400 text-red-800 rounded-lg text-center font-semibold">
-              {failedMsg}
-            </div>
-          )}
         </form>
       </div>
     </div>
