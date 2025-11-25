@@ -79,6 +79,7 @@ const ProductList = () => {
 
   // EDIT handler
   const handleEdit = useCallback((item) => {
+    console.log("Item coming to handle Edit in product list", item);
     setEditingProduct(item);
   }, []);
 

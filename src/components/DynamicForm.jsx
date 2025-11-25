@@ -15,11 +15,10 @@ const DynamicForm = ({ fields = [], formData, setFormData, className = "" }) => 
 
           {field.type === "text" && (
             <input
-              required
               type="text"
               value={formData[field.key] || ""}
               placeholder={field.placeholder}
-              // required={true}
+              required={field.required}
               disabled={field.disabled}
               onChange={(e) => handleChange(field.key, e.target.value)}
               className={`border p-3 rounded-lg w-full ${field.disabled ? "bg-gray-100 cursor-not-allowed" : ""}`}
@@ -106,7 +105,6 @@ const DynamicForm = ({ fields = [], formData, setFormData, className = "" }) => 
               onSearch={field.onSearch}
               onSelect={field.onSelect}
               clearResults={field.clearResults}
-              // required={field.required}
             />
           )}
         </div>
