@@ -152,7 +152,7 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
           Categories <span className="text-red-500">*</span>
         </label>
         <CategorySelector
-          categories={categoriesData}
+          categories={categoriesData?.data}
           selected={form?.categories}
           setSelected={(vals) => setForm({ ...form, categories: vals })}
         />
