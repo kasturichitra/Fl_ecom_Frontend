@@ -8,7 +8,7 @@ import { fetchProducts, updateProduct } from "../../redux/productSlice";
 
 import PageLayoutWithTable from "../../components/PageLayoutWithTable";
 import { useGetAllCategories } from "../../hooks/useCategory";
-import { useDeleteProduct, useDownloadProductExcel, useGetAllProducts, useUpdateProduct } from "../../hooks/useProduct";
+import { useCreateBulkProducts, useDeleteProduct, useDownloadProductExcel, useGetAllProducts, useUpdateProduct } from "../../hooks/useProduct";
 import ProductEditModal from "./ProductEditModal";
 import ProductManager from "./ProductManager";
 
@@ -46,7 +46,12 @@ const ProductList = () => {
       setEditingProduct(null);
     },
   });
-  const { mutateAsync: downloadExcel } = useDownloadProductExcel();
+  const { mutateAsync: downloadExcel } = useDownloadProductExcel({
+    onSuccess: () => {
+      setIsOpen(false);
+    },
+  });
+  const { mutateAsync: createBulkProducts } = useCreateBulkProducts();
 
   const handleExcelCategorySelect = async (item) => {
     const uniqueId = item.value;
@@ -63,6 +68,13 @@ const ProductList = () => {
     a.download = "products.xlsx";
     a.click();
     window.URL.revokeObjectURL(url);
+  };
+
+  const handleExcelUpload = async (e) => {
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append("file", file);
+    await createBulkProducts(formData);
   };
 
   // UPDATE handler
@@ -150,6 +162,7 @@ const ProductList = () => {
         itemsPerPage={8}
         pathname={pathname}
         DownloadHandler={DownloadHandler}
+        handleExcelUpload={handleExcelUpload}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         excelDropdownData={formattedCategories}

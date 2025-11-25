@@ -24,6 +24,8 @@ const IndustryTypeList = () => {
     limit: pageSize,
   });
 
+  console.log("industryTypes", industryTypes);
+
   const { mutateAsync: updateIndustry } = useUpdateIndustry({
     onSettled: () => setEditingIndustry(false),
   });

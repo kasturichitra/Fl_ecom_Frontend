@@ -1,4 +1,4 @@
-import { FaFileDownload } from "react-icons/fa";
+import { FaFileDownload, FaFileUpload } from "react-icons/fa";
 import DynamicTable from "./DynamicTable";
 import SearchBar from "./SearchBar";
 import DownloadXLExcel from "./xlDownloadModel.jsx";
@@ -24,6 +24,7 @@ const PageLayoutWithTable = ({
   itemsPerPage,
   pathname,
   DownloadHandler,
+  handleExcelUpload, 
   isOpen,
   setIsOpen,
   modelInputPlaceholder,
@@ -32,7 +33,7 @@ const PageLayoutWithTable = ({
   setExcelSearchTerm,
   showExcelDropdown,
   setShowExcelDropdown,
-  handleExcelCategorySelect, 
+  handleExcelCategorySelect,
 }) => {
   return (
     <div className="min-h-screen bg-gray-50 py-10">
@@ -61,7 +62,7 @@ const PageLayoutWithTable = ({
               <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search..." />
             </div>
             {pathname === "/productList" && (
-              <div>
+              <div className="flex gap-2 items-center">
                 <button
                   className="bg-white text-indigo-600 cursor-pointer font-bold px-6 py-3 
               rounded-lg shadow-lg hover:bg-indigo-50 transition 
@@ -69,8 +70,39 @@ const PageLayoutWithTable = ({
                   onClick={DownloadHandler}
                 >
                   <FaFileDownload />
-                  XL
+                  Download Excel
                 </button>
+                {/* New functionality I want to add */}
+                {/* <button
+                  className="bg-white text-indigo-600 cursor-pointer font-bold px-6 py-3 
+              rounded-lg shadow-lg hover:bg-indigo-50 transition 
+              transform hover:scale-105 flex items-center gap-2"
+                >
+                  <input type="file" />
+                  <FaFileUpload />
+                  Upload Excel
+                </button> */}
+
+                {/* Upload Excel */}
+                <div>
+                  <label
+                    htmlFor="excel-upload"
+                    className="bg-white text-indigo-600 cursor-pointer font-bold px-6 py-3 
+      rounded-lg shadow-lg hover:bg-indigo-50 transition transform hover:scale-105 
+      flex items-center gap-2"
+                  >
+                    <FaFileUpload />
+                    Upload Excel
+                  </label>
+
+                  <input
+                    id="excel-upload"
+                    type="file"
+                    accept=".xlsx,.xls"
+                    className="hidden"
+                    onChange={handleExcelUpload}
+                  />
+                </div>
               </div>
             )}
             {pathname === "/productList" && (
