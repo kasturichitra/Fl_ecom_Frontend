@@ -13,6 +13,7 @@ export default function DataTable({
   setPageSize,
 }) {
   const pageCount = Math.ceil(totalCount / pageSize);
+  
 
   const handlePageSizeChange = (newPageSize) => {
     setPageSize(newPageSize);
