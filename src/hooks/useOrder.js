@@ -2,7 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getAllOrdersApi } from "../ApiServices/orderService";
 
 export const useGetAllOrders = ({searchTerm = "", page = 1, limit = 10 }) => {
-    console.log("useGetAllOrders",searchTerm, page, limit)    
+    // console.log("useGetAllOrders",searchTerm, page, limit)    
 
     const queryKey = ["orders", searchTerm || "", page, limit]; 
   // const client = useQueryClient();
