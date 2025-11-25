@@ -9,7 +9,7 @@ export const useGetAllBrands = ({ searchTerm = "", page = 1, limit = 10, sort = 
   return useQuery({
     queryKey,
     queryFn: () => getAllBrandApi({ searchTerm, page, limit, sort }),
-    select: (res) => res?.data?.data,
+    select: (res) => res?.data, 
     staleTime: 10 * 60 * 1000,
     cacheTime: 30 * 60 * 1000,
     refetchOnMount: false,

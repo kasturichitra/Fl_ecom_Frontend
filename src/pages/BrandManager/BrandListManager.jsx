@@ -20,16 +20,14 @@ const BrandListManager = () => {
 
   const { mutateAsync: deleteBrandMutation } = useDeleteBrand();
 
-  const token = localStorage.getItem("token");
-  const tenantId = "tenant123";
-
-  const { data, isLoading, isError } = useGetAllBrands({
+  const { data: brandsData, isError } = useGetAllBrands({
     searchTerm,
     page: currentPage + 1, // API pages are 1-based
     limit: pageSize,
   });
 
-  console.log("brandsData", data);
+  console.log("brandsData", brandsData?.data);
+  const data = brandsData?.data || [];
 
   const columns = [
     {
@@ -160,12 +158,12 @@ const BrandListManager = () => {
               // />
 
               <DataTable
-                rows={data?.brands || []}
-                getRowId={(row) => row.brand_unique_id}
+                rows={data || []}
+                getRowId={(row) => row?.brand_unique_id}
                 columns={columns}
                 page={currentPage}
                 pageSize={pageSize}
-                totalCount={data?.totalCount || 0}
+                totalCount={brandsData?.totalCount || 0}
                 setCurrentPage={setCurrentPage}
                 setPageSize={setPageSize}
               />
