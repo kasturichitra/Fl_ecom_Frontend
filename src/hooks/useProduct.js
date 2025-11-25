@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  createBulkProductsApi,
   createProductApi,
   deleteProductApi,
   downloadProductsExcelApi,
@@ -67,7 +68,7 @@ export const useUpdateProduct = (options = {}) => {
   });
 };
 
-export const useDownloadProductExcel = () => {
+export const useDownloadProductExcel = (options = {}) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ uniqueId }) => downloadProductsExcelApi(uniqueId),
@@ -76,6 +77,7 @@ export const useDownloadProductExcel = () => {
       toast.success("Product Excel downloaded successfully", {
         duration: 2000, // 2 second
       });
+      options?.onSuccess?.();
     },
     onError: () => {
       toast.error("Failed to download product Excel", {
@@ -84,3 +86,17 @@ export const useDownloadProductExcel = () => {
     },
   });
 };
+
+export const useCreateBulkProducts = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => createBulkProductsApi(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Bulk products created successfully");
+    },
+    onError: () => {
+      toast.error("Failed to create bulk products");
+    },
+  })
+}

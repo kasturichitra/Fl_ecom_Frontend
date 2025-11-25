@@ -13,7 +13,7 @@ export const createProductApi = (data) => {
   return axiosInstance.post(`${BASE_URL}`, data, {
     headers: {
       "Content-Type": "multipart/form-data",
-    }
+    },
   });
 };
 
@@ -22,7 +22,7 @@ export const updateProductApi = (id, data) => {
   return axiosInstance.put(`${BASE_URL}/${id}`, data, {
     headers: {
       "Content-Type": "multipart/form-data",
-    }
+    },
   });
 };
 
@@ -34,5 +34,13 @@ export const deleteProductApi = (id) => {
 export const downloadProductsExcelApi = (id) => {
   return axiosInstance.get(`products/excel-template/${id}`, {
     responseType: "blob",
+  });
+};
+
+export const createBulkProductsApi = (data) => {
+  return axiosInstance.post(`${BASE_URL}/bulk`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
   });
 };

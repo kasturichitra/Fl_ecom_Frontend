@@ -50,6 +50,10 @@ const ProductManager = ({ onCancel }) => {
     search: brandSearchTerm,
   });
 
+  const { data: selectedCategoryItem } = useGetCategoryByUniqueId(selectedCategory);
+
+  const selectedCategoryAttributes = selectedCategoryItem?.attributes || [];
+  
   // Prepare DB attributes (stateless list used by AttributeRepeater)
   const dbAttributes = selectedCategoryAttributes.map((attr) => ({
     attribute_code: attr.code,
@@ -76,9 +80,6 @@ const ProductManager = ({ onCancel }) => {
     label: brand.brand_name,
   }));
 
-  const { data: selectedCategoryItem } = useGetCategoryByUniqueId(selectedCategory);
-
-  const selectedCategoryAttributes = selectedCategoryItem?.attributes || [];
 
   const { mutateAsync: createProduct, isPending: isSubmitting } = useCreateProduct({
     onSuccess: () => {
