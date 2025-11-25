@@ -13,6 +13,7 @@ const IndustryTypeList = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0); // 0-based page
+  const [sort, setSort] = useState("createdAt:desc");
 
   const {
     data: industryTypes,
@@ -22,9 +23,8 @@ const IndustryTypeList = () => {
     search: debouncedSearchTerm,
     page: currentPage + 1, // API pages are 1-based
     limit: pageSize,
+    sort,
   });
-
-  console.log("industryTypes", industryTypes);
 
   const { mutateAsync: updateIndustry } = useUpdateIndustry({
     onSettled: () => setEditingIndustry(false),
@@ -142,6 +142,12 @@ const IndustryTypeList = () => {
           totalCount={industryTypes?.totalCount || 0}
           setCurrentPage={setCurrentPage}
           setPageSize={setPageSize}
+          sort={sort}
+          setSort={(newSort) => {
+            const sortItem = newSort[0];
+
+            setSort(sortItem ? `${sortItem.field}:${sortItem.sort}` : "");
+          }}
         />
       </div>
 
