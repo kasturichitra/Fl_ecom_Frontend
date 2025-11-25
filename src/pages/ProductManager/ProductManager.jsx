@@ -53,7 +53,7 @@ const ProductManager = ({ onCancel }) => {
   const { data: selectedCategoryItem } = useGetCategoryByUniqueId(selectedCategory);
 
   const selectedCategoryAttributes = selectedCategoryItem?.attributes || [];
-  
+
   // Prepare DB attributes (stateless list used by AttributeRepeater)
   const dbAttributes = selectedCategoryAttributes.map((attr) => ({
     attribute_code: attr.code,
@@ -70,7 +70,7 @@ const ProductManager = ({ onCancel }) => {
     }));
   }, [dbAttributes]);
 
-  const formattedCategories = categories?.map((cat) => ({
+  const formattedCategories = categories?.data?.map((cat) => ({
     value: cat.category_unique_id,
     label: cat.category_name,
   }));

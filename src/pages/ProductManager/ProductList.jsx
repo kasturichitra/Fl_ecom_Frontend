@@ -62,7 +62,7 @@ const ProductList = () => {
     search: excelSearchTerm,
   });
 
-  const formattedCategories = categories?.map((cat) => ({
+  const formattedCategories = categories?.data?.map((cat) => ({
     value: cat.category_unique_id,
     label: cat.category_name,
   }));
