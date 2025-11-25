@@ -19,7 +19,11 @@ export const createProductApi = (data) => {
 
 // =========================== UPDATE (multipart/form-data) ===========================
 export const updateProductApi = (id, data) => {
-  return axiosInstance.put(`${BASE_URL}/${id}`, data);
+  return axiosInstance.put(`${BASE_URL}/${id}`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    }
+  });
 };
 
 // =========================== DELETE ===========================
