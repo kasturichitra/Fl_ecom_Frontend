@@ -15,7 +15,7 @@ const ProductList = lazy(() => import("./pages/ProductManager/ProductList"));
 const IndustryTypeList = lazy(() => import("./pages/industryType/IndustryTypeList"));
 const CategoryListManager = lazy(() => import("./pages/CategoryManager/CategoryListManager"));
 const BrandListManager = lazy(() => import("./pages/BrandManager/BrandListManager"));
-
+const OrderProductsDetailes = lazy(() => import("./pages/Orders/OrderProductsDetailes"));
 // Home Page
 const Home = () => (
   <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-indigo-50 to-purple-100">
@@ -183,7 +183,7 @@ const App = () => {
               <Route path="/add-category" element={<CategoryManager />} />
               <Route path="/add-brand" element={<BrandManager />} />
               <Route path="/add-product" element={<ProductManager />} />
-
+              <Route path="/order-products-detailes/:id" element={<OrderProductsDetailes />} />
 
               <Route path="*" element={<PageNotFound />} />
             </Routes>
