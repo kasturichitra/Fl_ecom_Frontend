@@ -1,16 +1,25 @@
 // src/pages/ProductManager/ProductList.jsx
 
-import { useCallback, useState } from "react";
-import { useDispatch } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { FaEdit } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+import { useLocation } from "react-router-dom";
 
-import { fetchProducts, updateProduct } from "../../redux/productSlice";
-
-import PageLayoutWithTable from "../../components/PageLayoutWithTable";
+import PageHeader from "../../components/PageHeader";
+import SearchBar from "../../components/SearchBar";
+import DataTable from "../../components/Table";
+import DownloadXLExcel from "../../components/xlDownloadModel.jsx";
 import { useGetAllCategories } from "../../hooks/useCategory";
-import { useCreateBulkProducts, useDeleteProduct, useDownloadProductExcel, useGetAllProducts, useUpdateProduct } from "../../hooks/useProduct";
+import {
+  useCreateBulkProducts,
+  useDeleteProduct,
+  useDownloadProductExcel,
+  useGetAllProducts,
+  useUpdateProduct,
+} from "../../hooks/useProduct";
 import ProductEditModal from "./ProductEditModal";
 import ProductManager from "./ProductManager";
+import { FaFileDownload, FaFileUpload } from "react-icons/fa";
 
 const ProductList = () => {
   const { pathname } = useLocation();
@@ -18,16 +27,34 @@ const ProductList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [excelSearchTerm, setExcelSearchTerm] = useState("");
   const [showExcelDropdown, setShowExcelDropdown] = useState(false);
-  // const [sugstion,setSuggstion]=useState("")
+  const [sort, setSort] = useState("createdAt:desc");
+
+  // Pagination state
+  const [pageSize, setPageSize] = useState(10);
+  const [currentPage, setCurrentPage] = useState(0); // 0-based
+
   const {
-    data: products,
+    data: productsResponse,
     isLoading: loading,
     isError: error,
   } = useGetAllProducts({
     searchTerm,
+    sort: decodeURIComponent(sort),
+    page: currentPage + 1, // API expects 1-based pages
+    limit: pageSize,
   });
 
-  const { mutate: deleteProduct, isPending } = useDeleteProduct();
+  // rows and totalCount: the hook's response structure may vary — handle both shapes
+  const rows = productsResponse?.data || productsResponse || [];
+  const totalCount = productsResponse?.totalCount ?? (Array.isArray(rows) ? rows.length : 0);
+
+  const { mutate: deleteProduct } = useDeleteProduct();
+  const { mutateAsync: downloadExcel } = useDownloadProductExcel({
+    onSuccess: () => setIsOpen(false),
+  });
+  const { mutateAsync: createBulkProducts } = useCreateBulkProducts();
+  const { mutateAsync: updateProduct } = useUpdateProduct();
+
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
 
@@ -35,23 +62,15 @@ const ProductList = () => {
     search: excelSearchTerm,
   });
 
-  // Format as { value: id, label: name } for the select dropdown component
   const formattedCategories = categories?.map((cat) => ({
     value: cat.category_unique_id,
     label: cat.category_name,
   }));
 
-  const { mutateAsync: updateProduct, isPending: isUpdatingProduct } = useUpdateProduct({
-    onSettled: () => {
-      setEditingProduct(null);
-    },
-  });
-  const { mutateAsync: downloadExcel } = useDownloadProductExcel({
-    onSuccess: () => {
-      setIsOpen(false);
-    },
-  });
-  const { mutateAsync: createBulkProducts } = useCreateBulkProducts();
+  useEffect(() => {
+    // Reset to first page if searchTerm changed (same UX as other pages)
+    setCurrentPage(0);
+  }, [searchTerm]);
 
   const handleExcelCategorySelect = async (item) => {
     const uniqueId = item.value;
@@ -63,7 +82,6 @@ const ProductList = () => {
 
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
-
     a.href = url;
     a.download = "products.xlsx";
     a.click();
@@ -71,23 +89,21 @@ const ProductList = () => {
   };
 
   const handleExcelUpload = async (e) => {
-    const file = e.target.files[0];
+    const file = e.target.files?.[0];
+    if (!file) return;
     const formData = new FormData();
     formData.append("file", file);
     await createBulkProducts(formData);
   };
 
-  // UPDATE handler
   const handleUpdate = async (formData) => {
     if (!editingProduct) return;
-
     await updateProduct({
-      id: editingProduct.product_unique_id,
-      data: formData,
+      uniqueId: editingProduct.product_unique_id,
+      payload: formData,
     });
   };
 
-  // EDIT handler
   const handleEdit = useCallback((item) => {
     setEditingProduct(item);
   }, []);
@@ -97,122 +113,191 @@ const ProductList = () => {
     deleteProduct({ uniqueId: product_unique_id });
   };
 
-  const DownloadHandler = () => {
-    setIsOpen((prev) => !prev);
-  };
+  const handleCloseEdit = () => setEditingProduct(null);
+  const handleCloseAdd = () => setShowAddModal(false);
 
-  // TABLE COLUMNS
+  // DataTable columns for MUI DataTable
   const columns = [
-    // {
-    //   header: "Category Unique ID *",
-    //   key: "category_unique_id",
-    //   width: 20,
-    // },
-    // {
-    //   header: "Brand Unique ID *",
-    //   key: "brand_unique_id",
-    //   width: 20,
-    // },
     {
-      header: "Product Unique ID *",
-      key: "product_unique_id",
-      width: 20,
+      field: "product_unique_id",
+      headerName: "PRODUCT ID",
+      flex: 1,
+      headerClassName: "custom-header",
+      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize",
+      renderCell: (params) => (
+        <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">{params.value}</span>
+      ),
     },
     {
-      header: "Product Name *",
-      key: "product_name",
-      width: 20,
+      field: "product_name",
+      headerName: "NAME",
+      flex: 2,
+      headerClassName: "custom-header",
+      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize",
     },
     {
-      header: "Price *",
-      key: "price",
-      width: 10,
+      field: "price",
+      headerName: "PRICE",
+      flex: 1,
+      headerClassName: "custom-header",
+      cellClassName: "px-6 py-4 text-left text-sm text-gray-800",
     },
     {
-      header: "Stock Quantity *",
-      key: "stock_quantity",
-      width: 10,
+      field: "stock_quantity",
+      headerName: "STOCK",
+      flex: 1,
+      headerClassName: "custom-header",
+      cellClassName: "px-6 py-4 text-left text-sm text-gray-800",
     },
     {
-      header: "Min Order Limit *",
-      key: "min_order_limit",
-      width: 20,
+      field: "min_order_limit",
+      headerName: "MIN ORDER",
+      flex: 1,
+      headerClassName: "custom-header",
+      cellClassName: "px-6 py-4 text-left text-sm text-gray-800",
     },
     {
-      header: "Gender *",
-      key: "gender",
-      width: 20,
+      field: "gender",
+      headerName: "GENDER",
+      flex: 1,
+      headerClassName: "custom-header",
+      cellClassName: "px-6 py-4 text-left text-sm text-gray-800",
+    },
+    {
+      field: "actions",
+      headerName: "ACTIONS",
+      sortable: false,
+      width: 140,
+      headerClassName: "custom-header",
+      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 flex gap-1",
+      renderCell: (params) => (
+        <div className="flex gap-2 items-center">
+          <button onClick={() => handleEdit(params.row)} className="cursor-pointer">
+            <FaEdit size={18} className="text-[#4f46e5]" />
+          </button>
+          <button onClick={() => handleDelete(params.row)}>
+            <MdDelete size={18} className="text-[#4f46e5]" />
+          </button>
+        </div>
+      ),
     },
   ];
+
   return (
     <>
-      <PageLayoutWithTable
-        title="Product Manager"
-        subtitle="Manage all store products"
-        buttonLabel="Add New Product"
-        onAddClick={() => setShowAddModal(true)}
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        tableData={products}
-        columns={columns}
-        loading={loading}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        error={error}
-        itemsPerPage={8}
-        pathname={pathname}
-        DownloadHandler={DownloadHandler}
-        handleExcelUpload={handleExcelUpload}
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-        excelDropdownData={formattedCategories}
-        excelSearchTerm={excelSearchTerm}
-        setExcelSearchTerm={setExcelSearchTerm}
-        showExcelDropdown={showExcelDropdown}
-        setShowExcelDropdown={setShowExcelDropdown}
-        handleExcelCategorySelect={handleExcelCategorySelect}
-        modelInputPlaceholder="Search products name"
-        excludeColumns={[
-          "_id",
-          "__v",
-          "tenant_id",
-          "createdAt",
-          "updatedAt",
-          "created_by",
-          "updated_by",
-          "product_images",
-          "product_attributes",
-        ]}
-        emptyMessage={<div className="text-center py-10 text-gray-500">No products found.</div>}
-      />
+      <div className="min-h-screen bg-gray-50 py-10">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
+            {/* Header */}
+            <PageHeader
+              title="Product Manager"
+              subtitle="Manage all store products"
+              actionLabel="Add New Product"
+              onAction={() => setShowAddModal(true)}
+            />
 
-      {/* ADD MODAL */}
+            {/* Search + Excel controls */}
+            <div className="p-6 bg-gray-50 border-b flex items-center justify-between gap-4">
+              <div className="max-w-md">
+                <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search products..." />
+              </div>
+
+              <div className="flex gap-3 items-center">
+                <button
+                  onClick={() => setIsOpen(true)}
+                  className="bg-white text-indigo-600 font-bold px-5 py-3 rounded-lg shadow hover:bg-indigo-50 flex items-center gap-2"
+                >
+                  <FaFileDownload />
+                  Download Excel
+                </button>
+
+                <label
+                  htmlFor="excel-upload"
+                  className="bg-white text-indigo-600 font-bold px-5 py-3 rounded-lg shadow hover:bg-indigo-50 flex items-center gap-2 cursor-pointer"
+                >
+                  <FaFileUpload />
+                  Upload Excel
+                </label>
+                <input
+                  id="excel-upload"
+                  type="file"
+                  accept=".xlsx,.xls"
+                  className="hidden"
+                  onChange={handleExcelUpload}
+                />
+              </div>
+            </div>
+
+            {/* Table */}
+            <div className="p-6 bg-white">
+              <DataTable
+                rows={rows}
+                getRowId={(row) => row.product_unique_id}
+                columns={columns}
+                page={currentPage}
+                pageSize={pageSize}
+                totalCount={totalCount}
+                setCurrentPage={setCurrentPage}
+                setPageSize={setPageSize}
+                sort={sort}
+                setSort={(newSort) => {
+                  console.log("New Sort:", newSort[0]);
+                  const sortItem = newSort[0];
+
+                  setSort(sortItem ? `${sortItem.field}:${sortItem.sort}` : "");
+                }}
+              />
+            </div>
+
+            {/* Error */}
+            {error && (
+              <div className="mx-6 mb-6 p-5 bg-red-50 border border-red-300 text-red-700 rounded-xl text-center">
+                Error loading products.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Add Modal */}
       {showAddModal && (
-        <div
-          className="fixed inset-0 bg-white/30 backdrop-blur-lg border border-white/20 
-        shadow-xl flex items-center justify-center z-50"
-        >
+        <div className="fixed inset-0 bg-white/30 backdrop-blur-lg border border-white/20 shadow-xl flex items-center justify-center z-50">
           <div className="relative">
             <button
-              onClick={() => setShowAddModal(false)}
+              onClick={handleCloseAdd}
               className="absolute right-5 top-5 text-gray-700 hover:text-red-600 text-3xl"
             >
               ×
             </button>
-
-            <ProductManager onCancel={() => setShowAddModal(false)} />
+            <ProductManager onCancel={handleCloseAdd} />
           </div>
         </div>
       )}
 
-      {/* EDIT MODAL */}
+      {/* Edit Modal */}
       {editingProduct && (
-        <ProductEditModal
-          formData={editingProduct}
-          onSubmit={handleUpdate}
-          closeModal={() => setEditingProduct(null)}
-        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="relative bg-white rounded-xl shadow-xl w-full max-w-6xl mx-4 p-6">
+            <button onClick={handleCloseEdit} className="absolute right-4 top-4 text-gray-700 text-3xl">
+              ×
+            </button>
+            <ProductEditModal formData={editingProduct} onSuccess={handleUpdate} closeModal={handleCloseEdit} />
+          </div>
+        </div>
       )}
+
+      {/* Download modal */}
+      <DownloadXLExcel
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        modelInputPlaceholder="Search products name"
+        data={formattedCategories}
+        searchTerm={excelSearchTerm}
+        setSearchTerm={setExcelSearchTerm}
+        showDropdown={showExcelDropdown}
+        setShowDropdown={setShowExcelDropdown}
+        handleSelect={handleExcelCategorySelect}
+      />
     </>
   );
 };
