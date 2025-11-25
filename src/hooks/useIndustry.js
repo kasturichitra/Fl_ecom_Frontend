@@ -20,13 +20,14 @@ export const useGetAllIndustries = ({ search = "", page = 1, limit = 10, sort = 
   });
 };
 
-export const useCreateIndustry = () => {
+export const useCreateIndustry = (options = {}) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data) => createIndustryApi(data),
     onSuccess: () => {
       toast.success("Industry created successfully");
       queryClient.invalidateQueries(["industries"]);
+      options?.onSuccess?.();
     },
     onError: (error) => {
       toast.error("Failed to create industry", error.message);
