@@ -66,7 +66,6 @@ const IndustryTypeManager = ({ onCancel }) => {
         <FormActionButtons
           submitLabel="Create Industry Type"
           onSubmit={() => {
-            console.log("Click happened with data:", form);
             handleAddIndustryType();
           }}
           onCancel={handleCancel}

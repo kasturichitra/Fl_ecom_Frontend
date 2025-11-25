@@ -88,7 +88,7 @@ const CategoryManager = ({ onCancel }) => {
     await createCategory(formData);
   };
 
-  const formattedIndustryTypes = industryTypes?.map((i) => ({
+  const formattedIndustryTypes = industryTypes?.data?.map((i) => ({
     label: `${i.industry_name} #${i.industry_unique_id}`,
     value: i.industry_unique_id,
   }));
