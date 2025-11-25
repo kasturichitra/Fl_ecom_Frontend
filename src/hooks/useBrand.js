@@ -9,14 +9,12 @@ export const useGetAllBrands = ({ searchTerm = "", page = 1, limit = 10 }) => {
   return useQuery({
     queryKey,
     queryFn: () => getAllBrandApi({ searchTerm, page, limit }),
-    select: (res) => res.data.data,
+    select: (res) => res?.data?.data?.brands,
     staleTime: 10 * 60 * 1000,
     cacheTime: 30 * 60 * 1000,
     refetchOnMount: false,
   });
 };
-
-
 
 export const useCreateBrand = () => {
   const queryClient = useQueryClient();
@@ -33,8 +31,7 @@ export const useCreateBrand = () => {
 };
 
 export const useUpdateBrand = (options = {}) => {
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }) => {
@@ -51,16 +48,16 @@ export const useUpdateBrand = (options = {}) => {
   });
 };
 
-export const useDeleteBrand = () =>{
-  const queryClient = useQueryClient()
+export const useDeleteBrand = () => {
+  const queryClient = useQueryClient();
   return useMutation({
-    mutationFn : (id) => deleteBrandApi(id),
-    onSuccess : () =>{
-      toast.success("Brand deleted successfully")
-      queryClient.invalidateQueries({queryKey : ["brands"]})
+    mutationFn: (id) => deleteBrandApi(id),
+    onSuccess: () => {
+      toast.success("Brand deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["brands"] });
     },
-    onError : () =>{
-      toast.error("Failed to delete")
-    }
-  })
-}
+    onError: () => {
+      toast.error("Failed to delete");
+    },
+  });
+};

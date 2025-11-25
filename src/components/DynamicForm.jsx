@@ -1,12 +1,14 @@
 import SearchDropdown from "./SearchDropdown";
+import cn from "../utils/tailwind-cn";
+import ScrollWrapper from "./ui/ScrollWrapper";
 
-const DynamicForm = ({ fields = [], formData, setFormData }) => {
+const DynamicForm = ({ fields = [], formData, setFormData, className = "" }) => {
   const handleChange = (key, value) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className={cn("flex flex-col gap-4", className)}>
       {fields.map((field) => (
         <div key={field.key} className="flex flex-col gap-2">
           <label className="font-semibold text-gray-700">{field.label}</label>
@@ -21,6 +23,17 @@ const DynamicForm = ({ fields = [], formData, setFormData }) => {
               disabled={field.disabled}
               onChange={(e) => handleChange(field.key, e.target.value)}
               className={`border p-3 rounded-lg w-full ${field.disabled ? "bg-gray-100 cursor-not-allowed" : ""}`}
+            />
+          )}
+
+          {field.type === "number" && (
+            <input
+              type="number"
+              value={formData[field.key] || ""}
+              placeholder={field.placeholder}
+              required={field.required}
+              onChange={(e) => handleChange(field.key, e.target.value)}
+              className="border p-3 rounded-lg w-full"
             />
           )}
 

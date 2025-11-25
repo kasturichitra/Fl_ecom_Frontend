@@ -35,7 +35,7 @@ const Home = () => (
 const App = () => {
   return (
     <Router>
-      <Toaster position="top-right" />
+      <Toaster position="top-right" reverseOrder={false} />
       {/* Sidebar */}
       <aside className="fixed top-0 left-0 h-screen w-72 bg-gray-900 text-white shadow-2xl z-50 overflow-y-auto">
         <div className="p-8 border-b border-gray-800">

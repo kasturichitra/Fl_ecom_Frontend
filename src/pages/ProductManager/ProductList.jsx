@@ -8,18 +8,17 @@ import { fetchProducts, updateProduct } from "../../redux/productSlice";
 
 import PageLayoutWithTable from "../../components/PageLayoutWithTable";
 import { useGetAllCategories } from "../../hooks/useCategory";
-import { useDeleteProduct, useGetAllProducts } from "../../hooks/useProduct";
+import { useDeleteProduct, useDownloadProductExcel, useGetAllProducts, useUpdateProduct } from "../../hooks/useProduct";
 import ProductEditModal from "./ProductEditModal";
 import ProductManager from "./ProductManager";
 
 const ProductList = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { pathname } = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [search, setSearch] = useState(""); // this only search xl download model search
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [excelSearchTerm, setExcelSearchTerm] = useState("");
+  const [showExcelDropdown, setShowExcelDropdown] = useState(false);
+  // const [sugstion,setSuggstion]=useState("")
   const {
     data: products,
     isLoading: loading,
@@ -27,43 +26,55 @@ const ProductList = () => {
   } = useGetAllProducts({
     searchTerm,
   });
-  const { data: categories } = useGetAllCategories({ search: search });
-
-  const formattedCategories = categories?.map((i) => ({
-    label: `${i.category_name}`,
-    value: i.category_unique_id,
-  }));
 
   const { mutate: deleteProduct, isPending } = useDeleteProduct();
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
-  const [isUpdating, setIsUpdating] = useState(false);
+
+  const { data: categories } = useGetAllCategories({
+    search: excelSearchTerm,
+  });
+
+  // Format as { value: id, label: name } for the select dropdown component
+  const formattedCategories = categories?.map((cat) => ({
+    value: cat.category_unique_id,
+    label: cat.category_name,
+  }));
+
+  const { mutateAsync: updateProduct, isPending: isUpdatingProduct } = useUpdateProduct({
+    onSettled: () => {
+      setEditingProduct(null);
+    },
+  });
+  const { mutateAsync: downloadExcel } = useDownloadProductExcel();
+
+  const handleExcelCategorySelect = async (item) => {
+    const uniqueId = item.value;
+    const response = await downloadExcel({ uniqueId });
+
+    // console.log("Excel data:", data);
+
+    const blob = new Blob([response.data], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = "products.xlsx";
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
 
   // UPDATE handler
   const handleUpdate = async (formData) => {
     if (!editingProduct) return;
-    setIsUpdating(true);
 
-    try {
-      await dispatch(
-        updateProduct({
-          originalId: editingProduct.product_unique_id,
-          updatedData: formData,
-          token,
-          tenantId,
-        })
-      ).unwrap();
-
-      await dispatch(fetchProducts({ token, tenantId }));
-
-      navigate("/productList");
-      setEditingProduct(null);
-    } catch (err) {
-      console.error(err);
-      alert("Update failed");
-    } finally {
-      setIsUpdating(false);
-    }
+    await updateProduct({
+      id: editingProduct.product_unique_id,
+      data: formData,
+    });
   };
 
   // EDIT handler
@@ -143,13 +154,13 @@ const ProductList = () => {
         DownloadHandler={DownloadHandler}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
-        formattedCategories={formattedCategories?.length ? formattedCategories : []}
-        search={search}// this value of the search input
+        excelDropdownData={formattedCategories}
+        excelSearchTerm={excelSearchTerm}
+        setExcelSearchTerm={setExcelSearchTerm}
+        showExcelDropdown={showExcelDropdown}
+        setShowExcelDropdown={setShowExcelDropdown}
+        handleExcelCategorySelect={handleExcelCategorySelect}
         modelInputPlaceholder="Search products name"
-        clearResults={setSearch}//clear search results
-        onChange={setSearch} // update search value
-        onSelect={(item) => setSearch(item.label)}//set the search value
-        onSearch={(val) => setSearch(val)} //trigger API search
         excludeColumns={[
           "_id",
           "__v",
@@ -182,6 +193,7 @@ const ProductList = () => {
           </div>
         </div>
       )}
+
       {/* EDIT MODAL */}
       {editingProduct && (
         <ProductEditModal
