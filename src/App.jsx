@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import PageNotFound from "./pages/PageNotFound/PageNotFound";
+import { Toaster } from "react-hot-toast";
 
 // Lazy-loaded pages
 const CategoryManager = lazy(() => import("./pages/CategoryManager/CategoryManager"));
@@ -33,6 +34,7 @@ const Home = () => (
 const App = () => {
   return (
     <Router>
+      <Toaster position="top-right" reverseOrder={false} />
       {/* Sidebar */}
       <aside className="fixed top-0 left-0 h-screen w-72 bg-gray-900 text-white shadow-2xl z-50 overflow-y-auto">
         <div className="p-8 border-b border-gray-800">

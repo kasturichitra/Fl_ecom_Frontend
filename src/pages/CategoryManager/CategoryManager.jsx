@@ -234,7 +234,7 @@ const CategoryManager = ({ onCancel }) => {
                           <button
                             type="button"
                             onClick={() => deleteAttribute(index)}
-                            className="text-red-600 hover:text-red-700 font-medium underline"
+                            className="text-red-600 hover:text-red-700 font-medium underline cursor-pointer"
                           >
                             Delete
                           </button>
@@ -247,7 +247,7 @@ const CategoryManager = ({ onCancel }) => {
                 <button
                   type="button"
                   onClick={addAttribute}
-                  className="mt-6 px-5 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition"
+                  className="mt-6 px-5 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition cursor-pointer"
                 >
                   + Add Another Attribute
                 </button>
