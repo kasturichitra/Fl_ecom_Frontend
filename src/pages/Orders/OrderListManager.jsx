@@ -35,12 +35,12 @@ const OrderListManager = () => {
           </div>
 
           {/* SEARCH (NO GAP) */}
-          <div className="p-6 bg-gray-50 border-b">
+          <div className="p-6 bg-gray-50  border-b">
               <SearchBar
                 searchTerm={searchTerm}
                 onSearchChange={setSearchTerm}
                 placeholder="Search orders..."
-                className="mx-auto max-w-md"
+                className=" max-w-md"
               />
           </div>
 
