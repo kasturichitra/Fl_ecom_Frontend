@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  createBulkProductsApi,
   createProductApi,
   deleteProductApi,
   downloadProductsExcelApi,
@@ -84,3 +85,17 @@ export const useDownloadProductExcel = () => {
     },
   });
 };
+
+export const useCreateBulkProducts = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data) => createBulkProductsApi(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      toast.success("Bulk products created successfully");
+    },
+    onError: () => {
+      toast.error("Failed to create bulk products");
+    },
+  })
+}
