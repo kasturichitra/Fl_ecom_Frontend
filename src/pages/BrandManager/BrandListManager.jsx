@@ -8,9 +8,9 @@ import SearchBar from "../../components/SearchBar";
 import DynamicTable from "../../components/DynamicTable";
 import BrandManager from "./BrandManager";
 import BrandEditModal from "./BrandEditModal";
+import PageHeader from "../../components/PageHeader";
 
 const BrandListManager = () => {
-  const dispatch = useDispatch();
 
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
@@ -21,19 +21,13 @@ const BrandListManager = () => {
   const token = localStorage.getItem("token");
   const tenantId = "tenant123";
 
-  const refreshBrands = useCallback(() => {
-    dispatch(fetchBrands({ token, tenantId }));
-  }, [dispatch, token, tenantId]);
-
-  useEffect(() => {
-    refreshBrands();
-  }, [refreshBrands]);
-
   const {
     data: brandsData,
     isLoading,
     isError,
   } = useGetAllBrands({ searchTerm });
+
+  // console.log("brandsData",brandsData);  
 
   const columns = [
     {
@@ -75,12 +69,12 @@ const BrandListManager = () => {
 
   const handleCloseAddModal = () => {
     setShowAddModal(false);
-    refreshBrands();
+    // refreshBrands();
   };
 
   const handleCloseEditModal = () => {
     setEditingBrand(null);
-    refreshBrands();
+    // refreshBrands();
   };
 
   return (
@@ -89,23 +83,15 @@ const BrandListManager = () => {
 
         {/* HEADER */}
         <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white px-8 py-7 flex justify-between items-center">
-            <div>
-              <h1 className="text-4xl font-extrabold">Brand Management</h1>
-              <p className="text-indigo-100 text-lg mt-1">Manage all brands</p>
-            </div>
-
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="bg-white text-indigo-600 cursor-pointer font-bold px-6 py-3 
-              rounded-lg shadow-lg hover:bg-indigo-50 transition transform hover:scale-105"
-            >
-              Add New Brand
-            </button>
-          </div>
+          <PageHeader
+          title="Brand Manager"
+          subtitle="Manage all brands"
+          actionLabel="Add New Brand"
+          onAction={() => setShowAddModal(true)}
+        />
 
           {/* SEARCH BAR */}
-          <div className="p-6 bg-gray-50 border-b flex justify-center">
+          <div className="p-6 bg-gray-50 border-b flex justify-start px-5">
             <div className="max-w-md w-full">
               <SearchBar
                 searchTerm={searchTerm}
@@ -121,7 +107,7 @@ const BrandListManager = () => {
               <p className="text-red-600">Error loading brands</p>
             ) : (
               <DynamicTable
-                data={brandsData?.brands || []}
+                data={brandsData || []}
                 columns={columns}
                 loading={isLoading}
                 onEdit={handleEdit}
@@ -154,7 +140,7 @@ const BrandListManager = () => {
             >
               ×
             </button>
-            <BrandManager onCancel={handleCloseAddModal} />
+            <BrandManager setShowAddModal={setShowAddModal} onCancel={handleCloseAddModal} />
           </div>
         </div>
       )}

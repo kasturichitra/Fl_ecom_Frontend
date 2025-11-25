@@ -5,43 +5,49 @@ import CategorySelector from "../../components/CategorySelector";
 import EditModalLayout from "../../components/EditModalLayout";
 import DynamicForm from "../../components/DynamicForm";
 import { useUpdateBrand } from "../../hooks/useBrand";
+import { useGetAllCategories } from "../../hooks/useCategory";
 
 const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }) => {
-  const dispatch = useDispatch();
-  const categories = useSelector((state) => state.categories.items || []);
   const { token, tenantId } = useSelector((state) => state.auth || {});
-  // const 
 
-  const { mutateAsync: updateBrand, isPending: isUpdating, onSuccess : success } = useUpdateBrand({
+
+  const {
+    mutateAsync: updateBrand,
+    isPending: isUpdating,
+    onSuccess: success,
+  } = useUpdateBrand({
     onSettled: () => {
       setIsLoading(false);
       setEditingBrand(null);
     },
   });
 
+  // console.log(brand, "brand");
+  const { data: categoriesData, isLoaing, isError } = useGetAllCategories({});
+  // console.log("categories", brand.categories);
+
+
+  const getSelectedCategoryObjects = (brandCategories = [], categoriesData = []) => {
+    if (!Array?.isArray(brandCategories) || !Array?.isArray(categoriesData)) return [];
+    
+    return categoriesData?.filter((cat) => brandCategories?.includes(cat?._id));
+  };
+  
+  console.log("selected categories", getSelectedCategoryObjects(brand?.categories, categoriesData));
+
   const [form, setForm] = useState({
-    categories: brand.categories || [],
-    brand_name: brand.brand_name || "",
-    brand_unique_id: brand.brand_unique_id || "",
-    brand_description: brand.brand_description || "",
+    categories: brand?.categories || [],
+    brand_name: brand?.brand_name || "",
+    brand_unique_id: brand?.brand_unique_id || "",
+    brand_description: brand?.brand_description || "",
     brand_image: "",
   });
-
-  console.log(form.brand_image,"image")
 
 
   const [imagePreview, setImagePreview] = useState("");
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
-  // Load initial image
-  useEffect(() => {
-    if (brand.brand_image) {
-      // const fullUrl = `${process.env.REACT_APP_API_URL}/${brand.brand_image.replace(/\\/g, "/")}`;
-      const fullUrl = ``;
-      setImagePreview(fullUrl);
-    }
-  }, [brand.brand_image]);
 
   const validate = () => {
     const e = {};
@@ -88,8 +94,7 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
 
     try {
       console.log("before update");
-
-      // console.log()
+      
       await updateBrand({
         id: brand._id,
         data: fd,
@@ -98,27 +103,6 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
       setEditingBrand(null);
 
       console.log("after update");
-
-      //     const handleUpdate = async (formData) => {
-      //   if (!editingIndustry) return;
-      //   // setIsUpdating(true);
-      //   await updateIndustry({
-      //     id: editingIndustry.industry_unique_id,
-      //     data: formData,
-      //   });
-      // };
-
-      // await dispatch(
-      //   updateBrand({
-      //     uniqueId: brand._id,
-      //     formData: fd,
-      //     token,
-      //     tenantId,
-      //   })
-      // ).unwrap();
-
-      // onSuccess?.();
-      // onClose();
     } catch (err) {
       // alert("Update failed: " + (err.message || "Please try again"));
     } finally {
@@ -126,9 +110,6 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
     }
   };
 
-  // ---------------------------
-  // ⭐ DynamicForm Field Config
-  // ---------------------------
   const fields = [
     {
       key: "brand_name",
@@ -172,7 +153,7 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
           Categories <span className="text-red-500">*</span>
         </label>
         <CategorySelector
-          categories={categories}
+          categories={categoriesData}
           selected={form.categories}
           setSelected={(vals) => setForm({ ...form, categories: vals })}
         />

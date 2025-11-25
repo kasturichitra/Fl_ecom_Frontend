@@ -2,7 +2,8 @@ import React from "react";
 import Select from "react-select";
 
 const CategorySelector = ({ categories, selected, setSelected, errors }) => {
-  const options = categories.map((cat) => ({
+  console.log("categories From Parent", categories);
+  const options = categories?.map((cat) => ({
     value: cat._id,   // MUST be a Mongo object id
     label: cat.category_name,        // MUST be a string
   }));
@@ -16,9 +17,9 @@ const CategorySelector = ({ categories, selected, setSelected, errors }) => {
       <Select
         isMulti
         options={options}
-        value={options.filter((opt) => selected.includes(opt.value))}
+        value={options?.filter((opt) => selected?.includes(opt.value))}
         onChange={(selectedOptions) =>
-          setSelected(selectedOptions.map((opt) => opt.value))
+          setSelected(selectedOptions?.map((opt) => opt?.value))
         }
         className="basic-multi-select"
         classNamePrefix="select"
