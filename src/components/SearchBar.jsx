@@ -11,7 +11,7 @@ const SearchBar = ({
   const hasValue = searchTerm.trim().length > 0;
 
   return (
-    <div className={`relative w-full max-w-md ${className}`}>
+    <div className={`relative max-w-md ${className}`}>
       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
         <Search className="h-5 w-5 text-gray-400" />
       </div>
@@ -19,7 +19,7 @@ const SearchBar = ({
       <input
         type="text"
         value={searchTerm}
-        onChange={(e) => onSearchChange(e.target.value)}
+        onChange={(e) => onSearchChange(e.  target.value)}
         placeholder={placeholder}
         className={`
           w-full pl-12 pr-12 py-3 

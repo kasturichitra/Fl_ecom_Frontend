@@ -6,6 +6,7 @@ import DynamicForm from "../../components/DynamicForm";
 import CategorySelector from "../../components/CategorySelector";
 import FormActionButtons from "../../components/FormActionButtons";
 import toast from "react-hot-toast";
+import { useGetAllCategories } from "../../hooks/useCategory";
 
 
 const objectToFormData = (obj) => {
@@ -24,11 +25,10 @@ const objectToFormData = (obj) => {
   return formData;
 };
 
-const BrandManager = ({onCancel}) => {
-  const dispatch = useDispatch();
+const BrandManager = ({setShowAddModal,onCancel}) => {
   const { mutateAsync: createBrand } = useCreateBrand();
-
-  const categories = useSelector((state) => state.categories?.items || []);
+  const { data : categoriesData , isLoading, isError} = useGetAllCategories({}) 
+  console.log("categoriesData", categoriesData)
 
   const [form, setForm] = useState({
     categories: [],
@@ -87,6 +87,7 @@ const BrandManager = ({onCancel}) => {
     });
 
     setImagePreview([]);
+    setShowAddModal(false);
   };
 
   const handleImageChange = (e) => {
@@ -129,7 +130,7 @@ const BrandManager = ({onCancel}) => {
       <form onSubmit={handleCreateBrand} className="space-y-6">
         {/* Category Selector */}
         <CategorySelector
-          categories={categories}
+          categories={categoriesData}
           selected={form.categories}
           setSelected={(values) => setForm({ ...form, categories: values })}
           errors={errors} 
