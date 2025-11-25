@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import EditModalLayout from "../../components/EditModalLayout";
 import DynamicForm from "../../components/DynamicForm";
 import { useGetAllCategories } from "../../hooks/useCategory";
@@ -38,6 +38,8 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
   const { data: categories } = useGetAllCategories({ search: categorySearchTerm });
   const { data: brands } = useGetAllBrands({ search: brandSearchTerm });
 
+  const attributesRef = useRef([]);
+
   // Map product.product_attributes to the AttributeRepeater 'predefined' format
   const productDbAttributes = useMemo(
     () =>
@@ -49,6 +51,15 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
       })),
     [product?.product_attributes]
   );
+
+  // Initialize attributesRef.current and sync to form whenever productDbAttributes change
+  useEffect(() => {
+    attributesRef.current = productDbAttributes.map((a) => ({
+      attribute_code: a.attribute_code,
+      value: a.value ?? "",
+    }));
+    setForm((prev) => ({ ...prev, product_attributes: attributesRef.current }));
+  }, [productDbAttributes]);
 
   useEffect(() => {
     if (!product) return;
@@ -71,10 +82,7 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
       stock_quantity: product.stock_quantity ?? "",
       min_order_limit: product.min_order_limit ?? "",
       gender: product.gender ?? "",
-      product_attributes: (product?.product_attributes || []).map((a) => ({
-        attribute_code: a.attribute_code || a.code || "",
-        value: a.value ?? "",
-      })),
+      product_attributes: attributesRef.current,
     });
   }, [product]);
 
@@ -86,14 +94,21 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e?.preventDefault?.();
-    // No validation here (removed as requested)
-    const { product_image, product_attributes, ...rest } = form;
+    // No validation here
+    const { product_image, ...rest } = form;
+
+    // Use attributesRef for the latest repeater values
+    const currentAttributes = attributesRef.current || [];
+    const validAttributes = currentAttributes
+      .filter((attr) => attr.attribute_code && attr.value !== undefined && String(attr.value).trim() !== "")
+      .map((attr) => ({
+        attribute_code: attr.attribute_code,
+        value: attr.value,
+      }));
 
     const formData = objectToFormData(rest);
     if (product_image) formData.append("product_image", product_image);
-    if (product_attributes && product_attributes.length) {
-      formData.append("product_attributes", JSON.stringify(product_attributes));
-    }
+    if (validAttributes.length) formData.append("product_attributes", JSON.stringify(validAttributes));
 
     await updateProduct({ uniqueId: product.product_unique_id, payload: formData });
 
@@ -149,8 +164,9 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
 
   // callback from AttributeRepeater to update product_attributes on the form
   const handleAttributesChange = (items) => {
-    console.log("Items that are being changed in handleAttributesChange:", items);
-    // items is an array containing { attribute_code, value, placeholderValue, isPredefined, ... }
+    // Update ref
+    attributesRef.current = items;
+    // Keep form.product_attributes in sync for compatibility
     const mapped = items.map((it) => ({
       attribute_code: it.attribute_code,
       value: it.value,

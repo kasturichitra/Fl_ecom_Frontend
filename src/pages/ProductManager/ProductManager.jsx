@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import DynamicForm from "../../components/DynamicForm";
 import { createProduct } from "../../redux/productSlice";
@@ -47,8 +47,24 @@ const ProductManager = ({ onCancel }) => {
   });
 
   const { data: brands } = useGetAllBrands({
-    searchTerm: brandSearchTerm,
+    search: brandSearchTerm,
   });
+
+  // Prepare DB attributes (stateless list used by AttributeRepeater)
+  const dbAttributes = selectedCategoryAttributes.map((attr) => ({
+    attribute_code: attr.code,
+    value: "",
+    placeholderValue: `Enter ${attr.name}`,
+    type: "text",
+  }));
+
+  // Initialize attributesRef with the pre-defined DB attributes
+  useEffect(() => {
+    attributesRef.current = dbAttributes.map((a) => ({
+      attribute_code: a.attribute_code,
+      value: a.value || "",
+    }));
+  }, [dbAttributes]);
 
   const formattedCategories = categories?.map((cat) => ({
     value: cat.category_unique_id,
@@ -63,13 +79,6 @@ const ProductManager = ({ onCancel }) => {
   const { data: selectedCategoryItem } = useGetCategoryByUniqueId(selectedCategory);
 
   const selectedCategoryAttributes = selectedCategoryItem?.attributes || [];
-
-  const dbAttributes = selectedCategoryAttributes.map((attr) => ({
-    attribute_code: attr.code,
-    value: "",
-    placeholderValue: `Enter ${attr.name}`,
-    type: "text",
-  }));
 
   const { mutateAsync: createProduct, isPending: isSubmitting } = useCreateProduct({
     onSuccess: () => {
