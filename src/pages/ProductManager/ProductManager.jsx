@@ -73,7 +73,7 @@ const ProductManager = ({ onCancel }) => {
     label: cat.category_name,
   }));
 
-  const formattedBrands = brands?.brands?.map((brand) => ({
+  const formattedBrands = brands?.data?.map((brand) => ({
     value: brand.brand_unique_id,
     label: brand.brand_name,
   }));

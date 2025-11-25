@@ -88,7 +88,7 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
 
   // format dropdowns
   const formattedCategories = categories?.data?.map((c) => ({ value: c.category_unique_id, label: c.category_name }));
-  const formattedBrands = brands?.map((b) => ({ value: b.brand_unique_id, label: b.brand_name }));
+  const formattedBrands = brands?.data?.map((b) => ({ value: b.brand_unique_id, label: b.brand_name }));
 
   const { mutateAsync: updateProduct, isPending: isUpdating } = useUpdateProduct();
 

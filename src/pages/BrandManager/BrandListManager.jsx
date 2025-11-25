@@ -21,12 +21,15 @@ const BrandListManager = () => {
 
   const { mutateAsync: deleteBrandMutation } = useDeleteBrand();
 
-  const { data, isError } = useGetAllBrands({
+  const { data: brandsData, isError } = useGetAllBrands({
     searchTerm,
     sort: decodeURIComponent(sort),
     page: currentPage + 1, // API pages are 1-based
     limit: pageSize,
   });
+
+  console.log("brandsData", brandsData?.data);
+  const data = brandsData?.data || [];
 
   const columns = [
     {
@@ -134,12 +137,12 @@ const BrandListManager = () => {
               <p className="text-red-600">Error loading brands</p>
             ) : (
               <DataTable
-                rows={data?.brands || []}
+                rows={data || []}
                 getRowId={(row) => row?.brand_unique_id}
                 columns={columns}
                 page={currentPage}
                 pageSize={pageSize}
-                totalCount={data?.totalCount || 0}
+                totalCount={brandsData?.totalCount || 0}
                 setCurrentPage={setCurrentPage}
                 setPageSize={setPageSize}
                 sort={sort}
