@@ -11,9 +11,10 @@ export default function DataTable({
   totalCount,
   setCurrentPage,
   setPageSize,
+  sort,
+  setSort,
 }) {
   const pageCount = Math.ceil(totalCount / pageSize);
-  
 
   const handlePageSizeChange = (newPageSize) => {
     setPageSize(newPageSize);
@@ -28,11 +29,21 @@ export default function DataTable({
         getRowId={getRowId}
         autoHeight={false} // Important when using fixed height
         disableRowSelectionOnClick
-
+        sortingMode="server"
+        sortModel={
+          sort
+            ? [
+                {
+                  field: sort.split(":")[0],
+                  sort: sort.split(":")[1],
+                },
+              ]
+            : []
+        }
+        onSortModelChange={setSort}
         // Completely disable MUI's internal pagination
-        pagination={false}           // This is the key!
+        pagination={false} // This is the key!
         hideFooter={true}
-
         sx={{
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: "#4f46e5",
@@ -56,7 +67,7 @@ export default function DataTable({
             onChange={(e) => handlePageSizeChange(Number(e.target.value))}
             className="border rounded px-2 py-1 text-sm"
           >
-            {[10,25,50,75,100].map((size) => (
+            {[10, 25, 50, 75, 100].map((size) => (
               <option key={size} value={size}>
                 {size}
               </option>

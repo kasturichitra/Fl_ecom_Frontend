@@ -1,38 +1,32 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useDispatch } from "react-redux";
+import { useState } from "react";
 
-import { fetchBrands } from "../../redux/brandSlice";
 import { useDeleteBrand, useGetAllBrands } from "../../hooks/useBrand";
 
-import SearchBar from "../../components/SearchBar";
-import DynamicTable from "../../components/DynamicTable";
-import BrandManager from "./BrandManager";
-import BrandEditModal from "./BrandEditModal";
-import PageHeader from "../../components/PageHeader";
-import DataTable from "../../components/Table";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import PageHeader from "../../components/PageHeader";
+import SearchBar from "../../components/SearchBar";
+import DataTable from "../../components/Table";
+import BrandEditModal from "./BrandEditModal";
+import BrandManager from "./BrandManager";
 
 const BrandListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
+  const [sort, setSort] = useState("createdAt:desc"); 
 
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0); // 0-based page
 
   const { mutateAsync: deleteBrandMutation } = useDeleteBrand();
 
-  const token = localStorage.getItem("token");
-  const tenantId = "tenant123";
-
-  const { data, isLoading, isError } = useGetAllBrands({
+  const { data, isError } = useGetAllBrands({
     searchTerm,
+    sort: decodeURIComponent(sort),
     page: currentPage + 1, // API pages are 1-based
     limit: pageSize,
   });
-
-  console.log("brandsData", data);
 
   const columns = [
     {
@@ -171,6 +165,11 @@ const BrandListManager = () => {
                 totalCount={data?.totalCount || 0}
                 setCurrentPage={setCurrentPage}
                 setPageSize={setPageSize}
+                sort={sort}
+                setSort={(newSort) => {
+                  const sortItem = newSort[0];
+                  setSort(sortItem ? `${sortItem.field}:${sortItem.sort}` : "");
+                }}
               />
             )}
           </div>
