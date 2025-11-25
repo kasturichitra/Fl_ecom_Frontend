@@ -1,17 +1,14 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useDispatch } from "react-redux";
+import { useState } from "react";
 
-import { fetchBrands } from "../../redux/brandSlice";
 import { useDeleteBrand, useGetAllBrands } from "../../hooks/useBrand";
 
-import SearchBar from "../../components/SearchBar";
-import DynamicTable from "../../components/DynamicTable";
-import BrandManager from "./BrandManager";
-import BrandEditModal from "./BrandEditModal";
-import PageHeader from "../../components/PageHeader";
-import DataTable from "../../components/Table";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import PageHeader from "../../components/PageHeader";
+import SearchBar from "../../components/SearchBar";
+import DataTable from "../../components/Table";
+import BrandEditModal from "./BrandEditModal";
+import BrandManager from "./BrandManager";
 
 const BrandListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
