@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
-import {  useSelector } from "react-redux";
+import { useState } from "react";
 import CategorySelector from "../../components/CategorySelector";
-import EditModalLayout from "../../components/EditModalLayout";
 import DynamicForm from "../../components/DynamicForm";
+import EditModalLayout from "../../components/EditModalLayout";
 import { useUpdateBrand } from "../../hooks/useBrand";
 import { useGetAllCategories } from "../../hooks/useCategory";
 
