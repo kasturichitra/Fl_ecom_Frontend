@@ -70,7 +70,7 @@ const PageLayoutWithTable = ({
                   onClick={DownloadHandler}
                 >
                   <FaFileDownload />
-                  Download XL
+                  Download Excel
                 </button>
                 {/* New functionality I want to add */}
                 {/* <button
