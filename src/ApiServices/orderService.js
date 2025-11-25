@@ -7,6 +7,8 @@ export const getAllOrdersApi = (params = {}) => {
     return axiosInstance.get(`${BASE_URL}/search${queryString ? `?${queryString}` : ""} `);
 };  
 
-
+export const getOrderProductsByIdApi= (orderId) => {
+    return axiosInstance.get(`${BASE_URL}/${orderId}`);
+}
 
 

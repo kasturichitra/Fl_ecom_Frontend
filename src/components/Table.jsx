@@ -13,6 +13,8 @@ export default function DataTable({
   setPageSize,
   sort,
   setSort,
+  onRowClick,
+  pathname,
 }) {
   const pageCount = Math.ceil(totalCount / pageSize);
 
@@ -41,10 +43,17 @@ export default function DataTable({
             : []
         }
         onSortModelChange={setSort}
+        onRowClick={onRowClick}
         // Completely disable MUI's internal pagination
         pagination={false} // This is the key!
         hideFooter={true}
         sx={{
+          ...(pathname === "/order" && {
+            "& .MuiDataGrid-row": {
+              cursor: "pointer",
+            },
+          }),
+
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: "#4f46e5",
             color: "black",
