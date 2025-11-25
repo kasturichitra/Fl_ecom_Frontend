@@ -1,42 +1,56 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import SearchDropdown from "./SearchDropdown";
 
 export default function DownloadXLExcel({
   isOpen,
   setIsOpen,
   modelInputPlaceholder,
-  search,
-  formattedCategories,
-  clearResults,
-  onChange,
-  onSearch,
-  onSelect,
+  data,
+  searchTerm,
+  setSearchTerm,
+  showDropdown,
+  setShowDropdown,
+  handleSelect, 
 }) {
+  // const filteredResults = data?.filter((item) => item.label.toLowerCase().includes(searchTerm.toLowerCase()));
 
+  // const handleSelect = (item) => {
+  //   console.log("Selected category_unique_id:", item.value);
+  //   setSearchTerm("");
+  //   setShowDropdown(false);
+  // };
 
   return (
     <>
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="absolute inset-0 bg-gray-100 opacity-50"
-            // onClick={() => setIsOpen(false)}
-          />
+          <div className="absolute inset-0 bg-gray-100 opacity-50" />
 
-          {/* Modal Content */}
           <div className="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Search</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Download by Category</h2>
 
             <SearchDropdown
-              value={search}//value of the search input
-              placeholder={modelInputPlaceholder}//placeholder text
-              results={formattedCategories}//results to be displayed in the dropdown
-              onChange={onChange} // update search value
-              onSearch={onSearch} // trigger API search
-              onSelect={onSelect} //set the search value
-              clearResults={clearResults} //clear search results
+              value={searchTerm}
+              placeholder={modelInputPlaceholder || "Search category..."}
+              results={showDropdown ? data : []}
+              onChange={(val) => {
+                setSearchTerm(val);
+                setShowDropdown(true);
+              }}
+              onSearch={(val) => {
+                setSearchTerm(val);
+                setShowDropdown(true);
+              }}
+              onSelect={(item) => {
+                handleSelect(item);
+                setShowDropdown(false);
+              }}
+              clearResults={() => {
+                setSearchTerm("");
+                setShowDropdown(false);
+              }}
             />
-            {/* Close Button */}
+
             <button
               onClick={() => setIsOpen(false)}
               className="mt-6 w-full py-2 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition"

@@ -22,6 +22,9 @@ export const createCategoryApi = async (formData) => {
   });
 };
 
+export const getCategoryByUniqueIdApi = async (uniqueId) => {
+  return await axiosInstance.get(`${BASE_URL}/${uniqueId ?? ""}`);
+}
 /**
  * -----------------------------------------
  * 🟥 DELETE CATEGORY

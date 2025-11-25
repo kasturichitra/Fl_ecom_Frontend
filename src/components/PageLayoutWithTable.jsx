@@ -1,7 +1,6 @@
-import React from "react";
-import SearchBar from "./SearchBar";
-import DynamicTable from "./DynamicTable";
 import { FaFileDownload } from "react-icons/fa";
+import DynamicTable from "./DynamicTable";
+import SearchBar from "./SearchBar";
 import DownloadXLExcel from "./xlDownloadModel.jsx";
 
 const PageLayoutWithTable = ({
@@ -28,12 +27,12 @@ const PageLayoutWithTable = ({
   isOpen,
   setIsOpen,
   modelInputPlaceholder,
-  search,
-  formattedCategories,
-  clearResults,
-  onChange,
-  onSearch,
-  onSelect
+  excelDropdownData,
+  excelSearchTerm,
+  setExcelSearchTerm,
+  showExcelDropdown,
+  setShowExcelDropdown,
+  handleExcelCategorySelect, 
 }) => {
   return (
     <div className="min-h-screen bg-gray-50 py-10">
@@ -80,12 +79,12 @@ const PageLayoutWithTable = ({
                   isOpen={isOpen}
                   setIsOpen={setIsOpen}
                   modelInputPlaceholder={modelInputPlaceholder}
-                  search={search}
-                  formattedCategories={formattedCategories}
-                  clearResults={clearResults}
-                  onChange={onChange}
-                  onSearch={onSearch}
-                  onSelect={onSelect}
+                  data={excelDropdownData}
+                  searchTerm={excelSearchTerm}
+                  setSearchTerm={setExcelSearchTerm}
+                  showDropdown={showExcelDropdown}
+                  setShowDropdown={setShowExcelDropdown}
+                  handleSelect={handleExcelCategorySelect}
                 />
               </div>
             )}

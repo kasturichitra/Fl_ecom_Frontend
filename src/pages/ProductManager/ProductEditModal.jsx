@@ -28,7 +28,7 @@ const ProductEditModal = ({ product, onClose }) => {
         if (value && (isNaN(value) || value < 0 || value > 99))
           error = "Discount must be between 0–99%";
         break;
-      case "products_unique_ID":
+      case "product_unique_id":
         if (!value.trim()) error = "Product ID is required";
         break;
       case "brand_unique_ID":
@@ -43,7 +43,7 @@ const ProductEditModal = ({ product, onClose }) => {
           !value ||
           isNaN(value) ||
           Number(value) <= 0 ||
-          Number(value) < Number(form.min_order_quantity)
+          Number(value) < Number(form?.min_order_quantity)
         )
           error = "Max order must be greater than or equal to min order";
         break;
@@ -64,8 +64,8 @@ const ProductEditModal = ({ product, onClose }) => {
 
   /** 💰 Auto calculate discount price */
   useEffect(() => {
-    const price = parseFloat(form.price);
-    const discount = parseFloat(form.discount_percentage);
+    const price = parseFloat(form?.price);
+    const discount = parseFloat(form?.discount_percentage);
     if (!isNaN(price) && !isNaN(discount)) {
       setForm((prev) => ({
         ...prev,
@@ -74,7 +74,7 @@ const ProductEditModal = ({ product, onClose }) => {
     } else {
       setForm((prev) => ({ ...prev, discount_price: "" }));
     }
-  }, [form.price, form.discount_percentage]);
+  }, [form?.price, form?.discount_percentage]);
 
   /** 💾 Submit handler */
   const handleSubmit = (e) => {
@@ -116,8 +116,8 @@ const ProductEditModal = ({ product, onClose }) => {
             </label>
             <input
               type="text"
-              name="products_unique_ID"
-              value={form.products_unique_ID || ""}
+              name="product_unique_id"
+              value={form?.product_unique_id || ""}
               readOnly
               className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100 cursor-not-allowed"
             />
@@ -131,7 +131,7 @@ const ProductEditModal = ({ product, onClose }) => {
             <input
               type="text"
               name="product_name"
-              value={form.product_name || ""}
+              value={form?.product_name || ""}
               onChange={handleChange}
               className={`w-full border ${
                 errors.product_name ? "border-red-400" : "border-gray-300"
@@ -151,15 +151,15 @@ const ProductEditModal = ({ product, onClose }) => {
             </label>
             <select
               name="brand_unique_ID"
-              value={form.brand_unique_ID || ""}
+              value={form?.brand_unique_ID || ""}
               onChange={handleChange}
               className={`w-full border ${
                 errors.brand_unique_ID ? "border-red-400" : "border-gray-300"
               } rounded px-3 py-2`}
             >
               <option value="">-- Choose Brand --</option>
-              {brands.map((b) => (
-                <option key={b.brand_unique_ID} value={b.brand_unique_ID}>
+              {brands.map((b, idx) => (
+                <option key={idx} value={b.brand_unique_ID}>
                   {b.brand_name}
                 </option>
               ))}
@@ -179,7 +179,7 @@ const ProductEditModal = ({ product, onClose }) => {
             <input
               type="text"
               name="price"
-              value={form.price || ""}
+              value={form?.price || ""}
               onChange={handleChange}
               className={`w-full border ${
                 errors.price ? "border-red-400" : "border-gray-300"
@@ -198,7 +198,7 @@ const ProductEditModal = ({ product, onClose }) => {
             <input
               type="text"
               name="discount_percentage"
-              value={form.discount_percentage || ""}
+              value={form?.discount_percentage || ""}
               onChange={handleChange}
               className={`w-full border ${
                 errors.discount_percentage
@@ -221,7 +221,7 @@ const ProductEditModal = ({ product, onClose }) => {
             <input
               type="text"
               name="discount_price"
-              value={form.discount_price || ""}
+              value={form?.discount_price || ""}
               readOnly
               className="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100 cursor-not-allowed"
             />
@@ -235,7 +235,7 @@ const ProductEditModal = ({ product, onClose }) => {
             <input
               type="text"
               name="stock_quantity"
-              value={form.stock_quantity || ""}
+              value={form?.stock_quantity || ""}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded px-3 py-2"
             />
@@ -246,7 +246,7 @@ const ProductEditModal = ({ product, onClose }) => {
             <input
               type="checkbox"
               name="stock_availability"
-              checked={form.stock_availability || false}
+              checked={form?.stock_availability || false}
               onChange={handleChange}
               className="h-4 w-4"
             />
@@ -263,7 +263,7 @@ const ProductEditModal = ({ product, onClose }) => {
             <input
               type="number"
               name="min_order_quantity"
-              value={form.min_order_quantity || ""}
+              value={form?.min_order_quantity || ""}
               onChange={handleChange}
               className={`w-full border ${
                 errors.min_order_quantity
@@ -286,7 +286,7 @@ const ProductEditModal = ({ product, onClose }) => {
             <input
               type="number"
               name="max_order_quantity"
-              value={form.max_order_quantity || ""}
+              value={form?.max_order_quantity || ""}
               onChange={handleChange}
               className={`w-full border ${
                 errors.max_order_quantity
