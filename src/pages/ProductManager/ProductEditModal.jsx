@@ -95,7 +95,7 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
   const handleSubmit = async (e) => {
     e?.preventDefault?.();
     // No validation here
-    const { product_image, ...rest } = form;
+    const { product_image, product_attributes, ...rest } = form;
 
     // Use attributesRef for the latest repeater values
     const currentAttributes = attributesRef.current || [];
@@ -112,7 +112,7 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
 
     await updateProduct({ uniqueId: product.product_unique_id, payload: formData });
 
-    if (onSuccess) onSuccess();
+    // if (onSuccess) onSuccess();
     closeModal();
   };
 
