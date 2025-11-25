@@ -173,23 +173,3 @@ const IndustryTypeList = () => {
 };
 
 export default IndustryTypeList;
-
-{
-  /* <PageLayoutWithTable
-        title="Industry Types Manager"
-        subtitle="Manage all industry classifications"
-        buttonLabel="Add New Industry"
-        onAddClick={() => setShowAddModal(true)}
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        tableData={industryTypes}
-        columns={columns}
-        loading={loading}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        error={error}
-        itemsPerPage={8}
-        excludeColumns={["_id", "__v", "tenant_id", "createdAt", "updatedAt", "created_by", "updated_by"]}
-        emptyMessage={<div className="text-center py-10 text-gray-500">No industry types found.</div>}
-      /> */
-}

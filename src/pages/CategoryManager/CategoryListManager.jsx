@@ -123,7 +123,7 @@ const CategoryListManager = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10">
+    <div className="min-h-screen bg-gray-50 py-0">
       <div className="flex flex-col gap-y-4 border border-gray-300 rounded-lg p-4 height-full border-blck">
         {/* HEADER */}
         <PageHeader

@@ -133,6 +133,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
     });
 
     await updateCategory({ uniqueId: category.category_unique_id, payload: fd });
+    onClose()
   };
 
   // ------------------------------
