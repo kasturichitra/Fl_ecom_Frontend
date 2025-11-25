@@ -52,8 +52,6 @@ const ProductList = () => {
     const uniqueId = item.value;
     const response = await downloadExcel({ uniqueId });
 
-    // console.log("Excel data:", data);
-
     const blob = new Blob([response.data], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });

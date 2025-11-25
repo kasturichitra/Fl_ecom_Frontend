@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const AttributeRepeater = ({
   label = "Attributes",
@@ -6,8 +6,16 @@ const AttributeRepeater = ({
   onChange,
 }) => {
   const [items, setItems] = useState([]);
+  const prevPredefinedRef = useRef(null);
 
   useEffect(() => {
+    // Only update items when the content of `predefined` actually changes.
+    const currentJSON = JSON.stringify(predefined || []);
+    if (prevPredefinedRef.current === currentJSON) {
+      return;
+    }
+    prevPredefinedRef.current = currentJSON;
+
     // Load predefined DB attributes (non-removable)
     const dbItems = predefined.map((item) => ({
       ...item,
@@ -15,7 +23,7 @@ const AttributeRepeater = ({
     }));
 
     setItems([...dbItems]);
-    // Don't call onChange here - this was causing the infinite loop!
+    // Don't call onChange here to avoid writing back the initial values as user edits them
   }, [predefined]);
 
   const updateItems = (newItems) => {
@@ -26,7 +34,8 @@ const AttributeRepeater = ({
 
   const handleFieldChange = (index, key, value) => {
     const updated = [...items];
-    updated[index][key] = value;
+    // Always store as string from the input - this avoids lost digits, etc.
+    updated[index][key] = typeof value === "number" ? String(value) : value;
     updateItems(updated);
   };
 

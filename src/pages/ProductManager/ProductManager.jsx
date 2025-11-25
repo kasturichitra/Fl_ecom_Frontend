@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import DynamicForm from "../../components/DynamicForm";
 import { createProduct } from "../../redux/productSlice";
@@ -9,6 +9,7 @@ import ScrollWrapper from "../../components/ui/ScrollWrapper";
 import FormActionButtons from "../../components/FormActionButtons";
 import { useCreateProduct } from "../../hooks/useProduct";
 import { objectToFormData } from "../../utils/ObjectToFormData";
+import { PRODUCT_STATIC_FIELDS } from "../../constants/productFields";
 
 const ProductManager = ({ onCancel }) => {
   // Ref to get attributes from AttributeRepeater
@@ -46,8 +47,24 @@ const ProductManager = ({ onCancel }) => {
   });
 
   const { data: brands } = useGetAllBrands({
-    searchTerm: brandSearchTerm,
+    search: brandSearchTerm,
   });
+
+  // Prepare DB attributes (stateless list used by AttributeRepeater)
+  const dbAttributes = selectedCategoryAttributes.map((attr) => ({
+    attribute_code: attr.code,
+    value: "",
+    placeholderValue: `Enter ${attr.name}`,
+    type: "text",
+  }));
+
+  // Initialize attributesRef with the pre-defined DB attributes
+  useEffect(() => {
+    attributesRef.current = dbAttributes.map((a) => ({
+      attribute_code: a.attribute_code,
+      value: a.value || "",
+    }));
+  }, [dbAttributes]);
 
   const formattedCategories = categories?.map((cat) => ({
     value: cat.category_unique_id,
@@ -62,13 +79,6 @@ const ProductManager = ({ onCancel }) => {
   const { data: selectedCategoryItem } = useGetCategoryByUniqueId(selectedCategory);
 
   const selectedCategoryAttributes = selectedCategoryItem?.attributes || [];
-
-  const dbAttributes = selectedCategoryAttributes.map((attr) => ({
-    attribute_code: attr.code,
-    value: "",
-    placeholderValue: `Enter ${attr.name}`,
-    type: "text",
-  }));
 
   const { mutateAsync: createProduct, isPending: isSubmitting } = useCreateProduct({
     onSuccess: () => {
@@ -116,101 +126,7 @@ const ProductManager = ({ onCancel }) => {
       onSelect: (value) => setForm((prev) => ({ ...prev, brand_unique_id: value.value })),
       placeholder: "e.g., apple1",
     },
-    {
-      key: "product_unique_id",
-      label: "Product Unique ID *",
-      type: "text",
-      required: true,
-      placeholder: "e.g., HF1-002",
-    },
-    {
-      key: "product_name",
-      label: "Product Name *",
-      type: "text",
-      required: true,
-      placeholder: "e.g., Premium Cotton Bedsheet",
-    },
-    {
-      key: "product_description",
-      label: "Product Description",
-      type: "textarea",
-      placeholder: "e.g., Premium Cotton Bedsheet",
-    },
-    {
-      key: "product_color",
-      label: "Product Color",
-      type: "text",
-      placeholder: "e.g., White",
-    },
-    {
-      key: "product_size",
-      label: "Product Size",
-      type: "text",
-      placeholder: "e.g., 3x4",
-    },
-    {
-      key: "price",
-      label: "Price *",
-      type: "number",
-      required: true,
-      min: 0,
-    },
-    {
-      key: "discount_percentage",
-      label: "Discount Percentage",
-      type: "number",
-      min: 0,
-      max: 99,
-    },
-    {
-      key: "cgst",
-      label: "CGST %",
-      type: "number",
-      min: 0,
-    },
-    {
-      key: "sgst",
-      label: "SGST %",
-      type: "number",
-      min: 0,
-    },
-    {
-      key: "igst",
-      label: "IGST %",
-      type: "number",
-      min: 0,
-    },
-    {
-      key: "stock_quantity",
-      label: "Stock Quantity *",
-      type: "number",
-      required: true,
-      min: 0,
-    },
-    {
-      key: "min_order_limit",
-      label: "Minimum Order Limit *",
-      type: "number",
-      required: true,
-      min: 1,
-    },
-    {
-      key: "gender",
-      label: "Gender *",
-      type: "select",
-      required: true,
-      options: [
-        { label: "Unisex", value: "Unisex" },
-        { label: "Men", value: "Men" },
-        { label: "Women", value: "Women" },
-      ],
-    },
-    {
-      key: "product_image",
-      label: "Product Image *",
-      type: "file",
-      required: true,
-    },
+    ...PRODUCT_STATIC_FIELDS,
   ];
 
   // CALLBACK: Update attributes ref
