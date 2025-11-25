@@ -43,5 +43,8 @@ export const deleteCategoryApi = async (uniqueId) => {
  */
 // http://10.1.1.156:3000/category/ME1
 export const updateCategoryApi = async (uniqueId, payload) => {
+  console.log(payload,'category update paload....');
+  console.log(uniqueId,'category update uniqueId....');
+  
   return await axiosInstance.put(`${BASE_URL}/${uniqueId ?? ""}`, payload);
 };

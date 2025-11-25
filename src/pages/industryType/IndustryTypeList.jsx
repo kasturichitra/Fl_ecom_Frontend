@@ -91,10 +91,10 @@ const IndustryTypeList = () => {
       renderCell: (params) => (
         <span
           className={`px-3 py-1 rounded-full text-xs font-bold ${
-            params.value ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
           }`}
         >
-          {params.value ? "Active" : "Inactive"}
+          {params.row?.is_active ? "Active" : "Inactive"}
         </span>
       ),
     },
@@ -173,23 +173,3 @@ const IndustryTypeList = () => {
 };
 
 export default IndustryTypeList;
-
-{
-  /* <PageLayoutWithTable
-        title="Industry Types Manager"
-        subtitle="Manage all industry classifications"
-        buttonLabel="Add New Industry"
-        onAddClick={() => setShowAddModal(true)}
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        tableData={industryTypes}
-        columns={columns}
-        loading={loading}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        error={error}
-        itemsPerPage={8}
-        excludeColumns={["_id", "__v", "tenant_id", "createdAt", "updatedAt", "created_by", "updated_by"]}
-        emptyMessage={<div className="text-center py-10 text-gray-500">No industry types found.</div>}
-      /> */
-}

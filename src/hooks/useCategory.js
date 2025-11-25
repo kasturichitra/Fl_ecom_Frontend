@@ -7,7 +7,7 @@ export const useGetAllCategories = ({ search = "", page = 1, limit = 10 } = {}) 
   return useQuery({
     queryKey,
     queryFn: () => getAllCategoryApi({ search, page, limit }),
-    select: (res) => res.data.data,
+    select: (res) => res.data,
     staleTime: 5 * 60 * 1000,
     cacheTime: 20 * 60 * 1000, 
     refetchOnMount: false, 
@@ -67,14 +67,16 @@ export const useCategoryDelete = () => {
     mutationFn: ({ uniqueId }) => deleteCategoryApi(uniqueId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
-      toast.success("Category deleted successfully", {
-        duration: 2000, // 2 second
-      });
+      // toast.success("Category deleted successfully", {
+      //   duration: 2000, // 2 second
+      // });
+      alert("Category deleted successfully");
     },
     onError: () => {
-      toast.error("Failed to delete category", {
-        duration: 3000, // 3 second
-      });
+      // toast.error("Failed to delete category", {
+      //   duration: 3000, // 3 second
+      // });
+      alert("Failed to delete category");
     },
   });
 };

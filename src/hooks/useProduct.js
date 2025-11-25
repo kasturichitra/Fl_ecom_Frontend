@@ -9,12 +9,12 @@ import {
 } from "../ApiServices/productService";
 import toast from "react-hot-toast";
 
-export const useGetAllProducts = ({ searchTerm = "", page = 1, limit = 10 } = {}) => {
-  const queryKey = ["products", searchTerm, page, limit];
+export const useGetAllProducts = ({ searchTerm = "", page = 1, limit = 10, sort = "" } = {}) => {
+  const queryKey = ["products", searchTerm, page, limit, sort];
   return useQuery({
     queryKey,
-    queryFn: () => getAllProductsApi({ searchTerm, page, limit }),
-    select: (res) => res.data.data,
+    queryFn: () => getAllProductsApi({ searchTerm, page, limit, sort }),
+    select: (res) => res.data,
     staleTime: 60 * 1000,
     refetchOnMount: false,
   });
@@ -98,5 +98,5 @@ export const useCreateBulkProducts = () => {
     onError: () => {
       toast.error("Failed to create bulk products");
     },
-  })
-}
+  });
+};
