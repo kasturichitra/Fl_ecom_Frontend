@@ -46,7 +46,11 @@ const ProductList = () => {
       setEditingProduct(null);
     },
   });
-  const { mutateAsync: downloadExcel } = useDownloadProductExcel();
+  const { mutateAsync: downloadExcel } = useDownloadProductExcel({
+    onSuccess: () => {
+      setIsOpen(false);
+    },
+  });
   const { mutateAsync: createBulkProducts } = useCreateBulkProducts();
 
   const handleExcelCategorySelect = async (item) => {

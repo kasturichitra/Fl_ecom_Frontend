@@ -68,7 +68,7 @@ export const useUpdateProduct = (options = {}) => {
   });
 };
 
-export const useDownloadProductExcel = () => {
+export const useDownloadProductExcel = (options = {}) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ uniqueId }) => downloadProductsExcelApi(uniqueId),
@@ -77,6 +77,7 @@ export const useDownloadProductExcel = () => {
       toast.success("Product Excel downloaded successfully", {
         duration: 2000, // 2 second
       });
+      options?.onSuccess?.();
     },
     onError: () => {
       toast.error("Failed to download product Excel", {
