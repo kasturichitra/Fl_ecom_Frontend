@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 
 import toast from "react-hot-toast";
@@ -6,23 +6,37 @@ import DynamicTable from "../../components/DynamicTable";
 import PageHeader from "../../components/PageHeader";
 import SearchBar from "../../components/SearchBar";
 
-import {
-  useCategoryDelete,
-  useGetAllCategories,
-} from "../../hooks/useCategory.js";
+import { useCategoryDelete, useGetAllCategories } from "../../hooks/useCategory.js";
 
 import CategoryEditModal from "./CategoryEditModal";
 import CategoryManager from "./CategoryManager";
+import DataTable from "../../components/Table.jsx";
+import { FaEdit } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
 
 const CategoryListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+
   const [editingCategory, setEditingCategory] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
-
-  const { data: categories, isLoading: loading, isError: error } =
-    useGetAllCategories({ search: searchTerm });
+  const [pageSize, setPageSize] = useState(10);
+  const [currentPage, setCurrentPage] = useState(0);
+  const {
+    data: categories,
+    isLoading: loading,
+    isError: error,
+  } = useGetAllCategories({ search: searchTerm, page: currentPage + 1, limit: pageSize });
 
   const { mutate: deleteCategory, isPending } = useCategoryDelete();
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(0); // reset to first page on search
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
 
   const handleEdit = useCallback((category) => {
     setEditingCategory(category);
@@ -33,48 +47,84 @@ const CategoryListManager = () => {
   }, []);
 
   const handleDelete = (targetcategory) => {
-    const { category_unique_id } = targetcategory;
-    deleteCategory({ uniqueId: category_unique_id });
-  };
+    const { category_unique_id, category_name } = targetcategory;
 
+    if (window.confirm(`Delete ${category_name}?`)) {
+      deleteCategory({ uniqueId: category_unique_id });
+    }
+  };
   const columns = [
     {
-      key: "category_unique_id",
-      label: "UNIQUE ID",
-      render: (value) => (
+      field: "category_unique_id",
+      headerName: "UNIQUE ID",
+      flex: 1,
+      headerClassName: "custom-header",
+      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize font-bold",
+      renderCell: (params) => (
         <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-          {value || "N/A"}
+          {params.value || "N/A"}
         </span>
       ),
     },
+
     {
-      key: "category_name",
-      label: "CATEGORY NAME",
-      render: (value) => (
-        <span className="font-semibold">{value || "Unnamed"}</span>
-      ),
+      field: "category_name",
+      headerName: "CATEGORY NAME",
+      flex: 1,
+      headerClassName: "custom-header",
+      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize",
+      renderCell: (params) => <span className="font-semibold">{params.value || "Unnamed"}</span>,
     },
+
     {
-      key: "is_active",
-      label: "STATUS",
-      render: (value) => (
+      field: "is_active",
+      headerName: "STATUS",
+      flex: 1,
+      type: "singleSelect",
+      valueOptions: ["Active", "Inactive"],
+
+      // Convert boolean → string for filters
+      valueGetter: (params) => (params.value ? "Active" : "Inactive"),
+
+      renderCell: (params) => (
+        // console.log(params?.row?.is_active,'pafsjafbksdf')
+
         <span
           className={`px-3 py-1.5 rounded-full text-xs font-bold ${
-            value
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
+            params?.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
           }`}
         >
-          {value ? "Active" : "Inactive"}
+          {params?.row?.is_active ? "Active" : "Inactive"}
         </span>
+      ),
+    },
+
+    {
+      field: "actions",
+      headerName: "ACTIONS",
+      sortable: false,
+      filterable: false,
+      width: 150,
+      headerClassName: "custom-header",
+      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 flex gap-1",
+      disableColumnMenu: true,
+
+      renderCell: (params) => (
+        <div className="flex gap-2 align-center">
+          <button onClick={() => handleEdit(params.row)} className="cursor-pointer">
+            <FaEdit size={18} className="text-[#4f46e5]" />
+          </button>
+          <button onClick={() => handleDelete(params.row)}>
+            <MdDelete size={18} className="text-[#4f46e5]" />
+          </button>
+        </div>
       ),
     },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50 py-10">
-      <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
-
+      <div className="flex flex-col gap-y-4 border border-gray-300 rounded-lg p-4 height-full border-blck">
         {/* HEADER */}
         <PageHeader
           title="Categories Manager"
@@ -84,17 +134,28 @@ const CategoryListManager = () => {
         />
 
         {/* SEARCH */}
-        <div className="p-6 bg-gray-50 border-b">
-          <SearchBar
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
-            placeholder="Search categories..."
-            className="mx-auto max-w-md"
-          />
-        </div>
+        {/* <div className="p-6 bg-gray-50 border-b"> */}
+        <SearchBar
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          placeholder="Search categories..."
+          // className="mx-auto max-w-md"
+        />
+        {/* </div> */}
+
+        <DataTable
+          rows={categories?.data || []}
+          columns={columns}
+          getRowId={(row) => row.category_unique_id}
+          page={currentPage}
+          pageSize={pageSize}
+          totalCount={categories?.totalCount || 0}
+          setCurrentPage={setCurrentPage}
+          setPageSize={setPageSize}
+        />
 
         {/* TABLE */}
-        <div className="p-6 bg-white">
+        {/* <div className="p-6 bg-white">
           {error ? (
             <p>Error loading categories</p>
           ) : (
@@ -130,16 +191,13 @@ const CategoryListManager = () => {
               ]}
             />
           )}
-        </div>
+        </div> */}
       </div>
 
       {/* Add Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setShowAddModal(false)}
-          />
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowAddModal(false)} />
           <div className="relative bg-white rounded-2xl p-6 w-full max-w-xl shadow-lg">
             <CategoryManager onCancel={() => setShowAddModal(false)} />
           </div>
@@ -147,12 +205,7 @@ const CategoryListManager = () => {
       )}
 
       {/* Edit Modal */}
-      {editingCategory && (
-        <CategoryEditModal
-          category={editingCategory}
-          onClose={handleCloseEditModal}
-        />
-      )}
+      {editingCategory && <CategoryEditModal category={editingCategory} onClose={handleCloseEditModal} />}
     </div>
   );
 };

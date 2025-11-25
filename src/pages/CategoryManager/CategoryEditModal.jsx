@@ -27,6 +27,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
     image: null,
     currentImage: null,
   });
+// console.log(formData,'formData');
 
   const [attributes, setAttributes] = useState([]);
 
@@ -139,7 +140,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
   // ------------------------------
 
   // Format accordingly how the dynamic form is expecting
-  const formattedIndustryTypes = industryTypes?.map((i) => ({
+  const formattedIndustryTypes = industryTypes?.data?.map((i) => ({
     label: `${i.industry_name} #${i.industry_unique_id}`,
     value: i.industry_unique_id,
   }));

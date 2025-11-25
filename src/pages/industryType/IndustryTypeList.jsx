@@ -89,10 +89,10 @@ const IndustryTypeList = () => {
       renderCell: (params) => (
         <span
           className={`px-3 py-1 rounded-full text-xs font-bold ${
-            params.value ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
           }`}
         >
-          {params.value ? "Active" : "Inactive"}
+          {params.row?.is_active ? "Active" : "Inactive"}
         </span>
       ),
     },
