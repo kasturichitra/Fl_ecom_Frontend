@@ -130,7 +130,7 @@ const BrandManager = ({setShowAddModal,onCancel}) => {
       <form onSubmit={handleCreateBrand} className="space-y-6">
         {/* Category Selector */}
         <CategorySelector
-          categories={categoriesData}
+          categories={categoriesData?.data}
           selected={form.categories}
           setSelected={(values) => setForm({ ...form, categories: values })}
           errors={errors} 
