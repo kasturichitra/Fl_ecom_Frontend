@@ -5,8 +5,10 @@ import { useGetAllCategories } from "../../hooks/useCategory";
 import { useGetAllBrands } from "../../hooks/useBrand";
 import { useUpdateProduct } from "../../hooks/useProduct";
 import { PRODUCT_STATIC_FIELDS } from "../../constants/productFields";
+import { objectToFormData } from "../../utils/ObjectToFormData";
 
 const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
+  console.log("Product in edit modal:", product);
   const [form, setForm] = useState({
     category_unique_id: "",
     brand_unique_id: "",
@@ -46,9 +48,7 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
       product_color: product.product_color ?? "",
       product_size: product.product_size ?? "",
       product_image: null,
-      currentImage: product.product_images?.[0]
-        ? `${import.meta.env.VITE_API_URL}/${product.product_images[0]}`
-        : null,
+      currentImage: product.product_images?.[0] ? `${import.meta.env.VITE_API_URL}/${product.product_images[0]}` : null,
       price: product.price ?? "",
       discount_percentage: product.discount_percentage ?? "",
       cgst: product.cgst ?? "",
@@ -71,15 +71,12 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
     e?.preventDefault?.();
     // No validation here (removed as requested)
     try {
-      // Prepare payload (FormData if file upload support needed)
-      const payload = { ...form };
+      const { product_image, product_attributes, ...rest } = form;
 
-      // If product_image is a file, and backend expects multipart form
-      // user can re-enable or change logic later. For now, sending as-is.
-      await updateProduct({ id: product.product_unique_id, data: payload });
+      const formData = objectToFormData(rest);
+      formData.append("product_image", product_image);
 
-      if (onSuccess) onSuccess();
-      closeModal();
+      await updateProduct({ uniqueId: product.product_unique_id, payload: formData });
     } catch (err) {
       console.error(err);
       alert("Update failed");
@@ -141,7 +138,7 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
       isLoading={isUpdating}
       width="max-w-5xl"
     >
-      <DynamicForm fields={productFields} form={form} setForm={setForm} />
+      <DynamicForm fields={productFields} formData={form} setFormData={setForm} className="grid grid-cols-2" />
     </EditModalLayout>
   );
 };
