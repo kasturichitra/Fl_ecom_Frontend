@@ -95,9 +95,4 @@ export const PRODUCT_STATIC_FIELDS = [
     required: true,
     accept: "image/*",
   },
-  {
-    key: "product_attributes",
-    label: "Product Attributes",
-    type: "textarea",
-  },
 ];

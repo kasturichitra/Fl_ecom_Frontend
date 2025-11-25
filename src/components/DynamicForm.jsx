@@ -7,7 +7,7 @@ const DynamicForm = ({ fields = [], formData, setFormData, className = "" }) => 
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  console.log("Form Data coming into dynamic form:", formData);
+  // console.log("Form Data coming into dynamic form:", formData);
 
   return (
     <div className={cn("flex flex-col gap-4", className)}>
