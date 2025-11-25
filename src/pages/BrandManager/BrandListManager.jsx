@@ -139,32 +139,9 @@ const BrandListManager = () => {
             {isError ? (
               <p className="text-red-600">Error loading brands</p>
             ) : (
-              // <DynamicTable
-              //   data={brandsData || []}
-              //   columns={columns}
-              //   loading={isLoading}
-              //   onEdit={handleEdit}
-              //   onDelete={handleDelete}
-              //   sortable={true}
-              //   itemsPerPage={10}
-              //   emptyMessage={"No brands found"}
-              //   excludeColumns={["_id", "__v", "tenant_id", "createdAt", "updatedAt", "created_by", "updated_by"]}
-              // />
-
-              // <DataTable
-              //   rows={industryTypes?.data || []}
-              //   getRowId={(row) => row.industry_unique_id}
-              //   columns={columns}
-              //   page={currentPage}
-              //   pageSize={pageSize}
-              //   totalCount={industryTypes?.totalCount || 0}
-              //   setCurrentPage={setCurrentPage}
-              //   setPageSize={setPageSize}
-              // />
-
               <DataTable
                 rows={data?.brands || []}
-                getRowId={(row) => row.brand_unique_id}
+                getRowId={(row) => row?.brand_unique_id}
                 columns={columns}
                 page={currentPage}
                 pageSize={pageSize}
