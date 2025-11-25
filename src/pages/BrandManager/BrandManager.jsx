@@ -5,6 +5,7 @@ import { useCreateBrand } from "../../hooks/useBrand";
 import DynamicForm from "../../components/DynamicForm";
 import CategorySelector from "../../components/CategorySelector";
 import FormActionButtons from "../../components/FormActionButtons";
+import toast from "react-hot-toast";
 
 
 const objectToFormData = (obj) => {
@@ -23,7 +24,7 @@ const objectToFormData = (obj) => {
   return formData;
 };
 
-const BrandManager = () => {
+const BrandManager = ({onCancel}) => {
   const dispatch = useDispatch();
   const { mutateAsync: createBrand } = useCreateBrand();
 
@@ -40,16 +41,24 @@ const BrandManager = () => {
   const [errors, setErrors] = useState({});
   const [imagePreview, setImagePreview] = useState([]);
 
+  console.log(errors,"errors" )
+
 
   const validate = () => {
     const e = {};
 
-    if (!form.brand_name.trim()) e.brand_name = "Brand name is required";
-    if (!form.brand_unique_id.trim()) e.brand_unique_id = "Brand Unique ID is required";
+    if(!form.brand_name.trim()) e.brand_name = "Brand name is required";
+    if(!form.brand_unique_id.trim()) e.brand_unique_id = "Brand unique ID is required";
+    if(!form.categories || !form.categories.length) {
+      e.categories = "Please select at least one category"
+    };
+    if(!form.brand_image) e.brand_image = "Brand image is required";
 
     setErrors(e);
+
     return Object.keys(e).length === 0;
   };
+
 
 
   const handleCreateBrand = async (e) => {
@@ -123,8 +132,9 @@ const BrandManager = () => {
           categories={categories}
           selected={form.categories}
           setSelected={(values) => setForm({ ...form, categories: values })}
+          errors={errors} 
         />
-        {errors.categories && <p className="text-red-500 text-sm">{errors.categories}</p>}
+        {/* {errors.categories && <p className="text-red-500 text-sm">{errors.categories}</p>} */}
 
         {/* Dynamic Inputs */}
         <DynamicForm fields={formFields} formData={form} setFormData={setForm} errors={errors} />
@@ -143,18 +153,7 @@ const BrandManager = () => {
 
         {/* Action Buttons */}
         <FormActionButtons
-          submitLabel="Add Brand"
-          onCancel={() => {
-            setForm({
-              categories: [],
-              brand_name: "",
-              brand_unique_id: "",
-              brand_description: "",
-              brand_image: [],
-            });
-            setImagePreview([]);
-          }}
-        />
+          onCancel = {onCancel}/>
       </form>
     </div>
   );

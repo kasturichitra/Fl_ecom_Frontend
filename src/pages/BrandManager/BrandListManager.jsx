@@ -1,14 +1,13 @@
-// src/components/BrandListManager.jsx
-
 import React, { useState, useEffect, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
-import { fetchBrands, deleteBrand } from "../../redux/brandSlice";
+import { fetchBrands } from "../../redux/brandSlice";
+import { useDeleteBrand, useGetAllBrands } from "../../hooks/useBrand";
 
-import PageLayoutWithTable from "../../components/PageLayoutWithTable";
+import SearchBar from "../../components/SearchBar";
+import DynamicTable from "../../components/DynamicTable";
 import BrandManager from "./BrandManager";
 import BrandEditModal from "./BrandEditModal";
-import { useDeleteBrand, useGetAllBrands, useUpdateBrand } from "../../hooks/useBrand";
 
 const BrandListManager = () => {
   const dispatch = useDispatch();
@@ -17,7 +16,7 @@ const BrandListManager = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
 
-  const { mutateAsync: deleteBrand } = useDeleteBrand();
+  const { mutateAsync: deleteBrandMutation } = useDeleteBrand();
 
   const token = localStorage.getItem("token");
   const tenantId = "tenant123";
@@ -32,60 +31,26 @@ const BrandListManager = () => {
 
   const {
     data: brandsData,
-    isLoading: loading,
-    isError: error,
-  } = useGetAllBrands({
-    searchTerm,
-  });
-
-  const handleEdit = async (brand) => {
-    setEditingBrand(brand);
-  };
-
-  const handleDelete = async (brand) => {
-    if (!window.confirm(`Delete brand "${brand.brand_name}"?`)) return;
-
-    await deleteBrand(brand.brand_unique_id);
-  };
-
-  const handleUpdate = async () => {
-    const { mutateAsync: updateBrand, isPending: isUpdating } = useUpdateBrand({
-      onSettled: () => {
-        setIsLoading(false);
-        setEditingBrand(null);
-      },
-    });
-
-    console.log("before update");
-
-    await updateBrand({
-      id: brand._id,
-      data: fd,
-    });
-
-    console.log("after update");
-  };
-
-  const handleCloseAddModal = () => {
-    setShowAddModal(false);
-    refreshBrands();
-  };
-
-  const handleCloseEditModal = () => {
-    setEditingBrand(null);
-    refreshBrands();
-  };
+    isLoading,
+    isError,
+  } = useGetAllBrands({ searchTerm });
 
   const columns = [
     {
       key: "brand_unique_id",
       label: "BRAND ID",
-      render: (value) => <span className="font-mono px-3 py-1 bg-purple-100 text-purple-700 rounded-md">{value}</span>,
+      render: (value) => (
+        <span className="font-mono px-3 py-1 bg-purple-100 text-purple-700 rounded-md">
+          {value}
+        </span>
+      ),
     },
     {
       key: "brand_name",
       label: "BRAND NAME",
-      render: (value) => <span className="font-semibold text-gray-800 text-lg">{value}</span>,
+      render: (value) => (
+        <span className="font-semibold text-gray-800 text-lg">{value}</span>
+      ),
     },
     {
       key: "brand_description",
@@ -99,39 +64,93 @@ const BrandListManager = () => {
     },
   ];
 
-  console.log("brands Data", brandsData);
+  const handleEdit = (brand) => {
+    setEditingBrand(brand);
+  };
+
+  const handleDelete = async (brand) => {
+    if (!window.confirm(`Delete brand "${brand.brand_name}"?`)) return;
+    await deleteBrandMutation(brand.brand_unique_id);
+  };
+
+  const handleCloseAddModal = () => {
+    setShowAddModal(false);
+    refreshBrands();
+  };
+
+  const handleCloseEditModal = () => {
+    setEditingBrand(null);
+    refreshBrands();
+  };
 
   return (
-    <>
-      <PageLayoutWithTable
-        title="Brand Management"
-        subtitle="Manage all brands for your system"
-        buttonLabel="Add New Brand"
-        onAddClick={() => setShowAddModal(true)}
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        tableData={brandsData?.brands}
-        columns={columns}
-        loading={loading}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        error={error}
-        emptyMessage="No brands found"
-        excludeColumns={["_id", "__v", "tenant_id", "createdAt", "updatedAt", "created_by", "updated_by"]}
-        itemsPerPage={10}
-      />
+    <div className="min-h-screen bg-gray-50 py-10">
+      <div className="max-w-8xl mx-auto px-4">
 
-      {/* ADD MODAL */}
+        {/* HEADER */}
+        <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white px-8 py-7 flex justify-between items-center">
+            <div>
+              <h1 className="text-4xl font-extrabold">Brand Management</h1>
+              <p className="text-indigo-100 text-lg mt-1">Manage all brands</p>
+            </div>
+
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="bg-white text-indigo-600 cursor-pointer font-bold px-6 py-3 
+              rounded-lg shadow-lg hover:bg-indigo-50 transition transform hover:scale-105"
+            >
+              Add New Brand
+            </button>
+          </div>
+
+          {/* SEARCH BAR */}
+          <div className="p-6 bg-gray-50 border-b flex justify-center">
+            <div className="max-w-md w-full">
+              <SearchBar
+                searchTerm={searchTerm}
+                onSearchChange={setSearchTerm}
+                placeholder="Search brands..."
+              />
+            </div>
+          </div>
+
+          {/* TABLE */}
+          <div className="p-6 bg-white">
+            {isError ? (
+              <p className="text-red-600">Error loading brands</p>
+            ) : (
+              <DynamicTable
+                data={brandsData?.brands || []}
+                columns={columns}
+                loading={isLoading}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                sortable={true}
+                itemsPerPage={10}
+                emptyMessage={"No brands found"}
+                excludeColumns={[
+                  "_id",
+                  "__v",
+                  "tenant_id",
+                  "createdAt",
+                  "updatedAt",
+                  "created_by",
+                  "updated_by",
+                ]}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ADD BRAND MODAL */}
       {showAddModal && (
-        <div
-          className="fixed glass-container:
-bg-white/20 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg
- bg-opacity-60 inset-0 flex items-center justify-center bg-black/40 z-50"
-        >
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
           <div className="bg-white rounded-xl shadow-xl p-8 max-w-3xl w-full relative">
             <button
               onClick={handleCloseAddModal}
-              className="absolute right-4 top-4 text-gray-800 text-3xl leading-none"
+              className="absolute right-4 top-4 text-gray-800 text-3xl"
             >
               ×
             </button>
@@ -140,21 +159,17 @@ bg-white/20 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg
         </div>
       )}
 
-      {/* EDIT MODAL */}
+      {/* EDIT BRAND MODAL */}
       {editingBrand && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
-          <div className="bg-white rounded-xl shadow-xl p-8 max-w-3xl w-full relative">
-            <button
-              onClick={handleCloseEditModal}
-              className="absolute right-4 top-4 text-gray-800 text-3xl leading-none"
-            >
-              ×
-            </button>
-            <BrandEditModal brand={editingBrand} onClose={handleCloseEditModal} setEditingBrand={setEditingBrand} />
-          </div>
+          <BrandEditModal
+            brand={editingBrand}
+            onClose={handleCloseEditModal}
+            setEditingBrand={setEditingBrand}
+          />
         </div>
       )}
-    </>
+    </div>
   );
 };
 

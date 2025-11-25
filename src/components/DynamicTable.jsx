@@ -21,15 +21,6 @@ const DynamicTable = ({
     (col) => !excludeColumns.includes(col.key)
   );
 
-  // const sortedData = useMemo(() => {
-  //   if (!sortable || !sortConfig.key) return data;
-  //   const sorted = [...data].sort((a, b) => {
-  //     if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === "asc" ? -1 : 1;
-  //     if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === "asc" ? 1 : -1;
-  //     return 0;
-  //   });
-  //   return sorted;
-  // }, [data, sortConfig, sortable]);
 
   const paginatedData = useMemo(() => {
     const start = currentPage * itemsPerPage;

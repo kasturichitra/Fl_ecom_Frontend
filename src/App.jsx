@@ -2,6 +2,8 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import PageNotFound from "./pages/PageNotFound/PageNotFound";
+import { Toaster, ToastIcon } from "react-hot-toast";
+import OrderListManager from "./pages/Orders/OrderListManager";
 
 // Lazy-loaded pages
 const CategoryManager = lazy(() => import("./pages/CategoryManager/CategoryManager"));
@@ -33,6 +35,7 @@ const Home = () => (
 const App = () => {
   return (
     <Router>
+      <Toaster position="top-right" />
       {/* Sidebar */}
       <aside className="fixed top-0 left-0 h-screen w-72 bg-gray-900 text-white shadow-2xl z-50 overflow-y-auto">
         <div className="p-8 border-b border-gray-800">
@@ -134,6 +137,22 @@ const App = () => {
             </svg>
             <span>Products</span>
           </NavLink>
+          <NavLink
+            to="/order"
+            className={({ isActive }) =>
+              `flex items-center gap-4 px-6 py-4 rounded-xl text-lg font-medium transition-all duration-300 ${
+                isActive
+                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 shadow-xl text-white scale-105"
+                  : "text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-2"
+              }`
+            }
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <span>Order</span>
+          </NavLink>
         </nav>
       </aside>
 
@@ -157,12 +176,14 @@ const App = () => {
               <Route path="/CategoryList" element={<CategoryListManager />} />
               <Route path="/brands" element={<BrandListManager />} />
               <Route path="/productList" element={<ProductList />} />
+              <Route path="/order" element={<OrderListManager />} />
 
               {/* Add / Create Pages (usually opened as modals, but accessible via URL) */}
               <Route path="/add-industry-type" element={<IndustryTypeManager />} />
               <Route path="/add-category" element={<CategoryManager />} />
               <Route path="/add-brand" element={<BrandManager />} />
               <Route path="/add-product" element={<ProductManager />} />
+
 
               <Route path="*" element={<PageNotFound />} />
             </Routes>

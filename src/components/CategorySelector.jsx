@@ -1,7 +1,7 @@
 import React from "react";
 import Select from "react-select";
 
-const CategorySelector = ({ categories, selected, setSelected }) => {
+const CategorySelector = ({ categories, selected, setSelected, errors }) => {
   const options = categories.map((cat) => ({
     value: cat._id,   // MUST be a Mongo object id
     label: cat.category_name,        // MUST be a string
@@ -22,8 +22,9 @@ const CategorySelector = ({ categories, selected, setSelected }) => {
         }
         className="basic-multi-select"
         classNamePrefix="select"
-        required = {false}
+        // required = {true}
       />
+     {/* {errors.categories && <span className="text-red-500">{errors.categories}</span>} */}
     </div>
   );
 };

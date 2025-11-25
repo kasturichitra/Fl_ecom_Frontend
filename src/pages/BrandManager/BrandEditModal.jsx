@@ -10,8 +10,9 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
   const dispatch = useDispatch();
   const categories = useSelector((state) => state.categories.items || []);
   const { token, tenantId } = useSelector((state) => state.auth || {});
+  // const 
 
-  const { mutateAsync: updateBrand, isPending: isUpdating } = useUpdateBrand({
+  const { mutateAsync: updateBrand, isPending: isUpdating, onSuccess : success } = useUpdateBrand({
     onSettled: () => {
       setIsLoading(false);
       setEditingBrand(null);
