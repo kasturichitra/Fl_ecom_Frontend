@@ -1,15 +1,13 @@
-import React, { useState, useRef, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import DynamicForm from "../../components/DynamicForm";
-import { createProduct } from "../../redux/productSlice";
-import { useGetAllCategories, useGetCategoryByUniqueId } from "../../hooks/useCategory";
-import { useGetAllBrands } from "../../hooks/useBrand";
+import { useEffect, useRef, useState } from "react";
 import AttributeRepeater from "../../components/AttributeRepeater";
-import ScrollWrapper from "../../components/ui/ScrollWrapper";
+import DynamicForm from "../../components/DynamicForm";
 import FormActionButtons from "../../components/FormActionButtons";
+import ScrollWrapper from "../../components/ui/ScrollWrapper";
+import { PRODUCT_STATIC_FIELDS } from "../../constants/productFields";
+import { useGetAllBrands } from "../../hooks/useBrand";
+import { useGetAllCategories, useGetCategoryByUniqueId } from "../../hooks/useCategory";
 import { useCreateProduct } from "../../hooks/useProduct";
 import { objectToFormData } from "../../utils/ObjectToFormData";
-import { PRODUCT_STATIC_FIELDS } from "../../constants/productFields";
 
 const ProductManager = ({ onCancel }) => {
   // Ref to get attributes from AttributeRepeater
@@ -75,7 +73,7 @@ const ProductManager = ({ onCancel }) => {
     label: cat.category_name,
   }));
 
-  const formattedBrands = brands?.map((brand) => ({
+  const formattedBrands = brands?.brands?.map((brand) => ({
     value: brand.brand_unique_id,
     label: brand.brand_name,
   }));
