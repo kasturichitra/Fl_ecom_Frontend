@@ -9,7 +9,6 @@ import { objectToFormData } from "../../utils/ObjectToFormData";
 import AttributeRepeater from "../../components/AttributeRepeater";
 
 const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
-  // console.log("Product in edit modal:", product);
   const [form, setForm] = useState({
     category_unique_id: "",
     brand_unique_id: "",

@@ -90,8 +90,6 @@ const CategoryListManager = () => {
       valueGetter: (params) => (params.value ? "Active" : "Inactive"),
 
       renderCell: (params) => (
-        // console.log(params?.row?.is_active,'pafsjafbksdf')
-
         <span
           className={`px-3 py-1.5 rounded-full text-xs font-bold ${
             params?.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"

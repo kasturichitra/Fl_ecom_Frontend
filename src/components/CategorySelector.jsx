@@ -2,7 +2,6 @@ import React from "react";
 import Select from "react-select";
 
 const CategorySelector = ({ categories, selected, setSelected, errors }) => {
-  console.log("categories From Parent", categories);
   const options = categories?.map((cat) => ({
     value: cat._id,   // MUST be a Mongo object id
     label: cat.category_name,        // MUST be a string

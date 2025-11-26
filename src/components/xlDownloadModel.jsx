@@ -12,14 +12,6 @@ export default function DownloadXLExcel({
   setShowDropdown,
   handleSelect, 
 }) {
-  // const filteredResults = data?.filter((item) => item.label.toLowerCase().includes(searchTerm.toLowerCase()));
-
-  // const handleSelect = (item) => {
-  //   console.log("Selected category_unique_id:", item.value);
-  //   setSearchTerm("");
-  //   setShowDropdown(false);
-  // };
-
   return (
     <>
       {isOpen && (

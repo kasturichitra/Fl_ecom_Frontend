@@ -29,7 +29,6 @@ export const fetchIndustryTypes = createAsyncThunk(
 export const createIndustryType = createAsyncThunk(
   "industryTypes/",
   async ({ formData, token, tenantId }, { rejectWithValue }) => {
-     console.log(formData,token,tenantId)
     try {
       const response = await createIndustryApi(formData, token, tenantId);
       return response.data.data;

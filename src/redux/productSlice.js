@@ -22,10 +22,8 @@ const ensureArray = (data) => {
 export const fetchProducts = createAsyncThunk(
   "products/",
   async ({ token, tenantId }, { rejectWithValue }) => {
-    console.log(tenantId, token)
     try {
       const res = await getAllProductsApi(token, tenantId);
-      console.log(res, "res")
       return ensureArray(res?.data?.data);
     } catch (err) {
       return rejectWithValue(

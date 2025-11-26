@@ -14,11 +14,6 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
   });
 
   const { mutateAsync: updateCategory, isPending: isLoading } = useCategoryUpdate();
-
-  // ------------------------------
-  // MAIN FORM DATA
-  // ------------------------------
-
   const [formData, setFormData] = useState({
     category_name: "",
     category_unique_id: "",
@@ -27,7 +22,6 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
     image: null,
     currentImage: null,
   });
-// console.log(formData,'formData');
 
   const [attributes, setAttributes] = useState([]);
 
