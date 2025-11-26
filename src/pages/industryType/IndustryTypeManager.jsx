@@ -1,6 +1,5 @@
-import { useState } from "react";
-import DynamicForm from "../../components/DynamicForm";
 import FormActionButtons from "../../components/FormActionButtons";
+import IndustryTypeForm from "../../form/industyrTypes/industyTypeForm";
 import { useCreateIndustry } from "../../hooks/useIndustry";
 import { objectToFormData } from "../../utils/ObjectToFormData";
 
@@ -8,45 +7,31 @@ const IndustryTypeManager = ({ onCancel }) => {
   const { mutateAsync: createIndustry } = useCreateIndustry({
     onSuccess: () => {
       onCancel();
-      setForm({
-        industry_name: "",
-        industry_unique_id: "",
-        description: "",
-        image: null,
-        is_active: true,
-      });
     },
   });
-
-  const [form, setForm] = useState({
-    industry_name: "",
-    industry_unique_id: "",
-    description: "",
-    image: null,
-    is_active: true,
-  });
-
   const handleCancel = () => {
     if (onCancel) onCancel();
   };
 
   const fields = [
-    { key: "industry_name", label: "Industry Name", type: "text", required: true },
-    { key: "industry_unique_id", label: "Unique ID", type: "text", required: true },
-    { key: "description", label: "Description", type: "textarea", required: true },
+    {
+      key: "industry_name", label: "Industry Name", type: "text",
+    },
+    {
+      key: "industry_unique_id", label: "Unique ID", type: "text",
+    },
+    {
+      key: "description", label: "Description", type: "textarea",
+    },
     { key: "image", label: "Upload Image", type: "file", accept: "image/*" },
     { key: "is_active", label: "Active", type: "checkbox" },
   ];
 
-  const handleAddIndustryType = async () => {
+  const handleAddIndustryType = async (formData) => {
+    console.log("Fform state before AI PI call", formData);
+    const result = objectToFormData(formData);
+    await createIndustry(result);
 
-    try {
-      const formData = objectToFormData(form);
-
-      await createIndustry(formData);
-    } catch (err) {
-      console.error("Creation failed:", err);
-    }
   };
 
   return (
@@ -57,20 +42,15 @@ const IndustryTypeManager = ({ onCancel }) => {
 
       <div className="p-8 bg-gray-50">
         {/* Form Fields Only */}
-        <DynamicForm
+        <IndustryTypeForm
           fields={fields}
-          formData={form}
-          setFormData={setForm}
-          // onSubmit={handleAddIndustryType}
-        />
-
-        {/* Submit / Cancel Buttons */}
-        <FormActionButtons
-          submitLabel="Create Industry Type"
-          onSubmit={() => {
-            handleAddIndustryType();
-          }}
-          onCancel={handleCancel}
+          onSubmit={handleAddIndustryType}
+          additionalContent={
+            <FormActionButtons
+              submitLabel="Create Industry Type"
+              onCancel={handleCancel}
+            />
+          }
         />
       </div>
     </div>
