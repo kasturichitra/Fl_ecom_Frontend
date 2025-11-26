@@ -9,7 +9,6 @@ import { objectToFormData } from "../../utils/ObjectToFormData";
 import AttributeRepeater from "../../components/AttributeRepeater";
 
 const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
-  // console.log("Product in edit modal:", product);
   const [form, setForm] = useState({
     category_unique_id: "",
     brand_unique_id: "",
@@ -95,7 +94,7 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
   const handleSubmit = async (e) => {
     e?.preventDefault?.();
     // No validation here
-    const { product_image, ...rest } = form;
+    const { product_image, product_attributes, ...rest } = form;
 
     // Use attributesRef for the latest repeater values
     const currentAttributes = attributesRef.current || [];
@@ -112,7 +111,7 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
 
     await updateProduct({ uniqueId: product.product_unique_id, payload: formData });
 
-    if (onSuccess) onSuccess();
+    // if (onSuccess) onSuccess();
     closeModal();
   };
 

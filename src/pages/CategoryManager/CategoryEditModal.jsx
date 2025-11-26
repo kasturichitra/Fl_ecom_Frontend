@@ -14,11 +14,6 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
   });
 
   const { mutateAsync: updateCategory, isPending: isLoading } = useCategoryUpdate();
-
-  // ------------------------------
-  // MAIN FORM DATA
-  // ------------------------------
-
   const [formData, setFormData] = useState({
     category_name: "",
     category_unique_id: "",
@@ -27,7 +22,6 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
     image: null,
     currentImage: null,
   });
-// console.log(formData,'formData');
 
   const [attributes, setAttributes] = useState([]);
 
@@ -49,7 +43,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
           code: a.code,
           slug: a.slug,
           description: a.description,
-          units: a.units || "N/A",
+          units: a.units,
           is_active: a.is_active,
           _id: a._id,
         }))
@@ -93,7 +87,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
         code: "",
         slug: "",
         description: "",
-        units: "N/A",
+        units: "",
         is_active: true,
         _id: null,
       },
@@ -235,21 +229,21 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
 
               <div className="grid grid-cols-2 gap-4">
                 <input
-                  placeholder="Name"
+                  placeholder="Name:- ex. RAM (GB), Battery, Storage (GB), etc."
                   value={attr.name}
                   onChange={(e) => handleAttributeChange(idx, "name", e.target.value)}
                   className="border p-3 rounded-lg"
                 />
 
                 <input
-                  placeholder="Code"
+                  placeholder="Code:- ex. ram_gb, battery, storage_gb, etc."
                   value={attr.code}
                   onChange={(e) => handleAttributeChange(idx, "code", e.target.value)}
                   className="border p-3 rounded-lg"
                 />
 
                 <input
-                  placeholder="Units"
+                  placeholder="Units:- ex. gb, mAH, gb, etc."
                   value={attr.units}
                   onChange={(e) => handleAttributeChange(idx, "units", e.target.value)}
                   className="border p-3 rounded-lg"

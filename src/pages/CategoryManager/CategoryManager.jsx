@@ -39,6 +39,7 @@ const CategoryManager = ({ onCancel }) => {
       });
       setAttributes([{ name: "", code: "", description: "", units: "", is_active: true }]);
       setShowAttributes(false);
+      onCancel();
     },
   });
 

@@ -5,7 +5,18 @@ import { useCreateIndustry } from "../../hooks/useIndustry";
 import { objectToFormData } from "../../utils/ObjectToFormData";
 
 const IndustryTypeManager = ({ onCancel }) => {
-  const { mutateAsync: createIndustry } = useCreateIndustry();
+  const { mutateAsync: createIndustry } = useCreateIndustry({
+    onSuccess: () => {
+      onCancel();
+      setForm({
+        industry_name: "",
+        industry_unique_id: "",
+        description: "",
+        image: null,
+        is_active: true,
+      });
+    },
+  });
 
   const [form, setForm] = useState({
     industry_name: "",
@@ -33,15 +44,6 @@ const IndustryTypeManager = ({ onCancel }) => {
       const formData = objectToFormData(form);
 
       await createIndustry(formData);
-
-      // Reset UI state if needed (React Query already navigates & toasts)
-      setForm({
-        industry_name: "",
-        industry_unique_id: "",
-        description: "",
-        image: null,
-        is_active: true,
-      });
     } catch (err) {
       console.error("Creation failed:", err);
     }

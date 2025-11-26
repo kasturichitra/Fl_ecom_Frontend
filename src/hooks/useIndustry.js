@@ -7,12 +7,12 @@ import {
   updateIndustryApi,
 } from "../ApiServices/industryService";
 
-export const useGetAllIndustries = ({ search = "", page = 1, limit = 10 }) => {
-  const queryKey = ["industries", search || "", page, limit];
+export const useGetAllIndustries = ({ search = "", page = 1, limit = 10, sort = "" }) => {
+  const queryKey = ["industries", search || "", page, limit, sort];
 
   return useQuery({
     queryKey,
-    queryFn: () => getAllIndustryApi({ search, page, limit }),
+    queryFn: () => getAllIndustryApi({ search, page, limit, sort }),
     select: (res) => res.data,
     staleTime: 10 * 60 * 1000,
     cacheTime: 30 * 60 * 1000,
@@ -20,13 +20,14 @@ export const useGetAllIndustries = ({ search = "", page = 1, limit = 10 }) => {
   });
 };
 
-export const useCreateIndustry = () => {
+export const useCreateIndustry = (options = {}) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data) => createIndustryApi(data),
     onSuccess: () => {
       toast.success("Industry created successfully");
       queryClient.invalidateQueries(["industries"]);
+      options?.onSuccess?.();
     },
     onError: (error) => {
       toast.error("Failed to create industry", error.message);

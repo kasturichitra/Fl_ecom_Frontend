@@ -197,8 +197,8 @@ const ProductList = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 py-10">
-        <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-8xl mx-auto px-4 sm:px-6">
           <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
 
             <PageHeader
@@ -256,9 +256,7 @@ const ProductList = () => {
                 sort={sort}
                 setSort={(newSort) => {
                   const sortItem = newSort[0];
-                  setSort(
-                    sortItem ? `${sortItem.field}:${sortItem.sort}` : ""
-                  );
+                  setSort(sortItem ? `${sortItem.field}:${sortItem.sort}` : "");
                 }}
               />
             </div>

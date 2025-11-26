@@ -1,13 +1,14 @@
-import React, { useState } from "react";
-import { useGetAllOrders } from "../../hooks/useOrder";
-import DynamicTable from "../../components/DynamicTable";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import PageHeader from "../../components/PageHeader";
 import SearchBar from "../../components/SearchBar";
 import DataTable from "../../components/Table";
+import { useGetAllOrders } from "../../hooks/useOrder";
 
 const OrderListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
-
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0); // 0-based page
 
@@ -17,7 +18,10 @@ const OrderListManager = () => {
     limit: pageSize,
   });
 
-  console.log("order data", data);
+  const handleRowClick = (params) => {
+    const orderId = params.row._id;
+    navigate(`/order-products-detailes/${orderId}`);
+  };
 
   const columns = [
     {
@@ -129,6 +133,8 @@ const OrderListManager = () => {
               totalCount={data?.totalCount || 0}
               setCurrentPage={setCurrentPage}
               setPageSize={setPageSize}
+              onRowClick={handleRowClick}
+              pathname={pathname}
             />
           )}
         </div>
