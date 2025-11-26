@@ -160,20 +160,20 @@ export default function OrderProductsDetailes() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="font-semibold text-gray-800">{p?.product_name}</div>
-                      <div className="text-xs text-gray-500">{p?.product_details?.barcode}</div>
+                      {/* <div className="text-xs text-gray-500">{p?.product_details?.barcode}</div> */}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
-                        {p?.product_details?.product_color}
+                        {p?.product_details?.product_color ?? "N/A"}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">
-                        {p?.product_details?.product_size}
+                        {p?.product_details?.product_size ?? "N/A"}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                      {p?.product_details?.model_number}
+                      {p?.product_details?.model_number ?? "N/A"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right font-semibold text-gray-800">₹{p?.price}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
