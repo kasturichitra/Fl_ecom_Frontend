@@ -22,11 +22,14 @@ const CategoryListManager = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
+
+  const [sort, setSort] = useState("createdAt:desc");
+
   const {
     data: categories,
     isLoading: loading,
     isError: error,
-  } = useGetAllCategories({ search: searchTerm, page: currentPage + 1, limit: pageSize });
+  } = useGetAllCategories({ search: searchTerm, page: currentPage + 1, limit: pageSize, sort });
 
   const { mutate: deleteCategory, isPending } = useCategoryDelete();
 
@@ -150,6 +153,11 @@ const CategoryListManager = () => {
           totalCount={categories?.totalCount || 0}
           setCurrentPage={setCurrentPage}
           setPageSize={setPageSize}
+          sort={sort}
+          setSort={(newSort) => {
+            const sortItem = newSort[0];
+            setSort(sortItem ? `${sortItem.field}:${sortItem.sort}` : "");
+          }}
         />
 
         {/* TABLE */}
