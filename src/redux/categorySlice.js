@@ -13,9 +13,7 @@ export const fetchCategories = createAsyncThunk(
   "categories/",
   async ({ token, tenantId }, { rejectWithValue }) => {
     try {
-      console.log(tenantId, token)
       const res = await getAllCategoryApi(token, tenantId);
-      console.log(res, "res")
       return res?.data?.data ?? [];
     } catch (error) {
       console.error("❌ Fetch Categories Error:", error);
@@ -32,10 +30,8 @@ export const createCategory = createAsyncThunk(
   async ({ formData, token, tenantId }, { rejectWithValue }) => {
     // Debug: Log all FormData values
     for (let pair of formData.entries()) {
-      console.log(pair[0] + ": ", pair[1]);
     }
 
-    console.log(tenantId, token)
     try {
       const res = await createCategoryApi(formData, token, tenantId);
       return res?.data?.data ?? null;

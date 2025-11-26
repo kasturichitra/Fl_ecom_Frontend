@@ -48,12 +48,8 @@ export const useCategoryUpdate = () => {
   return useMutation({
     mutationFn: ({ uniqueId, payload }) => updateCategoryApi(uniqueId, payload),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
-      console.log("update successfully....");
-      
-      toast.success("Category updated successfully");
-      console.log("update is completed");
-      
+      queryClient.invalidateQueries({ queryKey: ["categories"] });    
+      toast.success("Category updated successfully"); 
     },
     onError: () => {
       toast.error("Failed to update category");

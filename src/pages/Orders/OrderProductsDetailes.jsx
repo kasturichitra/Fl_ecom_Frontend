@@ -4,10 +4,8 @@ import { useGetOrderProductsById } from "../../hooks/useOrder.js";
 
 export default function OrderProductsDetailes() {
   const { id } = useParams();
-  console.log(id, "order id in order products detailes");
 
   const { data: orderData, isLoading, isError } = useGetOrderProductsById(id);
-    console.log(orderData, "orderData in order products detailes");
   const InfoCard = ({ icon: Icon, title, children, bgColor, status }) => (
     <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
       <div className="flex items-center justify-between mb-6">

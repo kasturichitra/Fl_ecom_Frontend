@@ -1,5 +1,5 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-dom";
+import React, { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route, NavLink, useLocation } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import PageNotFound from "./pages/PageNotFound/PageNotFound";
 import { Toaster, ToastIcon } from "react-hot-toast";
@@ -32,9 +32,22 @@ const Home = () => (
   </div>
 );
 
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth", // remove "smooth" if you want instant scroll
+    });
+  }, [pathname]);
+  return null;
+};
+
 const App = () => {
   return (
     <Router>
+      <ScrollToTop />
       <Toaster position="top-right" />
       {/* Sidebar */}
       <aside className="fixed top-0 left-0 h-screen w-72 bg-gray-900 text-white shadow-2xl z-50 overflow-y-auto">
