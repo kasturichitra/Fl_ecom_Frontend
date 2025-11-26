@@ -39,7 +39,7 @@ const BrandManager = ({setShowAddModal,onCancel}) => {
   const [errors, setErrors] = useState({});
   const [imagePreview, setImagePreview] = useState([]);
 
-  console.log(errors,"errors" )
+  // console.log(errors,"errors" )
 
 
   const validate = () => {
@@ -122,7 +122,7 @@ const BrandManager = ({setShowAddModal,onCancel}) => {
   ];
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-10">
+    <div className="">
       <h2 className="text-2xl font-bold text-blue-600 text-center mb-6">Add New Brand</h2>
 
       <form onSubmit={handleCreateBrand} className="space-y-6">

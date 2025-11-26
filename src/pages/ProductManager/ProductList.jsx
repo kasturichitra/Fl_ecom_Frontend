@@ -20,6 +20,8 @@ import {
 import ProductEditModal from "./ProductEditModal";
 import ProductManager from "./ProductManager";
 import { FaFileDownload, FaFileUpload } from "react-icons/fa";
+import ImportantNotesDialog from "../../components/ImportantNotesDialog.jsx"; // ⬅️ ADD THIS IMPORT
+import { Diameter } from "lucide-react";
 
 const ProductList = () => {
   const { pathname } = useLocation();
@@ -28,10 +30,13 @@ const ProductList = () => {
   const [excelSearchTerm, setExcelSearchTerm] = useState("");
   const [showExcelDropdown, setShowExcelDropdown] = useState(false);
   const [sort, setSort] = useState("createdAt:desc");
+  const [open, setOpen] = useState(false);
+
+  const [openNotes, setOpenNotes] = useState(false); // ⬅️ REQUIRED STATE
 
   // Pagination state
   const [pageSize, setPageSize] = useState(10);
-  const [currentPage, setCurrentPage] = useState(0); // 0-based
+  const [currentPage, setCurrentPage] = useState(0);
 
   const {
     data: productsResponse,
@@ -40,13 +45,14 @@ const ProductList = () => {
   } = useGetAllProducts({
     searchTerm,
     sort: decodeURIComponent(sort),
-    page: currentPage + 1, // API expects 1-based pages
+    page: currentPage + 1,
     limit: pageSize,
   });
 
-  // rows and totalCount: the hook's response structure may vary — handle both shapes
   const rows = productsResponse?.data || productsResponse || [];
-  const totalCount = productsResponse?.totalCount ?? (Array.isArray(rows) ? rows.length : 0);
+  const totalCount =
+    productsResponse?.totalCount ??
+    (Array.isArray(rows) ? rows.length : 0);
 
   const { mutate: deleteProduct } = useDeleteProduct();
   const { mutateAsync: downloadExcel } = useDownloadProductExcel({
@@ -68,7 +74,6 @@ const ProductList = () => {
   }));
 
   useEffect(() => {
-    // Reset to first page if searchTerm changed (same UX as other pages)
     setCurrentPage(0);
   }, [searchTerm]);
 
@@ -116,16 +121,18 @@ const ProductList = () => {
   const handleCloseEdit = () => setEditingProduct(null);
   const handleCloseAdd = () => setShowAddModal(false);
 
-  // DataTable columns for MUI DataTable
   const columns = [
     {
       field: "product_unique_id",
       headerName: "PRODUCT ID",
       flex: 1,
       headerClassName: "custom-header",
-      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize",
+      cellClassName:
+        "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize",
       renderCell: (params) => (
-        <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">{params.value}</span>
+        <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+          {params.value}
+        </span>
       ),
     },
     {
@@ -133,7 +140,8 @@ const ProductList = () => {
       headerName: "NAME",
       flex: 2,
       headerClassName: "custom-header",
-      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize",
+      cellClassName:
+        "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize",
     },
     {
       field: "price",
@@ -169,10 +177,14 @@ const ProductList = () => {
       sortable: false,
       width: 140,
       headerClassName: "custom-header",
-      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 flex gap-1",
+      cellClassName:
+        "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 flex gap-1",
       renderCell: (params) => (
         <div className="flex gap-2 items-center">
-          <button onClick={() => handleEdit(params.row)} className="cursor-pointer">
+          <button
+            onClick={() => handleEdit(params.row)}
+            className="cursor-pointer"
+          >
             <FaEdit size={18} className="text-[#4f46e5]" />
           </button>
           <button onClick={() => handleDelete(params.row)}>
@@ -188,7 +200,7 @@ const ProductList = () => {
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-8xl mx-auto px-4 sm:px-6">
           <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
-            {/* Header */}
+
             <PageHeader
               title="Product Manager"
               subtitle="Manage all store products"
@@ -196,15 +208,18 @@ const ProductList = () => {
               onAction={() => setShowAddModal(true)}
             />
 
-            {/* Search + Excel controls */}
             <div className="p-6 bg-gray-50 border-b flex items-center justify-between gap-4">
               <div className="max-w-md">
-                <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search products..." />
+                <SearchBar
+                  searchTerm={searchTerm}
+                  onSearchChange={setSearchTerm}
+                  placeholder="Search products..."
+                />
               </div>
 
               <div className="flex gap-3 items-center">
                 <button
-                  onClick={() => setIsOpen(true)}
+                  onClick={() => setOpenNotes(true)} // ⬅️ UPDATED CLICK HANDLER
                   className="bg-white text-indigo-600 font-bold px-5 py-3 rounded-lg shadow hover:bg-indigo-50 flex items-center gap-2"
                 >
                   <FaFileDownload />
@@ -228,7 +243,6 @@ const ProductList = () => {
               </div>
             </div>
 
-            {/* Table */}
             <div className="p-6 bg-white">
               <DataTable
                 rows={rows}
@@ -247,7 +261,6 @@ const ProductList = () => {
               />
             </div>
 
-            {/* Error */}
             {error && (
               <div className="mx-6 mb-6 p-5 bg-red-50 border border-red-300 text-red-700 rounded-xl text-center">
                 Error loading products.
@@ -257,7 +270,6 @@ const ProductList = () => {
         </div>
       </div>
 
-      {/* Add Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-white/30 backdrop-blur-lg border border-white/20 shadow-xl flex items-center justify-center z-50">
           <div className="relative">
@@ -272,19 +284,24 @@ const ProductList = () => {
         </div>
       )}
 
-      {/* Edit Modal */}
       {editingProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="relative bg-white rounded-xl shadow-xl w-full max-w-6xl mx-4 p-6">
-            <button onClick={handleCloseEdit} className="absolute right-4 top-4 text-gray-700 text-3xl">
+            <button
+              onClick={handleCloseEdit}
+              className="absolute right-4 top-4 text-gray-700 text-3xl"
+            >
               ×
             </button>
-            <ProductEditModal formData={editingProduct} onSuccess={handleUpdate} closeModal={handleCloseEdit} />
+            <ProductEditModal
+              formData={editingProduct}
+              onSuccess={handleUpdate}
+              closeModal={handleCloseEdit}
+            />
           </div>
         </div>
       )}
 
-      {/* Download modal */}
       <DownloadXLExcel
         isOpen={isOpen}
         setIsOpen={setIsOpen}
@@ -295,6 +312,16 @@ const ProductList = () => {
         showDropdown={showExcelDropdown}
         setShowDropdown={setShowExcelDropdown}
         handleSelect={handleExcelCategorySelect}
+      />
+
+      {/* ⬇️ REQUIRED: IMPORTANT EXCEL NOTES POPUP */}
+      <ImportantNotesDialog
+        open={openNotes}
+        onClose={() => setOpenNotes(false)}
+        onProceed={() => {
+          setOpenNotes(false);
+          setIsOpen(true);
+        }}
       />
     </>
   );
