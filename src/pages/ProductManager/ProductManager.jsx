@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import AttributeRepeater from "../../components/AttributeRepeater";
-import DynamicForm from "../../components/DynamicForm";
 import FormActionButtons from "../../components/FormActionButtons";
 import ScrollWrapper from "../../components/ui/ScrollWrapper";
 import { PRODUCT_STATIC_FIELDS } from "../../constants/productFields";
@@ -8,32 +7,12 @@ import { useGetAllBrands } from "../../hooks/useBrand";
 import { useGetAllCategories, useGetCategoryByUniqueId } from "../../hooks/useCategory";
 import { useCreateProduct } from "../../hooks/useProduct";
 import { objectToFormData } from "../../utils/ObjectToFormData";
+import ProductForm from "../../form/products/productForm";
 
 const ProductManager = ({ onCancel }) => {
   // Ref to get attributes from AttributeRepeater
   const attributesRef = useRef([]);
 
-  // Required fields only
-  const initialForm = {
-    category_unique_id: "",
-    brand_unique_id: "",
-    product_unique_id: "",
-    product_name: "",
-    product_description: "",
-    product_color: "",
-    product_size: "",
-    product_image: "",
-    price: "",
-    discount_percentage: "",
-    cgst: "",
-    sgst: "",
-    igst: "",
-    stock_quantity: "",
-    min_order_limit: "",
-    gender: "",
-  };
-
-  const [form, setForm] = useState(initialForm);
   const [categorySearchTerm, setCategorySearchTerm] = useState("");
   const [brandSearchTerm, setBrandSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -45,7 +24,7 @@ const ProductManager = ({ onCancel }) => {
   });
 
   const { data: brands } = useGetAllBrands({
-    search: brandSearchTerm,
+    searchTerm: brandSearchTerm,
   });
 
   const { data: selectedCategoryItem } = useGetCategoryByUniqueId(selectedCategory);
@@ -78,16 +57,14 @@ const ProductManager = ({ onCancel }) => {
     label: brand.brand_name,
   }));
 
-
   const { mutateAsync: createProduct, isPending: isSubmitting } = useCreateProduct({
     onSuccess: () => {
       onCancel();
-      setForm(initialForm);
     }
   });
 
   // --------------------------
-  // REQUIRED FIELD LIST
+  // PRODUCT FIELD LIST
   // --------------------------
   const productFields = [
     {
@@ -104,7 +81,6 @@ const ProductManager = ({ onCancel }) => {
         setShowCategoryDropdown(false);
       },
       onSelect: (value) => {
-        setForm((prev) => ({ ...prev, category_unique_id: value.value }));
         setSelectedCategory(value.value);
       },
       placeholder: "e.g., HF1",
@@ -122,7 +98,11 @@ const ProductManager = ({ onCancel }) => {
         setBrandSearchTerm("");
         setShowBrandDropdown(false);
       },
-      onSelect: (value) => setForm((prev) => ({ ...prev, brand_unique_id: value.value })),
+      onSelect: (value) => {
+        // No additional action needed, react-hook-form handles the valu
+        setBrandSearchTerm("");
+        setShowBrandDropdown(false);
+      },
       placeholder: "e.g., apple1",
     },
     ...PRODUCT_STATIC_FIELDS,
@@ -134,9 +114,7 @@ const ProductManager = ({ onCancel }) => {
   };
 
   // FORM SUBMIT
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleSubmit = async (formData) => {
     // Get current attributes from the ref
     const currentAttributes = attributesRef.current;
 
@@ -148,45 +126,47 @@ const ProductManager = ({ onCancel }) => {
         value: attr.value,
       }));
 
-    const { product_image, product_attributes, ...rest } = form;
+    const { product_image, product_attributes, ...rest } = formData;
 
-    const formData = objectToFormData(rest);
-    formData.append("product_image", product_image);
-    formData.append("product_attributes", JSON.stringify(validAttributes));
-
-    await createProduct(formData);
+    const formDataToSend = objectToFormData(rest);
+    formDataToSend.append("product_image", product_image);
+    formDataToSend.append("product_attributes", JSON.stringify(validAttributes));
+    
+    await createProduct(formDataToSend);
   };
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-white rounded-2xl shadow-xl">
       <ScrollWrapper maxHeight="800px">
-        <form onSubmit={handleSubmit}>
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-800">Create Product</h1>
-            <p className="text-gray-600 mt-2">Fill the required fields to create a product.</p>
-          </div>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">Create Product</h1>
+          <p className="text-gray-600 mt-2">Fill the required fields to create a product.</p>
+        </div>
 
-          {/* Dynamic Form for all product fields */}
-          <DynamicForm
-            fields={productFields}
-            formData={form}
-            setFormData={setForm}
-            onSubmit={handleSubmit}
-            buttonLabel={isSubmitting ? "Saving..." : "Create Product"}
-            disabled={isSubmitting}
-            className="grid grid-cols-2 max-w-6xl"
-          />
+        <ProductForm
+          fields={productFields}
+          onSubmit={handleSubmit}
+          onCancel={onCancel}
+          isSubmitting={isSubmitting}
+          className="grid grid-cols-2 max-w-6xl"
+          additionalContent={
+            <>
+              {/* Attribute Repeater - automatically shows DB attributes + allows custom ones */}
+              <AttributeRepeater 
+                label="Product Attributes" 
+                predefined={dbAttributes} 
+                onChange={handleAttributesChange} 
+              />
 
-          {/* Attribute Repeater - automatically shows DB attributes + allows custom ones */}
-          <AttributeRepeater label="Product Attributes" predefined={dbAttributes} onChange={handleAttributesChange} />
-
-          {/* Form Action Buttons */}
-          <FormActionButtons
-            onCancel={onCancel}
-            submitLabel={isSubmitting ? "Creating..." : "Create Product"}
-            disabled={isSubmitting}
-          />
-        </form>
+              {/* Form Action Buttons */}
+              <FormActionButtons
+                onCancel={onCancel}
+                submitLabel={isSubmitting ? "Creating..." : "Create Product"}
+                disabled={isSubmitting}
+              />
+            </>
+          }
+        />
       </ScrollWrapper>
     </div>
   );

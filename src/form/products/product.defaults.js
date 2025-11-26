@@ -1,0 +1,18 @@
+export const productDefaultValues = {
+  category_unique_id: "",
+  brand_unique_id: "",
+  product_unique_id: "",
+  product_name: "",
+  product_description: "",
+  product_color: "",
+  product_size: "",
+  product_image: null,
+  price: "",
+  discount_percentage: 0,
+  cgst: 0,
+  sgst: 0,
+  igst: 0,
+  stock_quantity: "",
+  min_order_limit: "",
+  gender: "",
+};

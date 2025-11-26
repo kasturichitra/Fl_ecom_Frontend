@@ -3,14 +3,14 @@ export const PRODUCT_STATIC_FIELDS = [
     key: "product_unique_id",
     label: "Product Unique ID *",
     type: "text",
-    required: true,
+    
     placeholder: "e.g., HF1-002",
   },
   {
     key: "product_name",
     label: "Product Name *",
     type: "text",
-    required: true,
+    
     placeholder: "e.g., Premium Cotton Bedsheet",
   },
   {
@@ -35,7 +35,7 @@ export const PRODUCT_STATIC_FIELDS = [
     key: "price",
     label: "Price *",
     type: "number",
-    required: true,
+    
     min: 0,
   },
   {
@@ -67,21 +67,21 @@ export const PRODUCT_STATIC_FIELDS = [
     key: "stock_quantity",
     label: "Stock Quantity *",
     type: "number",
-    required: true,
+    
     min: 0,
   },
   {
     key: "min_order_limit",
     label: "Minimum Order Limit *",
     type: "number",
-    required: true,
+    
     min: 1,
   },
   {
     key: "gender",
     label: "Gender *",
     type: "select",
-    required: true,
+    
     options: [
       { label: "Unisex", value: "Unisex" },
       { label: "Men", value: "Men" },
@@ -92,7 +92,7 @@ export const PRODUCT_STATIC_FIELDS = [
     key: "product_image",
     label: "Product Image *",
     type: "file",
-    required: true,
+    
     accept: "image/*",
   },
 ];
