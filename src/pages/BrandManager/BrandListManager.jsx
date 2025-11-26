@@ -134,29 +134,6 @@ const BrandListManager = () => {
             {isError ? (
               <p className="text-red-600">Error loading brands</p>
             ) : (
-              // <DynamicTable
-              //   data={brandsData || []}
-              //   columns={columns}
-              //   loading={isLoading}
-              //   onEdit={handleEdit}
-              //   onDelete={handleDelete}
-              //   sortable={true}
-              //   itemsPerPage={10}
-              //   emptyMessage={"No brands found"}
-              //   excludeColumns={["_id", "__v", "tenant_id", "createdAt", "updatedAt", "created_by", "updated_by"]}
-              // />
-
-              // <DataTable
-              //   rows={industryTypes?.data || []}
-              //   getRowId={(row) => row.industry_unique_id}
-              //   columns={columns}
-              //   page={currentPage}
-              //   pageSize={pageSize}
-              //   totalCount={industryTypes?.totalCount || 0}
-              //   setCurrentPage={setCurrentPage}
-              //   setPageSize={setPageSize}
-              // />
-
               <DataTable
                 rows={data || []}
                 getRowId={(row) => row?.brand_unique_id}
@@ -174,9 +151,9 @@ const BrandListManager = () => {
 
       {/* ADD BRAND MODAL */}
       {showAddModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+        <div className="fixed inset-0 flex items-center justify-center backdrop-blur-lg bg-black/40 z-50">
           <div className="bg-white rounded-xl shadow-xl p-8 max-w-3xl w-full relative">
-            <button onClick={handleCloseAddModal} className="absolute right-4 top-4 text-gray-800 text-3xl">
+            <button onClick={handleCloseAddModal} className="absolute right-4 top-4 text-gray-800 text-4xl hover:text-red-600 transition ">
               ×
             </button>
             <BrandManager setShowAddModal={setShowAddModal} onCancel={handleCloseAddModal} />
