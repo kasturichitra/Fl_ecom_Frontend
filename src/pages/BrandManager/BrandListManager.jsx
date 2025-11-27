@@ -9,6 +9,8 @@ import SearchBar from "../../components/SearchBar";
 import DataTable from "../../components/Table";
 import BrandEditModal from "./BrandEditModal";
 import BrandManager from "./BrandManager";
+import { DropdownFilter } from "../../components/DropdownFilter";
+import { statusOptions } from "../../lib/constants";
 
 const BrandListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,10 +22,21 @@ const BrandListManager = () => {
 
   const { mutateAsync: deleteBrandMutation } = useDeleteBrand();
 
+  const [activeStatus, setActiveStatus] = useState("");
+  // console.log("activeStatus", activeStatus);
+
+  const statusFun = () => {
+    if (activeStatus === "active") return true;
+    if (activeStatus === "inactive") return false;
+
+    return undefined; // ⭐ FIX — remove filter
+  };
+
   const { data: brandsData, isError } = useGetAllBrands({
     searchTerm,
     page: currentPage + 1, // API pages are 1-based
     limit: pageSize,
+    is_active: statusFun(),
   });
 
   console.log("brandsData", brandsData?.data);
@@ -51,7 +64,23 @@ const BrandListManager = () => {
       cellClassName: "px-6 py-4 text-left text-sm tracking-wider text-gray-700 font-semibold capitalize",
       renderCell: (params) => <span className="font-semibold text-gray-800">{params?.value ?? ""}</span>,
     },
-
+    {
+      field: "is_active",
+      headerName: "STATUS",
+      flex: 1,
+      type: "singleSelect", // Enables filter dropdown
+      valueOptions: ["Active", "Inactive"], // Shows in filter
+      valueGetter: (params) => (params.value ? "Active" : "Inactive"), // Convert boolean → string
+      renderCell: (params) => (
+        <span
+          className={`px-3 py-1 rounded-full text-xs font-bold ${
+            params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+          }`}
+        >
+          {params.row?.is_active ? "Active" : "Inactive"}
+        </span>
+      ),
+    },
     {
       field: "brand_description",
       headerName: "DESCRIPTION",
@@ -123,14 +152,13 @@ const BrandListManager = () => {
           />
 
           {/* SEARCH BAR */}
-          <div className="p-6 bg-gray-50 border-b flex justify-start px-5">
-            <div className="max-w-md w-full">
-              <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search brands..." />
-            </div>
+          <div className="px-6 py-4 flex items-center gap-4">
+            <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
+            <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} />
           </div>
 
           {/* TABLE */}
-          <div className="p-6 bg-white">
+          <div className="p-3 bg-white">
             {isError ? (
               <p className="text-red-600">Error loading brands</p>
             ) : (
@@ -153,7 +181,10 @@ const BrandListManager = () => {
       {showAddModal && (
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-lg bg-black/40 z-50">
           <div className="bg-white rounded-xl shadow-xl p-8 max-w-3xl w-full relative">
-            <button onClick={handleCloseAddModal} className="absolute right-4 top-4 text-gray-800 text-4xl hover:text-red-600 transition ">
+            <button
+              onClick={handleCloseAddModal}
+              className="absolute right-4 top-4 text-gray-800 text-4xl hover:text-red-600 transition "
+            >
               ×
             </button>
             <BrandManager setShowAddModal={setShowAddModal} onCancel={handleCloseAddModal} />
