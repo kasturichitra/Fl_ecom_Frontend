@@ -25,6 +25,7 @@ const CategoryListManager = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
+  const [industryId, setIndustryId] = useState("");
 
   const [sort, setSort] = useState("createdAt:desc");
 
@@ -38,12 +39,25 @@ const CategoryListManager = () => {
     return undefined; // ⭐ FIX — remove filter
   };
 
+  const { data: industries } = useGetAllIndustries();
+  // console.log("industries", industries);
+
+  let formattedIndustries = industries?.data?.map((ind) => ({
+    label: ind.industry_name,
+    value: ind.industry_unique_id,
+  }));
+
+  // Add "All Industries" option to the start of array using array.unshitf method
+  formattedIndustries?.unshift({
+    label: "All Industries",
+    value: "",
+  });
 
   const {
     data: categories,
     isLoading: loading,
     isError: error,
-  } = useGetAllCategories({ search: searchTerm, page: currentPage + 1, limit: pageSize, sort, is_active: statusFun() });
+  } = useGetAllCategories({ search: searchTerm, page: currentPage + 1, limit: pageSize, sort, is_active: statusFun(), industry_unique_id: industryId });
 
   const { mutate: deleteCategory, isPending } = useCategoryDelete();
 
@@ -153,6 +167,7 @@ const CategoryListManager = () => {
         <div className="flex items-center gap-4">
           <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
           <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} />
+          <DropdownFilter data={formattedIndustries} onSelect={(id) => setIndustryId(id)} />
         </div>
         {/* </div> */}
 

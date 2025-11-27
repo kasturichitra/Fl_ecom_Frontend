@@ -22,15 +22,19 @@ import ProductManager from "./ProductManager";
 import { FaFileDownload, FaFileUpload } from "react-icons/fa";
 import ImportantNotesDialog from "../../components/ImportantNotesDialog.jsx"; // ⬅️ ADD THIS IMPORT
 import { Diameter } from "lucide-react";
+import { DropdownFilter } from "../../components/DropdownFilter.jsx";
+import { useGetAllIndustries } from "../../hooks/useIndustry.js";
+import { GENDER_OPTIONS } from "../../lib/constants.js";
 
 const ProductList = () => {
-  const { pathname } = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [excelSearchTerm, setExcelSearchTerm] = useState("");
   const [showExcelDropdown, setShowExcelDropdown] = useState(false);
   const [sort, setSort] = useState("createdAt:desc");
-  const [open, setOpen] = useState(false);
+  const [industryId, setIndustryId] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [selectedGender, setSelectedGender] = useState("");
 
   const [openNotes, setOpenNotes] = useState(false); // ⬅️ REQUIRED STATE
 
@@ -44,15 +48,44 @@ const ProductList = () => {
     isError: error,
   } = useGetAllProducts({
     searchTerm,
+    industry_unique_id: industryId,
+    category_unique_id: categoryId,
+    gender: selectedGender,
     sort: decodeURIComponent(sort),
     page: currentPage + 1,
     limit: pageSize,
   });
 
+  const { data: industries } = useGetAllIndustries();
+
+  let formattedIndustries = industries?.data?.map((ind) => ({
+    value: ind.industry_unique_id,
+    label: ind.industry_name,
+  }));
+
+  // Add "All Industries" option to the start of array using array.unshitf method
+  formattedIndustries?.unshift({
+    label: "All Industries",
+    value: "",
+  });
+
+  const { data: filterCategories } = useGetAllCategories({
+    ...(industryId && { industry_unique_id: industryId }),
+  });
+
+  let formattedFilterCategories = filterCategories?.data?.map((cat) => ({
+    value: cat.category_unique_id,
+    label: cat.category_name,
+  }));
+
+  // Add "All Categories" option to the start of array using array.unshift method
+  formattedFilterCategories?.unshift({
+    label: "All Categories",
+    value: "",
+  });
+
   const rows = productsResponse?.data || productsResponse || [];
-  const totalCount =
-    productsResponse?.totalCount ??
-    (Array.isArray(rows) ? rows.length : 0);
+  const totalCount = productsResponse?.totalCount ?? (Array.isArray(rows) ? rows.length : 0);
 
   const { mutate: deleteProduct } = useDeleteProduct();
   const { mutateAsync: downloadExcel } = useDownloadProductExcel({
@@ -127,12 +160,9 @@ const ProductList = () => {
       headerName: "PRODUCT ID",
       flex: 1,
       headerClassName: "custom-header",
-      cellClassName:
-        "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize",
+      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize",
       renderCell: (params) => (
-        <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-          {params.value}
-        </span>
+        <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">{params.value}</span>
       ),
     },
     {
@@ -140,8 +170,7 @@ const ProductList = () => {
       headerName: "NAME",
       flex: 2,
       headerClassName: "custom-header",
-      cellClassName:
-        "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize",
+      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize",
     },
     {
       field: "price",
@@ -159,7 +188,14 @@ const ProductList = () => {
     },
     {
       field: "min_order_limit",
-      headerName: "MIN ORDER",
+      headerName: "MOQ",
+      flex: 1,
+      headerClassName: "custom-header",
+      cellClassName: "px-6 py-4 text-left text-sm text-gray-800",
+    },
+    {
+      field: "product_color",
+      headerName: "COLOR",
       flex: 1,
       headerClassName: "custom-header",
       cellClassName: "px-6 py-4 text-left text-sm text-gray-800",
@@ -177,14 +213,10 @@ const ProductList = () => {
       sortable: false,
       width: 140,
       headerClassName: "custom-header",
-      cellClassName:
-        "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 flex gap-1",
+      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 flex gap-1",
       renderCell: (params) => (
         <div className="flex gap-2 items-center">
-          <button
-            onClick={() => handleEdit(params.row)}
-            className="cursor-pointer"
-          >
+          <button onClick={() => handleEdit(params.row)} className="cursor-pointer">
             <FaEdit size={18} className="text-[#4f46e5]" />
           </button>
           <button onClick={() => handleDelete(params.row)}>
@@ -200,7 +232,6 @@ const ProductList = () => {
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-8xl mx-auto px-4 sm:px-6">
           <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
-
             <PageHeader
               title="Product Manager"
               subtitle="Manage all store products"
@@ -210,11 +241,14 @@ const ProductList = () => {
 
             <div className="p-6 bg-gray-50 border-b flex items-center justify-between gap-4">
               <div className="max-w-md">
-                <SearchBar
-                  searchTerm={searchTerm}
-                  onSearchChange={setSearchTerm}
-                  placeholder="Search products..."
-                />
+                <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search products..." />
+              </div>
+
+              {/*Filters Grid / Filters Column whatever it is */}
+              <div className="flex items-center gap-2">
+                <DropdownFilter data={formattedIndustries} onSelect={(id) => setIndustryId(id)} />
+                <DropdownFilter data={formattedFilterCategories} onSelect={(id) => setCategoryId(id)} />
+                <DropdownFilter data={GENDER_OPTIONS} onSelect={(value) => setSelectedGender(value)} />
               </div>
 
               <div className="flex gap-3 items-center">
@@ -287,17 +321,10 @@ const ProductList = () => {
       {editingProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="relative bg-white rounded-xl shadow-xl w-full max-w-6xl mx-4 p-6">
-            <button
-              onClick={handleCloseEdit}
-              className="absolute right-4 top-4 text-gray-700 text-3xl"
-            >
+            <button onClick={handleCloseEdit} className="absolute right-4 top-4 text-gray-700 text-3xl">
               ×
             </button>
-            <ProductEditModal
-              formData={editingProduct}
-              onSuccess={handleUpdate}
-              closeModal={handleCloseEdit}
-            />
+            <ProductEditModal formData={editingProduct} onSuccess={handleUpdate} closeModal={handleCloseEdit} />
           </div>
         </div>
       )}

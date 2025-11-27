@@ -29,3 +29,13 @@ export const ORDER_TYPE_OPTIONS = [
   { label: "Online", value: "Online" },
   { label: "Offline", value: "Offline" },
 ];
+
+export const GENDER_OPTIONS = [
+    { label: "All Genders", value: "" },
+    // { label: "All", value: "" },
+    { label: "Men", value: "Men" },
+    { label: "Women", value: "Women" },
+    { label: "Unisex", value: "Unisex" },
+    { label: "Kids", value: "Kids" },
+    { label: "Other", value: "Other" },
+]
