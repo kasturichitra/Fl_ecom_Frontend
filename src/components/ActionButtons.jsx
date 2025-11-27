@@ -17,7 +17,7 @@ const ActionButtons = ({
         onEdit(row);
         if (onSubmit) onSubmit(row);   // OPTIONAL
       }}
-      className="flex items-center cursor-pointer gap-1.5 px-4 py-2 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition"
+      className="flex items-center cursor-pointer gap-1.5 px-4 py-2 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition "
       title="Edit"
     >
       <PencilIcon className="h-4 w-4" />

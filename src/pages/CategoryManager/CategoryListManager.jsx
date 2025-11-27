@@ -1,39 +1,73 @@
-import React, { useState, useCallback, useEffect, useMemo } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { deleteCategory, fetchCategories } from "../../redux/categorySlice";
+import { useCallback, useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 
-import PageLayoutWithTable from "../../components/PageLayoutWithTable";
+import toast from "react-hot-toast";
+import DynamicTable from "../../components/DynamicTable";
+import PageHeader from "../../components/PageHeader";
+import SearchBar from "../../components/SearchBar";
+
+import { useCategoryDelete, useGetAllCategories } from "../../hooks/useCategory.js";
+
 import CategoryEditModal from "./CategoryEditModal";
 import CategoryManager from "./CategoryManager";
+import DataTable from "../../components/Table.jsx";
+import { FaEdit } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
+import { useGetAllIndustries } from "../../hooks/useIndustry.js";
+import { DropdownFilter } from "../../components/DropdownFilter.jsx";
+import { statusOptions } from "../../lib/constants.js";
 
 const CategoryListManager = () => {
-  const dispatch = useDispatch();
-
-  const categories = useSelector((state) => state?.categories?.items ?? []);
-  const loading = useSelector((state) => state?.categories?.loading ?? false);
-  const error = useSelector((state) => state?.categories?.error);
-
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+
   const [editingCategory, setEditingCategory] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [pageSize, setPageSize] = useState(10);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [industryId, setIndustryId] = useState("");
 
-  const tenantId = "tenant123";
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MTE4YjA3YzRmNjM2OTY1OWRiNTU3ZSIsImlhdCI6MTc2MzExMjQxOCwiZXhwIjoxNzY1NzA0NDE4fQ.SkiLEPCmg4HEQAIMoBT4C-JTS09J8BYR2eivRJxlAas";
+  const [sort, setSort] = useState("createdAt:desc");
+
+  const [activeStatus, setActiveStatus] = useState("");
+  // console.log("activeStatus", activeStatus);
+
+  const statusFun = () => {
+    if (activeStatus === "active") return true;
+    if (activeStatus === "inactive") return false;
+
+    return undefined; // ⭐ FIX — remove filter
+  };
+
+  const { data: industries } = useGetAllIndustries();
+  // console.log("industries", industries);
+
+  let formattedIndustries = industries?.data?.map((ind) => ({
+    label: ind.industry_name,
+    value: ind.industry_unique_id,
+  }));
+
+  // Add "All Industries" option to the start of array using array.unshitf method
+  formattedIndustries?.unshift({
+    label: "All Industries",
+    value: "",
+  });
+
+  const {
+    data: categories,
+    isLoading: loading,
+    isError: error,
+  } = useGetAllCategories({ search: searchTerm, page: currentPage + 1, limit: pageSize, sort, is_active: statusFun(), industry_unique_id: industryId });
+
+  const { mutate: deleteCategory, isPending } = useCategoryDelete();
 
   useEffect(() => {
-    dispatch(fetchCategories({ token, tenantId }));
-  }, [dispatch, token, tenantId]);
-
-  const filteredCategories = useMemo(() => {
-    if (!searchTerm.trim()) return categories;
-    const term = searchTerm.toLowerCase();
-    return categories.filter(
-      (cat) =>
-        (cat.category_name || "").toLowerCase().includes(term) ||
-        (cat.category_unique_id || "").toLowerCase().includes(term)
-    );
-  }, [categories, searchTerm]);
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(0); // reset to first page on search
+    }, 500);
+    return () => clearTimeout(handler);
+  }, [searchTerm]);
 
   const handleEdit = useCallback((category) => {
     setEditingCategory(category);
@@ -43,119 +77,169 @@ const CategoryListManager = () => {
     setEditingCategory(null);
   }, []);
 
-  const handleDelete = useCallback(
-    (category) => {
-      if (!window.confirm(`Delete "${category.category_name}"?`)) return;
+  const handleDelete = (targetcategory) => {
+    const { category_unique_id, category_name } = targetcategory;
 
-      dispatch(
-        deleteCategory({
-          uniqueId: category.category_unique_id,
-          token,
-          tenantId,
-        })
-      )
-        .unwrap()
-        .then(() => {
-          dispatch(fetchCategories({ token, tenantId }));
-        })
-        .catch(() => alert("Failed to delete category"));
-    },
-    [dispatch, token, tenantId]
-  );
-
+    if (window.confirm(`Delete ${category_name}?`)) {
+      deleteCategory({ uniqueId: category_unique_id });
+    }
+  };
   const columns = [
     {
-      key: "category_unique_id",
-      label: "UNIQUE ID",
-      render: (value) => (
+      field: "category_unique_id",
+      headerName: "UNIQUE ID",
+      flex: 1,
+      headerClassName: "custom-header",
+      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize font-bold",
+      renderCell: (params) => (
         <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-          {value || "N/A"}
+          {params.value || "N/A"}
         </span>
       ),
     },
+
     {
-      key: "category_name",
-      label: "CATEGORY NAME",
-      render: (value) => (
-        <span className="font-semibold">{value || "Unnamed"}</span>
-      ),
+      field: "category_name",
+      headerName: "CATEGORY NAME",
+      flex: 1,
+      headerClassName: "custom-header",
+      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize",
+      renderCell: (params) => <span className="font-semibold">{params.value || "Unnamed"}</span>,
     },
+
     {
-      key: "is_active",
-      label: "STATUS",
-      render: (value) => (
+      field: "is_active",
+      headerName: "STATUS",
+      flex: 1,
+      type: "singleSelect",
+      valueOptions: ["Active", "Inactive"],
+
+      // Convert boolean → string for filters
+      valueGetter: (params) => (params.value ? "Active" : "Inactive"),
+
+      renderCell: (params) => (
         <span
           className={`px-3 py-1.5 rounded-full text-xs font-bold ${
-            value ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            params?.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
           }`}
         >
-          {value ? "Active" : "Inactive"}
+          {params?.row?.is_active ? "Active" : "Inactive"}
         </span>
+      ),
+    },
+
+    {
+      field: "actions",
+      headerName: "ACTIONS",
+      sortable: false,
+      filterable: false,
+      width: 150,
+      headerClassName: "custom-header",
+      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 flex gap-1",
+      disableColumnMenu: true,
+
+      renderCell: (params) => (
+        <div className="flex gap-2 align-center">
+          <button onClick={() => handleEdit(params.row)} className="cursor-pointer">
+            <FaEdit size={18} className="text-[#4f46e5]" />
+          </button>
+          <button onClick={() => handleDelete(params.row)}>
+            <MdDelete size={18} className="text-[#4f46e5]" />
+          </button>
+        </div>
       ),
     },
   ];
 
   return (
-    <>
-      <PageLayoutWithTable
-        title="Categories Manager"
-        subtitle="Manage all product categories"
-        buttonLabel="Add New Category"
-        onAddClick={() => setShowAddModal(true)}
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        tableData={filteredCategories}
-        columns={columns}
-        loading={loading}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        error={error}
-        emptyMessage={
-          <div className="text-center py-16">
-            <div className="text-6xl mb-4">📦</div>
-            <p className="text-2xl text-gray-600 font-medium">
-              {searchTerm
-                ? `No results for "${searchTerm}"`
-                : "No categories found"}
-            </p>
-            <p className="text-gray-500">
-              Click "Add New Category" to create one!
-            </p>
-          </div>
-        }
-        excludeColumns={[
-          "_id",
-          "__v",
-          "tenant_id",
-          "createdAt",
-          "updatedAt",
-          "created_by",
-          "updated_by",
-        ]}
-        itemsPerPage={8}
-      />
+    <div className="min-h-screen bg-gray-50 py-0">
+      <div className="flex flex-col gap-y-4 border border-gray-300 rounded-lg p-4 height-full border-blck">
+        {/* HEADER */}
+        <PageHeader
+          title="Categories Manager"
+          subtitle="Manage all product categories"
+          actionLabel="Add New Category"
+          onAction={() => setShowAddModal(true)}
+        />
+
+        {/* SEARCH */}
+        {/* <div className="p-6 bg-gray-50 border-b"> */}
+        <div className="flex items-center gap-4">
+          <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
+          <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} />
+          <DropdownFilter data={formattedIndustries} onSelect={(id) => setIndustryId(id)} />
+        </div>
+        {/* </div> */}
+
+        <DataTable
+          rows={categories?.data || []}
+          columns={columns}
+          getRowId={(row) => row.category_unique_id}
+          page={currentPage}
+          pageSize={pageSize}
+          totalCount={categories?.totalCount || 0}
+          setCurrentPage={setCurrentPage}
+          setPageSize={setPageSize}
+          sort={sort}
+          setSort={(newSort) => {
+            const sortItem = newSort[0];
+            setSort(sortItem ? `${sortItem.field}:${sortItem.sort}` : "");
+          }}
+        />
+
+        {/* TABLE */}
+        {/* <div className="p-6 bg-white">
+          {error ? (
+            <p>Error loading categories</p>
+          ) : (
+            <DynamicTable
+              data={categories}
+              columns={columns}
+              loading={loading}
+              sortable={true}
+              itemsPerPage={8}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              emptyMessage={
+                <div className="text-center py-16">
+                  <div className="text-6xl mb-4">📦</div>
+                  <p className="text-2xl text-gray-600 font-medium">
+                    {searchTerm
+                      ? `No results for "${searchTerm}"`
+                      : "No categories found"}
+                  </p>
+                  <p className="text-gray-500">
+                    Click "Add New Category" to create one!
+                  </p>
+                </div>
+              }
+              excludeColumns={[
+                "_id",
+                "__v",
+                "tenant_id",
+                "createdAt",
+                "updatedAt",
+                "created_by",
+                "updated_by",
+              ]}
+            />
+          )}
+        </div> */}
+      </div>
 
       {/* Add Modal */}
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setShowAddModal(false)}
-          />
-          <div className="relative bg-white rounded-2xl p-6 w-full max-w-xl shadow-lg">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowAddModal(false)} />
+          <div className="relative bg-white rounded-2xl w-full max-w-3xl shadow-lg">
             <CategoryManager onCancel={() => setShowAddModal(false)} />
           </div>
         </div>
       )}
 
       {/* Edit Modal */}
-      {editingCategory && (
-        <CategoryEditModal
-          category={editingCategory}
-          onClose={handleCloseEditModal}
-        />
-      )}
-    </>
+      {editingCategory && <CategoryEditModal category={editingCategory} onClose={handleCloseEditModal} />}
+    </div>
   );
 };
 

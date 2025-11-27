@@ -1,43 +1,54 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { updateBrand } from "../../redux/brandSlice";
+import { useState } from "react";
 import CategorySelector from "../../components/CategorySelector";
-import EditModalLayout from "../../components/EditModalLayout";
 import DynamicForm from "../../components/DynamicForm";
+import EditModalLayout from "../../components/EditModalLayout";
+import { useUpdateBrand } from "../../hooks/useBrand";
+import { useGetAllCategories } from "../../hooks/useCategory";
 
-const BrandEditModal = ({ brand, onClose, onSuccess }) => {
-  const dispatch = useDispatch();
-  const categories = useSelector((state) => state.categories.items || []);
-  const { token, tenantId } = useSelector((state) => state.auth || {});
+const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }) => {
+  // const { token, tenantId } = useSelector((state) => state.auth || {});
+
+  const {
+    mutateAsync: updateBrand,
+    isPending: isUpdating,
+    onSuccess: success,
+  } = useUpdateBrand({
+    onSettled: () => {
+      setIsLoading(false);
+      setEditingBrand(null);
+    },
+  });
+
+  // console.log(brand, "brand");
+  const { data: categoriesData, isLoaing, isError } = useGetAllCategories({});
+  // console.log("categories", brand.categories);
+
+  const getSelectedCategoryObjects = (brandCategories = [], categoriesData = []) => {
+    if (!Array?.isArray(brandCategories) || !Array?.isArray(categoriesData)) return [];
+
+    return categoriesData?.filter((cat) => brandCategories?.includes(cat?._id));
+  };
+
+  console.log("selected categories", getSelectedCategoryObjects(brand?.categories, categoriesData));
 
   const [form, setForm] = useState({
-    categories: brand.categories || [],
-    brand_name: brand.brand_name || "",
-    brand_unique_id: brand.brand_unique_id || "",
-    brand_description: brand.brand_description || "",
-    brand_image: null,
+    categories: brand?.categories || [],
+    brand_name: brand?.brand_name || "",
+    brand_unique_id: brand?.brand_unique_id || "",
+    brand_description: brand?.brand_description || "",
+    brand_image: "",
+    is_active: brand?.is_active ?? true,
   });
 
   const [imagePreview, setImagePreview] = useState("");
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
-  // Load initial image
-  useEffect(() => {
-    if (brand.brand_image) {
-      const fullUrl = `${process.env.REACT_APP_API_URL}/${brand.brand_image.replace(
-        /\\/g,
-        "/"
-      )}`;
-      setImagePreview(fullUrl);
-    }
-  }, [brand.brand_image]);
-
   const validate = () => {
     const e = {};
-    if (!form.categories.length) e.categories = "Please select at least one category";
-    if (!form.brand_name.trim()) e.brand_name = "Brand name is required";
-    if (!form.brand_unique_id.trim()) e.brand_unique_id = "Brand unique ID is required";
+    if (!form?.categories?.length) e.categories = "Please select at least one category";
+    if (!form?.brand_name?.trim()) e.brand_name = "Brand name is required";
+    if (!form?.brand_unique_id?.trim()) e.brand_unique_id = "Brand unique ID is required";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -62,42 +73,40 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
 
     const fd = new FormData();
 
-    form.categories.forEach((id) => fd.append("category_unique_ids[]", id));
+    form.categories.forEach((id) => fd?.append("categories[]", id));
 
-    fd.append("brand_name", form.brand_name);
-    fd.append("brand_unique_id", form.brand_unique_id);
-    fd.append("brand_description", form.brand_description || "");
+    fd.append("brand_name", form?.brand_name);
+    // fd.append("brand_unique_id", form.brand_unique_id);
+    fd.append("brand_description", form?.brand_description || "");
 
-    if (form.brand_image && typeof form.brand_image !== "string") {
-      fd.append("brand_image", form.brand_image);
+    fd.append("is_active", form.is_active);
+
+    if (form?.brand_image && typeof form?.brand_image !== "string") {
+      fd.append("brand_image", form?.brand_image);
     }
 
-    if (!imagePreview && brand.brand_image) {
+    if (!imagePreview && brand?.brand_image) {
       fd.append("brand_image", "");
     }
 
     try {
-      await dispatch(
-        updateBrand({
-          uniqueId: brand._id,
-          formData: fd,
-          token,
-          tenantId,
-        })
-      ).unwrap();
+      console.log("before update");
 
-      onSuccess?.();
-      onClose();
+      await updateBrand({
+        id: brand?._id,
+        data: fd,
+      });
+
+      setEditingBrand(null);
+
+      console.log("after update");
     } catch (err) {
-      alert("Update failed: " + (err.message || "Please try again"));
+      // alert("Update failed: " + (err.message || "Please try again"));
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ---------------------------
-  // ⭐ DynamicForm Field Config
-  // ---------------------------
   const fields = [
     {
       key: "brand_name",
@@ -125,6 +134,11 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
       accept: "image/*",
       onChange: handleImageChange,
     },
+    {
+      key: "is_active",
+      label: "Active",
+      type: "checkbox",
+    },
   ];
 
   return (
@@ -141,13 +155,11 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
           Categories <span className="text-red-500">*</span>
         </label>
         <CategorySelector
-          categories={categories}
-          selected={form.categories}
+          categories={categoriesData?.data}
+          selected={form?.categories}
           setSelected={(vals) => setForm({ ...form, categories: vals })}
         />
-        {errors.categories && (
-          <p className="text-red-500 text-sm mt-2">{errors.categories}</p>
-        )}
+        {errors?.categories && <p className="text-red-500 text-sm mt-2">{errors?.categories}</p>}
       </div>
 
       {/* ⭐ Dynamic Form Handles all other fields */}

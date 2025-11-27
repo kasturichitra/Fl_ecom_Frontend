@@ -2,24 +2,18 @@ import React, { useState } from "react";
 import EditModalLayout from "../../components/EditModalLayout";
 import DynamicForm from "../../components/DynamicForm";
 
-const IndustryTypeEditModal = ({
-  formData: initialData,
-  closeModal,
-  onSubmit,
-}) => {
-
+const IndustryTypeEditModal = ({ formData: initialData, closeModal, onSubmit }) => {
   const [formData, setLocalFormData] = useState({
     ...initialData,
   });
 
   const [imageFile, setImageFile] = useState(null);
 
-
   // Submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const submitData = new FormData();
+
     submitData.append("industry_name", formData.industry_name || "");
     submitData.append("industry_unique_id", formData.industry_unique_id || "");
     submitData.append("description", formData.description || "");

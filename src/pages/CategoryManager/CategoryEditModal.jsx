@@ -1,21 +1,19 @@
 // src/components/CategoryEditModal.jsx
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 import DynamicForm from "../../components/DynamicForm";
 import EditModalLayout from "../../components/EditModalLayout";
-import { updateCategory } from "../../redux/categorySlice";
+
+import { useCategoryUpdate } from "../../hooks/useCategory";
+import { useGetAllIndustries } from "../../hooks/useIndustry";
 
 const CategoryEditModal = ({ category, onClose, onSuccess }) => {
-  const dispatch = useDispatch();
-  const industryTypes = useSelector((state) => state.industryTypes?.items ?? []);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const { data: industryTypes } = useGetAllIndustries({
+    search: searchTerm,
+  });
 
-  const token = localStorage.getItem("token") || "";
-  const tenantId = "tenant123";
-
-  // ------------------------------
-  // MAIN FORM DATA
-  // ------------------------------
-
+  const { mutateAsync: updateCategory, isPending: isLoading } = useCategoryUpdate();
   const [formData, setFormData] = useState({
     category_name: "",
     category_unique_id: "",
@@ -26,7 +24,6 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
   });
 
   const [attributes, setAttributes] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
 
   // Load Category Data into Form
   useEffect(() => {
@@ -46,7 +43,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
           code: a.code,
           slug: a.slug,
           description: a.description,
-          units: a.units || "N/A",
+          units: a.units,
           is_active: a.is_active,
           _id: a._id,
         }))
@@ -90,7 +87,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
         code: "",
         slug: "",
         description: "",
-        units: "N/A",
+        units: "",
         is_active: true,
         _id: null,
       },
@@ -107,7 +104,6 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
 
     const fd = new FormData();
     fd.append("category_name", formData.category_name);
@@ -130,39 +126,36 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
       });
     });
 
-    try {
-      await dispatch(
-        updateCategory({
-          uniqueId: category.category_unique_id,
-          formData: fd,
-          token,
-          tenantId,
-        })
-      ).unwrap();
-
-      onSuccess?.();
-      onClose();
-    } catch (err) {
-      alert("Failed to update category: " + err.message);
-    } finally {
-      setIsLoading(false);
-    }
+    await updateCategory({ uniqueId: category.category_unique_id, payload: fd });
+    onClose()
   };
 
   // ------------------------------
   // DYNAMIC FORM FIELDS
   // ------------------------------
 
+  // Format accordingly how the dynamic form is expecting
+  const formattedIndustryTypes = industryTypes?.data?.map((i) => ({
+    label: `${i.industry_name} #${i.industry_unique_id}`,
+    value: i.industry_unique_id,
+  }));
+
   const dynamicFields = [
     {
       key: "industry_unique_id",
       label: "Industry",
-      type: "select",
-      required: true,
-      options: industryTypes.map((i) => ({
-        label: `${i.industry_name} #${i.industry_unique_id}`,
-        value: i.industry_unique_id,
-      })),
+      type: "search",
+      onSearch: (searchTerm) => {
+        setSearchTerm(searchTerm);
+        setShowDropdown(true);
+      },
+      results: showDropdown ? formattedIndustryTypes : [],
+      clearResults: () => {
+        setSearchTerm("");
+        setShowDropdown(false);
+      },
+      onSelect: (value) => setFormData((prev) => ({ ...prev, industry_unique_id: value.value })),
+      options: formattedIndustryTypes,
     },
     {
       key: "category_name",
@@ -236,21 +229,21 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
 
               <div className="grid grid-cols-2 gap-4">
                 <input
-                  placeholder="Name"
+                  placeholder="Name:- ex. RAM (GB), Battery, Storage (GB), etc."
                   value={attr.name}
                   onChange={(e) => handleAttributeChange(idx, "name", e.target.value)}
                   className="border p-3 rounded-lg"
                 />
 
                 <input
-                  placeholder="Code"
+                  placeholder="Code:- ex. ram_gb, battery, storage_gb, etc."
                   value={attr.code}
                   onChange={(e) => handleAttributeChange(idx, "code", e.target.value)}
                   className="border p-3 rounded-lg"
                 />
 
                 <input
-                  placeholder="Units"
+                  placeholder="Units:- ex. gb, mAH, gb, etc."
                   value={attr.units}
                   onChange={(e) => handleAttributeChange(idx, "units", e.target.value)}
                   className="border p-3 rounded-lg"
@@ -259,9 +252,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
                 <input
                   placeholder="Description"
                   value={attr.description}
-                  onChange={(e) =>
-                    handleAttributeChange(idx, "description", e.target.value)
-                  }
+                  onChange={(e) => handleAttributeChange(idx, "description", e.target.value)}
                   className="border p-3 rounded-lg"
                 />
               </div>
@@ -270,9 +261,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
                 <input
                   type="checkbox"
                   checked={attr.is_active}
-                  onChange={(e) =>
-                    handleAttributeChange(idx, "is_active", e.target.checked)
-                  }
+                  onChange={(e) => handleAttributeChange(idx, "is_active", e.target.checked)}
                   className="w-5 h-5"
                 />
                 <span>Active Attribute</span>

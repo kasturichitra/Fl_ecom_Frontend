@@ -15,9 +15,9 @@ const initialState = {
 // =========================== GET ALL ===========================
 export const fetchIndustryTypes = createAsyncThunk(
   "industryType/search",
-  async ({ token, tenantId }, { rejectWithValue }) => {
+  async ({ rejectWithValue }) => {
     try {
-      const response = await getAllIndustryApi(token, tenantId);
+      const response = await getAllIndustryApi();
       return response.data.data;
     } catch (err) {
       return rejectWithValue(err.response?.data || "Failed to fetch");
@@ -29,7 +29,6 @@ export const fetchIndustryTypes = createAsyncThunk(
 export const createIndustryType = createAsyncThunk(
   "industryTypes/",
   async ({ formData, token, tenantId }, { rejectWithValue }) => {
-     console.log(formData,token,tenantId)
     try {
       const response = await createIndustryApi(formData, token, tenantId);
       return response.data.data;
