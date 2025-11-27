@@ -11,6 +11,7 @@ import BrandEditModal from "./BrandEditModal";
 import BrandManager from "./BrandManager";
 import { DropdownFilter } from "../../components/DropdownFilter";
 import { statusOptions } from "../../lib/constants";
+import { useGetAllIndustries } from "../../hooks/useIndustry";
 
 const BrandListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,6 +33,20 @@ const BrandListManager = () => {
     return undefined; // ⭐ FIX — remove filter
   };
 
+  const { data: industries } = useGetAllIndustries();
+  console.log("industries", industries);
+
+  let formattedIndustries = industries?.data?.map((ind) => ({
+    label: ind.industry_name,
+    value: ind.industry_unique_id,
+  }));
+
+  // Add "All Industries" option to the start of array using array.unshitf method
+  formattedIndustries?.unshift({
+    label: "All Industries",
+    value: "",
+  });
+
   const { data: brandsData, isError } = useGetAllBrands({
     searchTerm,
     page: currentPage + 1, // API pages are 1-based
@@ -39,7 +54,7 @@ const BrandListManager = () => {
     is_active: statusFun(),
   });
 
-  console.log("brandsData", brandsData?.data);
+  // console.log("brandsData", brandsData?.data);
   const data = brandsData?.data || [];
 
   const columns = [
