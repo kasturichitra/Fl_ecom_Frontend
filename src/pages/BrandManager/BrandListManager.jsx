@@ -11,7 +11,7 @@ import BrandEditModal from "./BrandEditModal";
 import BrandManager from "./BrandManager";
 import { DropdownFilter } from "../../components/DropdownFilter";
 import { statusOptions } from "../../lib/constants";
-import { useGetAllIndustries } from "../../hooks/useIndustry";
+import { useGetAllCategories } from "../../hooks/useCategory";
 
 const BrandListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,6 +23,7 @@ const BrandListManager = () => {
 
   const { mutateAsync: deleteBrandMutation } = useDeleteBrand();
 
+  const [caterogyId, setCaterogyId] = useState("");
   const [activeStatus, setActiveStatus] = useState("");
   // console.log("activeStatus", activeStatus);
 
@@ -33,17 +34,16 @@ const BrandListManager = () => {
     return undefined; // ⭐ FIX — remove filter
   };
 
-  const { data: industries } = useGetAllIndustries();
-  console.log("industries", industries);
+  const { data: categories } = useGetAllCategories();
 
-  let formattedIndustries = industries?.data?.map((ind) => ({
-    label: ind.industry_name,
-    value: ind.industry_unique_id,
-  }));
+  let formattedCategories =
+    categories?.data?.map((ind) => ({
+      label: ind?.category_name,
+      value: ind?.category_unique_id,
+    })) || [];
 
-  // Add "All Industries" option to the start of array using array.unshitf method
-  formattedIndustries?.unshift({
-    label: "All Industries",
+  formattedCategories.unshift({
+    label: "All Categories",
     value: "",
   });
 
@@ -52,6 +52,7 @@ const BrandListManager = () => {
     page: currentPage + 1, // API pages are 1-based
     limit: pageSize,
     is_active: statusFun(),
+    category_unique_id: caterogyId,
   });
 
   // console.log("brandsData", brandsData?.data);
@@ -170,6 +171,7 @@ const BrandListManager = () => {
           <div className="px-6 py-4 flex items-center gap-4">
             <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
             <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} />
+            <DropdownFilter data={formattedCategories} onSelect={(id) => setCaterogyId(id)} />
           </div>
 
           {/* TABLE */}
