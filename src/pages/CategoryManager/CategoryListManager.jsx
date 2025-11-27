@@ -204,7 +204,7 @@ const CategoryListManager = () => {
       {showAddModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowAddModal(false)} />
-          <div className="relative bg-white rounded-2xl p-6 w-full max-w-xl shadow-lg">
+          <div className="relative bg-white rounded-2xl w-full max-w-3xl shadow-lg">
             <CategoryManager onCancel={() => setShowAddModal(false)} />
           </div>
         </div>

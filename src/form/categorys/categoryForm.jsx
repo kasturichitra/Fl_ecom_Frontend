@@ -38,11 +38,9 @@ const CategoryForm = ({
     });
   };
 
-  console.log("Category Form Data:", formData);
-
   return (
     <>
-    <form onSubmit={handleSubmit} className="space-y-10">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
 
       <DynamicForm
         fields={fields}
