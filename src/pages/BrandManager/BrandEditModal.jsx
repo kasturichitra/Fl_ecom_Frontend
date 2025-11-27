@@ -8,7 +8,6 @@ import { useGetAllCategories } from "../../hooks/useCategory";
 const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }) => {
   // const { token, tenantId } = useSelector((state) => state.auth || {});
 
-
   const {
     mutateAsync: updateBrand,
     isPending: isUpdating,
@@ -24,13 +23,12 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
   const { data: categoriesData, isLoaing, isError } = useGetAllCategories({});
   // console.log("categories", brand.categories);
 
-
   const getSelectedCategoryObjects = (brandCategories = [], categoriesData = []) => {
     if (!Array?.isArray(brandCategories) || !Array?.isArray(categoriesData)) return [];
-    
+
     return categoriesData?.filter((cat) => brandCategories?.includes(cat?._id));
   };
-  
+
   console.log("selected categories", getSelectedCategoryObjects(brand?.categories, categoriesData));
 
   const [form, setForm] = useState({
@@ -39,13 +37,12 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
     brand_unique_id: brand?.brand_unique_id || "",
     brand_description: brand?.brand_description || "",
     brand_image: "",
+    is_active: brand?.is_active ?? true,
   });
-
 
   const [imagePreview, setImagePreview] = useState("");
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-
 
   const validate = () => {
     const e = {};
@@ -81,6 +78,8 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
     fd.append("brand_name", form?.brand_name);
     // fd.append("brand_unique_id", form.brand_unique_id);
     fd.append("brand_description", form?.brand_description || "");
+
+    fd.append("is_active", form.is_active);
 
     if (form?.brand_image && typeof form?.brand_image !== "string") {
       fd.append("brand_image", form?.brand_image);
@@ -134,6 +133,11 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
       type: "file",
       accept: "image/*",
       onChange: handleImageChange,
+    },
+    {
+      key: "is_active",
+      label: "Active",
+      type: "checkbox",
     },
   ];
 
