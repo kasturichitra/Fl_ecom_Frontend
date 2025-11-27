@@ -7,6 +7,8 @@ import { useDeleteIndustry, useGetAllIndustries, useUpdateIndustry } from "../..
 import IndustryTypeEditModal from "./IndustryTypeEditModal";
 import IndustryTypeManager from "./IndustryTypeManager";
 import PageHeader from "../../components/PageHeader.jsx";
+import { DropdownFilter } from "../../components/DropdownFilter.jsx";
+import { statusOptions } from "../../lib/constants.js";
 
 const IndustryTypeList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -14,6 +16,16 @@ const IndustryTypeList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0); // 0-based page
   const [sort, setSort] = useState("createdAt:desc");
+
+  const [activeStatus, setActiveStatus] = useState("");
+  // console.log("activeStatus", activeStatus);
+
+  const statusFun = () => {
+    if (activeStatus === "active") return true;
+    if (activeStatus === "inactive") return false;
+
+    return undefined; // ⭐ FIX — remove filter
+  };
 
   const {
     data: industryTypes,
@@ -24,6 +36,7 @@ const IndustryTypeList = () => {
     page: currentPage + 1, // API pages are 1-based
     limit: pageSize,
     sort,
+    is_active: statusFun(),
   });
 
   const { mutateAsync: updateIndustry } = useUpdateIndustry({
@@ -132,7 +145,11 @@ const IndustryTypeList = () => {
           actionLabel="Add New Industry"
           onAction={() => setShowAddModal(true)}
         />
-        <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
+        <div className="flex items-center gap-4">
+          <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} />
+          <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
+        </div>
+
         <DataTable
           rows={industryTypes?.data || []}
           getRowId={(row) => row.industry_unique_id}
