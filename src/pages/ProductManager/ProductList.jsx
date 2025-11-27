@@ -24,6 +24,7 @@ import ImportantNotesDialog from "../../components/ImportantNotesDialog.jsx"; //
 import { Diameter } from "lucide-react";
 import { DropdownFilter } from "../../components/DropdownFilter.jsx";
 import { useGetAllIndustries } from "../../hooks/useIndustry.js";
+import { GENDER_OPTIONS } from "../../lib/constants.js";
 
 const ProductList = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -33,6 +34,7 @@ const ProductList = () => {
   const [sort, setSort] = useState("createdAt:desc");
   const [industryId, setIndustryId] = useState("");
   const [categoryId, setCategoryId] = useState("");
+  const [selectedGender, setSelectedGender] = useState("");
 
   const [openNotes, setOpenNotes] = useState(false); // ⬅️ REQUIRED STATE
 
@@ -48,6 +50,7 @@ const ProductList = () => {
     searchTerm,
     industry_unique_id: industryId,
     category_unique_id: categoryId,
+    gender: selectedGender,
     sort: decodeURIComponent(sort),
     page: currentPage + 1,
     limit: pageSize,
@@ -245,6 +248,7 @@ const ProductList = () => {
               <div className="flex items-center gap-2">
                 <DropdownFilter data={formattedIndustries} onSelect={(id) => setIndustryId(id)} />
                 <DropdownFilter data={formattedFilterCategories} onSelect={(id) => setCategoryId(id)} />
+                <DropdownFilter data={GENDER_OPTIONS} onSelect={(value) => setSelectedGender(value)} />
               </div>
 
               <div className="flex gap-3 items-center">
