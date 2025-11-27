@@ -9,11 +9,18 @@ import {
 } from "../ApiServices/productService";
 import toast from "react-hot-toast";
 
-export const useGetAllProducts = ({ searchTerm = "", page = 1, limit = 10, sort = "" } = {}) => {
-  const queryKey = ["products", searchTerm, page, limit, sort];
+export const useGetAllProducts = ({
+  searchTerm = "",
+  page = 1,
+  limit = 10,
+  sort = "",
+  industry_unique_id = "",
+  category_unique_id = "",
+} = {}) => {
+  const queryKey = ["products", searchTerm, page, limit, sort, industry_unique_id, category_unique_id];
   return useQuery({
     queryKey,
-    queryFn: () => getAllProductsApi({ searchTerm, page, limit, sort }),
+    queryFn: () => getAllProductsApi({ searchTerm, page, limit, sort, industry_unique_id, category_unique_id }),
     select: (res) => res.data,
     staleTime: 60 * 1000,
     refetchOnMount: false,

@@ -7,7 +7,7 @@ import {
   updateIndustryApi,
 } from "../ApiServices/industryService";
 
-export const useGetAllIndustries = ({ search = "", page = 1, limit = 10, sort = "", is_active = "" }) => {
+export const useGetAllIndustries = ({ search = "", page = 1, limit = 10, sort = "", is_active = "" } = {}) => {
   const queryKey = ["industries", search || "", page, limit, sort, is_active];
 
   return useQuery({
