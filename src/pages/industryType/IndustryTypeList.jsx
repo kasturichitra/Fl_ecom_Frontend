@@ -81,6 +81,7 @@ const IndustryTypeList = () => {
       headerName: "UNIQUE ID",
       flex: 1,
       headerClassName: "custom-header",
+      
       cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize font-bold",
       renderCell: (params) => (
         <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">{params.value}</span>
