@@ -2,11 +2,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createCategoryApi, deleteCategoryApi, getAllCategoryApi, getCategoryByUniqueIdApi, updateCategoryApi } from "../ApiServices/categoryService.js";
 import toast from "react-hot-toast";
 
-export const useGetAllCategories = ({ search = "", page = 1, limit = 10, sort = "", is_active = "" } = {}) => {
-  const queryKey = ["categories", search, page, limit, sort, is_active];
+export const useGetAllCategories = ({ search = "", page = 1, limit = 10, sort = "", is_active = "", industry_unique_id = "" } = {}) => {
+  const queryKey = ["categories", search, page, limit, sort, is_active, industry_unique_id];
   return useQuery({
     queryKey,
-    queryFn: () => getAllCategoryApi({ search, page, limit, sort, is_active }),
+    queryFn: () => getAllCategoryApi({ search, page, limit, sort, is_active, industry_unique_id }),
     select: (res) => res.data,
     staleTime: 5 * 60 * 1000,
     cacheTime: 20 * 60 * 1000, 
