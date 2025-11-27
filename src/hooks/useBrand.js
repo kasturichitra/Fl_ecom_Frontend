@@ -3,12 +3,12 @@ import { createBrandApi, deleteBrandApi, getAllBrandApi, updateBrandApi } from "
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-export const useGetAllBrands = ({ searchTerm = "", page = 1, limit = 10, sort = "", is_active = "" }) => {
-  const queryKey = ["brands", searchTerm || "", page, limit, sort, is_active];
+export const useGetAllBrands = ({ searchTerm = "", page = 1, limit = 10, sort = "", is_active = "", category_unique_id = "" }) => {
+  const queryKey = ["brands", searchTerm || "", page, limit, sort, is_active, category_unique_id];
 
   return useQuery({
     queryKey,
-    queryFn: () => getAllBrandApi({ searchTerm, page, limit, sort, is_active }),
+    queryFn: () => getAllBrandApi({ searchTerm, page, limit, sort, is_active, category_unique_id }),
     select: (res) => res?.data, 
     staleTime: 10 * 60 * 1000,
     cacheTime: 30 * 60 * 1000,
