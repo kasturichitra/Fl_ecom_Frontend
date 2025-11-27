@@ -18,11 +18,12 @@ export const categorySchema = yup.object().shape({
     .min(2, "Category Name must be at least 2 characters")
     .max(100, "Category Name cannot exceed 100 characters"),
 
-  image_url: yup
+  image: yup
     .mixed()
+    // .nullable()
     .required("Image is required")
     .test("fileType", "Only JPEG or PNG images are allowed", (value) => {
-      if (!value) return false;
+      if (!value) return true; // optional field
       if (typeof value === "string") return true; // existing image URL
       if (value instanceof File) {
         return ["image/jpeg", "image/png"].includes(value.type);
@@ -30,9 +31,7 @@ export const categorySchema = yup.object().shape({
       return false;
     }),
 
-  description: yup
-    .string()
-    .trim()
-    .nullable()
-    .max(1000, "Description cannot exceed 1000 characters"),
+  is_active: yup
+    .boolean()
+    .default(true),
 });
