@@ -16,7 +16,7 @@ export default function OrderProductsDetailes() {
           </div>
           <h2 className="text-xl font-bold text-gray-800">{title}</h2>
         </div>
-        {status && <InfoItem label="" value={status} badge="bg-yellow-100 text-yellow-800" />}
+        {status && <InfoItem label="" value={status} badge={bgColor} />}
       </div>
       {children}
     </div>
@@ -57,7 +57,21 @@ export default function OrderProductsDetailes() {
           <InfoCard
             icon={Package}
             title="Order Info"
-            bgColor="bg-blue-100 text-blue-600"
+            bgColor={
+              orderData?.order_status === "Delivered"
+                ? "bg-green-100 text-green-600"
+                : orderData?.order_status === "Cancelled"
+                ? "bg-red-100 text-red-600"
+                : orderData?.order_status === "Shipped"
+                ? "bg-orange-100 text-orange-600"
+                : orderData?.order_status === "Returned"
+                ? "bg-purple-100 text-purple-600"
+                : orderData?.order_status === "Processing"
+                ? "bg-blue-100 text-blue-600"
+                : orderData?.order_status === "Pending"
+                ? "bg-yellow-100 text-yellow-600"
+                : "bg-gray-100 text-gray-600" // Default color for other statuses
+            }
             status={orderData?.order_status}
           >
             <div className="space-y-4">
@@ -78,7 +92,17 @@ export default function OrderProductsDetailes() {
           <InfoCard
             icon={CreditCard}
             title="Payment"
-            bgColor="bg-green-100 text-green-600"
+            bgColor={
+              orderData?.payment_status === "Paid"
+                ? "bg-green-100 text-green-600"
+                : orderData?.payment_status === "Pending"
+                ? "bg-yellow-100 text-yellow-600"
+                : orderData?.payment_status === "Failed"
+                ? "bg-red-100 text-red-600"
+                : orderData?.payment_status === "Refunded"
+                ? "bg-blue-100 text-blue-600"
+                : "bg-gray-100 text-gray-600"
+            }
             status={orderData?.payment_status}
           >
             <div className="space-y-4">

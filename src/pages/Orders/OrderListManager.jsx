@@ -4,6 +4,8 @@ import PageHeader from "../../components/PageHeader";
 import SearchBar from "../../components/SearchBar";
 import DataTable from "../../components/Table";
 import { useGetAllOrders } from "../../hooks/useOrder";
+import { DropdownFilter } from "../../components/DropdownFilter";
+import { ORDER_STATUS_OPTIONS, ORDER_TYPE_OPTIONS, PAYMENT_METHOD_OPTIONS } from "../../lib/constants";
 
 const OrderListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -12,24 +14,33 @@ const OrderListManager = () => {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0); // 0-based page
 
+  const [orderStatus, setOrderStatus] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [orderType, setOrderType] = useState("");
+
+
   const { data, isLoading, isError } = useGetAllOrders({
     searchTerm: searchTerm,
     page: currentPage + 1,
     limit: pageSize,
+    order_status: orderStatus,
+    order_type: orderType,
+    payment_method: paymentMethod,
   });
 
   const handleRowClick = (params) => {
-    console.log(params,'checking params');
     const orderId = params.row.order_id;
     navigate(`/order-products-detailes/${orderId}`);
   };
 
   const columns = [
     {
-      field: "_id",
+      field: "order_id",
       headerName: "ORDER ID",
       flex: 1,
       headerClassName: "custom-header",
+       hideable: false,
+      disableColumnMenu: true,
       cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 font-mono",
       renderCell: (params) => (
         <span className="font-mono text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded-full">
@@ -43,6 +54,8 @@ const OrderListManager = () => {
       headerName: "CUSTOMER ID",
       flex: 1,
       headerClassName: "custom-header",
+       hideable: false,
+      disableColumnMenu: true,
       cellClassName: "px-6 py-4 text-left text-sm tracking-wider text-gray-700 font-medium",
       renderCell: (params) => (
         <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
@@ -56,24 +69,25 @@ const OrderListManager = () => {
       headerName: "ORDER STATUS",
       flex: 1,
       headerClassName: "custom-header",
+       hideable: false,
+      disableColumnMenu: true,
       cellClassName: "px-6 py-4 text-left text-sm tracking-wider text-gray-700 capitalize",
       renderCell: (params) => {
         const status = params?.value ?? "";
-        const isDelivered = status === "delivered";
-        const isPending = status === "pending";
-        const isCancelled = status === "cancelled";
+        const isDelivered = status === "Delivered";
+        const isPending = status === "Pending";
+        const isCancelled = status === "Cancelled";
 
         return (
           <span
-            className={`px-3 py-1 rounded-full text-xs font-bold ${
-              isDelivered
+            className={`px-3 py-1 rounded-full text-xs font-bold ${isDelivered
                 ? "bg-green-100 text-green-800"
                 : isPending
-                ? "bg-yellow-100 text-yellow-800"
-                : isCancelled
-                ? "bg-red-100 text-red-800"
-                : "bg-gray-100 text-gray-700"
-            }`}
+                  ? "bg-yellow-100 text-yellow-800"
+                  : isCancelled
+                    ? "bg-red-100 text-red-800"
+                    : "bg-gray-100 text-gray-700"
+              }`}
           >
             {status}
           </span>
@@ -86,9 +100,22 @@ const OrderListManager = () => {
       headerName: "PAYMENT METHOD",
       flex: 1,
       headerClassName: "custom-header",
+       hideable: false,
+      disableColumnMenu: true,
       cellClassName: "px-6 py-4 text-left text-sm tracking-wider text-gray-700 capitalize",
       renderCell: (params) => <span className="font-semibold text-gray-800">{params?.value ?? ""}</span>,
     },
+    {
+      field: "order_type",
+      headerName: "ORDER TYPE",
+      flex: 1,
+      headerClassName: "custom-header",
+       hideable: false,
+      disableColumnMenu: true,
+      cellClassName: "px-6 py-4 text-left text-sm tracking-wider text-gray-700 capitalize",
+      renderCell: (params) => <span className="font-semibold text-gray-800">{params?.value ?? ""}</span>,
+    },
+
 
     {
       field: "total_amount",
@@ -111,12 +138,27 @@ const OrderListManager = () => {
         </div>
 
         {/* SEARCH (NO GAP) */}
-        <div className="p-6 bg-gray-50  border-b">
+        <div className="p-6 bg-gray-50  border-b flex items-center gap-4">
           <SearchBar
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
             placeholder="Search orders..."
             className=" max-w-md"
+          />
+          <DropdownFilter
+            value={orderStatus}
+            onSelect={setOrderStatus}
+            data={ORDER_STATUS_OPTIONS}
+          />
+          <DropdownFilter
+            value={paymentMethod}
+            onSelect={setPaymentMethod}
+            data={PAYMENT_METHOD_OPTIONS}
+          />
+          <DropdownFilter
+            value={orderType}
+            onSelect={setOrderType}
+            data={ORDER_TYPE_OPTIONS  }
           />
         </div>
 
