@@ -4,6 +4,8 @@ import { lazy, Suspense } from "react";
 import PageNotFound from "./pages/PageNotFound/PageNotFound";
 import { Toaster, ToastIcon } from "react-hot-toast";
 import OrderListManager from "./pages/Orders/OrderListManager";
+import { useStoreFcmToken } from "./hooks/useUser";
+import { requestPermissionAndGetToken } from "./lib/notifications";
 
 // Lazy-loaded pages
 const CategoryManager = lazy(() => import("./pages/CategoryManager/CategoryManager"));
@@ -45,6 +47,27 @@ const ScrollToTop = () => {
 };
 
 const App = () => {
+  const {mutateAsync: storeFcmToken} = useStoreFcmToken();
+
+  useEffect(() => {
+    async function initFCM() {
+      try {
+        const token = await requestPermissionAndGetToken(
+          import.meta.env.VITE_FIREBASE_VAPID_PUBLIC_KEY
+        );
+
+        if (token) {
+          await storeFcmToken({ token });
+          console.log("Token stored:", token);
+        }
+      } catch (err) {
+        console.error("FCM error:", err);
+      }
+    }
+
+    // initFCM();
+  }, []);
+
   return (
     <Router>
       <ScrollToTop />

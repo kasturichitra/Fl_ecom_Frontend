@@ -10,6 +10,14 @@ import store, { persistor } from "./redux/store.js";
 import "./index.css";
 import queryClient from "./react-query/queryClient.js";
 
+// src/main.jsx (or similar startup file)
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker
+    .register("/firebase-messaging-sw.js")
+    .then((reg) => console.log("sw registered", reg.scope))
+    .catch((err) => console.error("sw register failed", err));
+}
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>
