@@ -24,6 +24,7 @@ import ImportantNotesDialog from "../../components/ImportantNotesDialog.jsx"; //
 import { Diameter } from "lucide-react";
 import { DropdownFilter } from "../../components/DropdownFilter.jsx";
 import { useGetAllIndustries } from "../../hooks/useIndustry.js";
+import { GENDER_OPTIONS } from "../../lib/constants.js";
 
 const ProductList = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,6 +33,8 @@ const ProductList = () => {
   const [showExcelDropdown, setShowExcelDropdown] = useState(false);
   const [sort, setSort] = useState("createdAt:desc");
   const [industryId, setIndustryId] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [selectedGender, setSelectedGender] = useState("");
 
   const [openNotes, setOpenNotes] = useState(false); // ⬅️ REQUIRED STATE
 
@@ -46,6 +49,8 @@ const ProductList = () => {
   } = useGetAllProducts({
     searchTerm,
     industry_unique_id: industryId,
+    category_unique_id: categoryId,
+    gender: selectedGender,
     sort: decodeURIComponent(sort),
     page: currentPage + 1,
     limit: pageSize,
@@ -59,8 +64,23 @@ const ProductList = () => {
   }));
 
   // Add "All Industries" option to the start of array using array.unshitf method
-  formattedIndustries.unshift({
+  formattedIndustries?.unshift({
     label: "All Industries",
+    value: "",
+  });
+
+  const { data: filterCategories } = useGetAllCategories({
+    ...(industryId && { industry_unique_id: industryId }),
+  });
+
+  let formattedFilterCategories = filterCategories?.data?.map((cat) => ({
+    value: cat.category_unique_id,
+    label: cat.category_name,
+  }));
+
+  // Add "All Categories" option to the start of array using array.unshift method
+  formattedFilterCategories?.unshift({
+    label: "All Categories",
     value: "",
   });
 
@@ -225,7 +245,11 @@ const ProductList = () => {
               </div>
 
               {/*Filters Grid / Filters Column whatever it is */}
-              <DropdownFilter data={formattedIndustries} onSelect={(id) => setIndustryId(id)} />
+              <div className="flex items-center gap-2">
+                <DropdownFilter data={formattedIndustries} onSelect={(id) => setIndustryId(id)} />
+                <DropdownFilter data={formattedFilterCategories} onSelect={(id) => setCategoryId(id)} />
+                <DropdownFilter data={GENDER_OPTIONS} onSelect={(value) => setSelectedGender(value)} />
+              </div>
 
               <div className="flex gap-3 items-center">
                 <button
