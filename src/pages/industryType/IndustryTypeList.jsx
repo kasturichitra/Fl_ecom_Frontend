@@ -146,8 +146,8 @@ const IndustryTypeList = () => {
           onAction={() => setShowAddModal(true)}
         />
         <div className="flex items-center gap-4">
-          <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} />
           <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
+          <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} />
         </div>
 
         <DataTable

@@ -13,6 +13,9 @@ import CategoryManager from "./CategoryManager";
 import DataTable from "../../components/Table.jsx";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import { useGetAllIndustries } from "../../hooks/useIndustry.js";
+import { DropdownFilter } from "../../components/DropdownFilter.jsx";
+import { statusOptions } from "../../lib/constants.js";
 
 const CategoryListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,11 +28,22 @@ const CategoryListManager = () => {
 
   const [sort, setSort] = useState("createdAt:desc");
 
+  const [activeStatus, setActiveStatus] = useState("");
+  // console.log("activeStatus", activeStatus);
+
+  const statusFun = () => {
+    if (activeStatus === "active") return true;
+    if (activeStatus === "inactive") return false;
+
+    return undefined; // ⭐ FIX — remove filter
+  };
+
+
   const {
     data: categories,
     isLoading: loading,
     isError: error,
-  } = useGetAllCategories({ search: searchTerm, page: currentPage + 1, limit: pageSize, sort });
+  } = useGetAllCategories({ search: searchTerm, page: currentPage + 1, limit: pageSize, sort, is_active: statusFun() });
 
   const { mutate: deleteCategory, isPending } = useCategoryDelete();
 
@@ -136,12 +150,10 @@ const CategoryListManager = () => {
 
         {/* SEARCH */}
         {/* <div className="p-6 bg-gray-50 border-b"> */}
-        <SearchBar
-          searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          placeholder="Search categories..."
-          // className="mx-auto max-w-md"
-        />
+        <div className="flex items-center gap-4">
+          <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
+          <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} />
+        </div>
         {/* </div> */}
 
         <DataTable
