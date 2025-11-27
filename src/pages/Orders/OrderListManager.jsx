@@ -19,7 +19,8 @@ const OrderListManager = () => {
   });
 
   const handleRowClick = (params) => {
-    const orderId = params.row._id;
+    console.log(params,'checking params');
+    const orderId = params.row.order_id;
     navigate(`/order-products-detailes/${orderId}`);
   };
 

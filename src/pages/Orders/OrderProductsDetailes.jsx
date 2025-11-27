@@ -6,6 +6,7 @@ export default function OrderProductsDetailes() {
   const { id } = useParams();
 
   const { data: orderData, isLoading, isError } = useGetOrderProductsById(id);
+  console.log("order product data",orderData);
   const InfoCard = ({ icon: Icon, title, children, bgColor, status }) => (
     <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
       <div className="flex items-center justify-between mb-6">
@@ -48,7 +49,7 @@ export default function OrderProductsDetailes() {
       <div className="mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">Order Details</h1>
-          <p className="text-gray-600">Order ID: {orderData?._id}</p>
+          <p className="text-gray-600">Order ID: {orderData?.order_id}</p>
         </div>
 
         {/* User Info Cards */}
