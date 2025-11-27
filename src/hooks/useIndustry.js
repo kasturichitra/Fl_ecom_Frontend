@@ -7,12 +7,12 @@ import {
   updateIndustryApi,
 } from "../ApiServices/industryService";
 
-export const useGetAllIndustries = ({ search = "", page = 1, limit = 10, sort = "" }) => {
-  const queryKey = ["industries", search || "", page, limit, sort];
+export const useGetAllIndustries = ({ search = "", page = 1, limit = 10, sort = "", is_active = "" }) => {
+  const queryKey = ["industries", search || "", page, limit, sort, is_active];
 
   return useQuery({
     queryKey,
-    queryFn: () => getAllIndustryApi({ search, page, limit, sort }),
+    queryFn: () => getAllIndustryApi({ search, page, limit, sort, is_active }),
     select: (res) => res.data,
     staleTime: 10 * 60 * 1000,
     cacheTime: 30 * 60 * 1000,
