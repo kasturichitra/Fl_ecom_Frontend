@@ -28,6 +28,7 @@ const BrandManager = ({ setShowAddModal, onCancel }) => {
     { key: "brand_unique_id", label: "Brand Unique ID", type: "text", placeholder: "BR-001" },
     { key: "brand_description", label: "Brand Description", type: "textarea" },
     { key: "brand_image", label: "Brand Image", type: "file" },
+    { key: "is_active", label: "Active", type: "checkbox" },
   ];
 
   const handleCreateBrand = async (data) => {
