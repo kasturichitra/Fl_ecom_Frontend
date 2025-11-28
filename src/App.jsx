@@ -65,7 +65,7 @@ const App = () => {
       }
     }
 
-    // initFCM();
+    initFCM();
   }, []);
 
   return (
