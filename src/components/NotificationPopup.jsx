@@ -1,24 +1,29 @@
 import React from "react";
 import { useNotification } from "../hooks/useNotification";
+import { useNavigate } from "react-router-dom";
 
 const NotificationPopup = ({ open }) => {
   if (!open) return null;
 
   const {data } = useNotification();
+  const navigate = useNavigate();
 
-//   console.log("notificationsData", notificationsData);
-
-
-  const notifications = data?.map((notification) => notification.message);
-//   console.log("newData", newData);
+  console.log("data", data);
 
 
-//   const notifications = [
-//     "New order received",
-//     "Stock is low for product XYZ",
-//     "Your report is ready for download",
-//     "User John added a new brand",
-//   ];
+
+
+  // const notifications = data?.map((notification) => notification.message);
+
+  const notifications = data?.map((notification) => {
+    return {
+      path : notification.link,
+      message : notification.message
+    }
+  });
+
+  console.log("notifications", notifications);
+  
 
   return (
     <div className="absolute right-0 mt-2 w-90 bg-white shadow-xl rounded-xl p-4 border border-gray-200 z-50">
@@ -29,8 +34,9 @@ const NotificationPopup = ({ open }) => {
           <li
             key={index}
             className="text-sm text-gray-600 bg-gray-50 p-2 rounded-lg hover:bg-gray-100 cursor-pointer"
+            onClick={() => navigate(msg.path)}
           >
-            {msg}
+            {msg.message}
           </li>
         ))}
       </ul>
