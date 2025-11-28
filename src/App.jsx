@@ -6,6 +6,7 @@ import { Toaster, ToastIcon } from "react-hot-toast";
 import OrderListManager from "./pages/Orders/OrderListManager";
 import { useStoreFcmToken } from "./hooks/useUser";
 import { requestPermissionAndGetToken } from "./lib/notifications";
+import Navbar from "./components/Navbar";
 
 // Lazy-loaded pages
 const CategoryManager = lazy(() => import("./pages/CategoryManager/CategoryManager"));
@@ -192,8 +193,11 @@ const App = () => {
         </nav>
       </aside>
 
+      {/* Navbar */}
+      <Navbar />
+
       {/* Main Content Area */}
-      <main className="ml-72 min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50">
+      <main className="ml-72 pt-16 min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50">
         <div className="p-8">
           <Suspense
             fallback={
