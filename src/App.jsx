@@ -5,8 +5,8 @@ import PageNotFound from "./pages/PageNotFound/PageNotFound";
 import { Toaster, ToastIcon } from "react-hot-toast";
 import OrderListManager from "./pages/Orders/OrderListManager";
 import { useStoreFcmToken } from "./hooks/useUser";
-import { requestPermissionAndGetToken } from "./lib/notifications";
 import Navbar from "./components/Navbar";
+import { listenForForegroundMessages, requestPermissionAndGetToken } from "./lib/notifications";
 
 // Lazy-loaded pages
 const CategoryManager = lazy(() => import("./pages/CategoryManager/CategoryManager"));
@@ -67,6 +67,7 @@ const App = () => {
     }
 
     initFCM();
+    listenForForegroundMessages();
   }, []);
 
   return (
