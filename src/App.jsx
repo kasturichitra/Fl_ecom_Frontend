@@ -1,14 +1,13 @@
-import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, NavLink, useLocation, Link } from "react-router-dom";
-import { lazy, Suspense } from "react";
-import PageNotFound from "./pages/PageNotFound/PageNotFound";
-import { Toaster, ToastIcon } from "react-hot-toast";
-import OrderListManager from "./pages/Orders/OrderListManager";
-import { useStoreFcmToken } from "./hooks/useUser";
+import { lazy, Suspense, useEffect } from "react";
+import { Toaster } from "react-hot-toast";
+import { Link, NavLink, Route, BrowserRouter as Router, Routes, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import { useStoreFcmToken } from "./hooks/useUser";
 import { listenForForegroundMessages, requestPermissionAndGetToken } from "./lib/notifications";
-import UserList from "./pages/users/UserList";
 import { sidebarElements } from "./lib/sidebar_elements";
+import OrderListManager from "./pages/Orders/OrderListManager";
+import PageNotFound from "./pages/PageNotFound/PageNotFound";
+import EmployeeList from "./pages/users/EmployeeList";
 
 // Lazy-loaded pages
 const CategoryManager = lazy(() => import("./pages/CategoryManager/CategoryManager"));
@@ -147,7 +146,7 @@ const App = () => {
               <Route path="/add-product" element={<ProductManager />} />
               <Route path="/order-products-detailes/:id" element={<OrderProductsDetailes />} />
 
-              <Route path="/user" element={<UserList />} />
+              <Route path="/employee" element={<EmployeeList />} />
 
               <Route path="*" element={<PageNotFound />} />
             </Routes>
