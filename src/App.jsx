@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, NavLink, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, NavLink, useLocation, Link } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import PageNotFound from "./pages/PageNotFound/PageNotFound";
 import { Toaster, ToastIcon } from "react-hot-toast";
@@ -76,10 +76,12 @@ const App = () => {
       {/* Sidebar */}
       <aside className="fixed top-0 left-0 h-screen w-72 bg-gray-900 text-white shadow-2xl z-50 overflow-y-auto">
         <div className="p-8 border-b border-gray-800">
-          <h1 className="text-3xl font-bold tracking-wider bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
-            Admin Panel
-          </h1>
-          <p className="text-gray-400 text-sm mt-2">Management System</p>
+          <Link to={"/"}>
+            <h1 className="text-3xl font-bold tracking-wider bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+              Admin Panel
+            </h1>
+            <p className="text-gray-400 text-sm mt-2">Management System</p>
+          </Link>
         </div>
 
         <nav className="mt-8 space-y-3 px-6">
