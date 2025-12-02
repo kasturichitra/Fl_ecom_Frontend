@@ -42,14 +42,13 @@ const UserManager = ({ onCancel }) => {
             key: "role",
             label: "Role *",
             type: "select",
+            disabled: true,
             options: [
                 { label: "Employee", value: "employee" },
-                // { label: "User", value: "user" },
-                // { label: "Admin", value: "admin" },
             ],
         },
         {
-            key: "profile_image",
+            key: "image",
             label: "Profile Image *",
             type: "file",
             accept: "image/*",
@@ -57,10 +56,10 @@ const UserManager = ({ onCancel }) => {
     ];
 
     const handleSubmit = async (formData) => {
-        const { profile_image, ...rest } = formData;
+        const { image, ...rest } = formData;
         const formDataToSend = objectToFormData(rest);
-        if (profile_image) {
-            formDataToSend.append("profile_image", profile_image);
+        if (image) {
+            formDataToSend.append("image", image);
         }
         await createUser(formDataToSend);
         onCancel();

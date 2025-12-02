@@ -10,6 +10,7 @@ export const getAllUsers = () => {
 };
 
 export const createUser = (data) => {
+  console.log("createUser", data);
   return axiosInstance.post(`/employe`, data, {
     headers: {
       "Content-Type": "multipart/form-data",

@@ -6,5 +6,5 @@ export const userSchema = yup.object().shape({
     password: yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
     phone_number: yup.string().required("Phone number is required"),
     role: yup.string().required("Role is required"),
-    profile_image: yup.mixed().required("Profile image is required"),
+    image: yup.mixed().required("Profile image is required"),
 });
