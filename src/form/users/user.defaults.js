@@ -3,6 +3,6 @@ export const userDefaultValues = {
     email: "",
     password: "",
     phone_number: "",
-    role: "user",
-    profile_image: null,
+    role: "employee",
+    image: null,
 };
