@@ -13,7 +13,7 @@ export const useGetAllUsers = () => {
     queryKey: ["users"],
     queryFn: () => getAllUsers(),
     select: (res) => res.data.data,
-    staleTime: 60 * 1000,
+    staleTime: 5 *60 * 1000,
     refetchOnMount: false,
   });
 };
