@@ -7,6 +7,7 @@ import OrderListManager from "./pages/Orders/OrderListManager";
 import { useStoreFcmToken } from "./hooks/useUser";
 import Navbar from "./components/Navbar";
 import { listenForForegroundMessages, requestPermissionAndGetToken } from "./lib/notifications";
+import UserList from "./pages/users/UserList";
 
 // Lazy-loaded pages
 const CategoryManager = lazy(() => import("./pages/CategoryManager/CategoryManager"));
@@ -191,6 +192,22 @@ const App = () => {
             </svg>
             <span>Order</span>
           </NavLink>
+          <NavLink
+            to="/user"
+            className={({ isActive }) =>
+              `flex items-center gap-4 px-6 py-4 rounded-xl text-lg font-medium transition-all duration-300 ${
+                isActive
+                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 shadow-xl text-white scale-105"
+                  : "text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-2"
+              }`
+            }
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+            <span>Users</span>
+          </NavLink>
         </nav>
       </aside>
 
@@ -225,6 +242,8 @@ const App = () => {
               <Route path="/add-brand" element={<BrandManager />} />
               <Route path="/add-product" element={<ProductManager />} />
               <Route path="/order-products-detailes/:id" element={<OrderProductsDetailes />} />
+
+              <Route path="/user" element={<UserList />} />
 
               <Route path="*" element={<PageNotFound />} />
             </Routes>
