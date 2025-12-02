@@ -8,6 +8,7 @@ import { useStoreFcmToken } from "./hooks/useUser";
 import Navbar from "./components/Navbar";
 import { listenForForegroundMessages, requestPermissionAndGetToken } from "./lib/notifications";
 import UserList from "./pages/users/UserList";
+import { sidebarElements } from "./lib/sidebar_elements";
 
 // Lazy-loaded pages
 const CategoryManager = lazy(() => import("./pages/CategoryManager/CategoryManager"));
@@ -85,153 +86,34 @@ const App = () => {
         </div>
 
         <nav className="mt-8 space-y-3 px-6">
-          {/* Home */}
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) =>
-              `flex items-center gap-4 px-6 py-4 rounded-xl text-lg font-medium transition-all duration-300 ${
-                isActive
-                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 shadow-xl text-white scale-105"
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-2"
-              }`
+          {sidebarElements.map((item) => {
+            // Render divider
+            if (item.type === "divider") {
+              return <div key={item.id} className="h-px bg-gray-800 my-6" />;
             }
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-              />
-            </svg>
-            <span>Dashboard Home</span>
-          </NavLink>
 
-          <div className="h-px bg-gray-800 my-6" />
+            // Get the icon component
+            const IconComponent = item.icon;
 
-          {/* Divider */}
-
-          {/* Direct Links — No Dropdown */}
-          <NavLink
-            to="/industryTypeList"
-            className={({ isActive }) =>
-              `flex items-center gap-4 px-6 py-4 rounded-xl text-lg font-medium transition-all duration-300 ${
-                isActive
-                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 shadow-xl text-white scale-105"
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-2"
-              }`
-            }
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5"
-              />
-            </svg>
-            <span>Industry Types</span>
-          </NavLink>
-
-          <NavLink
-            to="/CategoryList"
-            className={({ isActive }) =>
-              `flex items-center gap-4 px-6 py-4 rounded-xl text-lg font-medium transition-all duration-300 ${
-                isActive
-                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 shadow-xl text-white scale-105"
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-2"
-              }`
-            }
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7h18M3 12h18M3 17h18" />
-            </svg>
-            <span>Categories</span>
-          </NavLink>
-
-          <NavLink
-            to="/brands"
-            className={({ isActive }) =>
-              `flex items-center gap-4 px-6 py-4 py-4 rounded-xl text-lg font-medium transition-all duration-300 ${
-                isActive
-                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 shadow-xl text-white scale-105"
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-2"
-              }`
-            }
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-              />
-            </svg>
-            <span>Brands</span>
-          </NavLink>
-
-          <NavLink
-            to="/productList"
-            className={({ isActive }) =>
-              `flex items-center gap-4 px-6 py-4 rounded-xl text-lg font-medium transition-all duration-300 ${
-                isActive
-                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 shadow-xl text-white scale-105"
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-2"
-              }`
-            }
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-              />
-            </svg>
-            <span>Products</span>
-          </NavLink>
-          <NavLink
-            to="/order"
-            className={({ isActive }) =>
-              `flex items-center gap-4 px-6 py-4 rounded-xl text-lg font-medium transition-all duration-300 ${
-                isActive
-                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 shadow-xl text-white scale-105"
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-2"
-              }`
-            }
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-              />
-            </svg>
-            <span>Order</span>
-          </NavLink>
-          <NavLink
-            to="/user"
-            className={({ isActive }) =>
-              `flex items-center gap-4 px-6 py-4 rounded-xl text-lg font-medium transition-all duration-300 ${
-                isActive
-                  ? "bg-gradient-to-r from-indigo-600 to-purple-600 shadow-xl text-white scale-105"
-                  : "text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-2"
-              }`
-            }
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5.121 17.804A9 9 0 0112 15a9 9 0 016.879 2.804M15 10a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
-
-            <span>Users</span>
-          </NavLink>
+            // Render nav link
+            return (
+              <NavLink
+                key={item.id}
+                to={item.path}
+                end={item.end}
+                className={({ isActive }) =>
+                  `flex items-center gap-4 px-6 py-4 rounded-xl text-lg font-medium transition-all duration-300 ${
+                    isActive
+                      ? "bg-gradient-to-r from-indigo-600 to-purple-600 shadow-xl text-white scale-105"
+                      : "text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-2"
+                  }`
+                }
+              >
+                <IconComponent className="w-6 h-6" />
+                <span>{item.label}</span>
+              </NavLink>
+            );
+          })}
         </nav>
       </aside>
 
