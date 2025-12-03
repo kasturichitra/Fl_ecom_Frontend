@@ -4,6 +4,8 @@ import { Link, NavLink, Route, BrowserRouter as Router, Routes, useLocation } fr
 import Navbar from "./components/Navbar";
 import { useStoreFcmToken } from "./hooks/useUser";
 import { listenForForegroundMessages, requestPermissionAndGetToken } from "./lib/notifications";
+// import UserList from "./pages/users/UserList";
+import CreateOrder from "./pages/Orders/CreateOrder";
 import { sidebarElements } from "./lib/sidebar_elements";
 import OrderListManager from "./pages/Orders/OrderListManager";
 import PageNotFound from "./pages/PageNotFound/PageNotFound";
@@ -145,6 +147,9 @@ const App = () => {
               <Route path="/add-brand" element={<BrandManager />} />
               <Route path="/add-product" element={<ProductManager />} />
               <Route path="/order-products-detailes/:id" element={<OrderProductsDetailes />} />
+
+              {/* <Route path="/user" element={<UserList />} /> */}
+              <Route path="/createOrder" element={<CreateOrder />} />
 
               <Route path="/employee" element={<EmployeeList />} />
 
