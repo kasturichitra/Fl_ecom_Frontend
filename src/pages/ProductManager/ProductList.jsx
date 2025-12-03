@@ -56,6 +56,8 @@ const ProductList = () => {
     limit: pageSize,
   });
 
+  console.log("productsResponse", productsResponse);
+
   const { data: industries } = useGetAllIndustries();
 
   let formattedIndustries = industries?.data?.map((ind) => ({
@@ -173,8 +175,22 @@ const ProductList = () => {
       cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize",
     },
     {
-      field: "price",
-      headerName: "PRICE",
+      field: "brand_name",
+      headerName: "BRAND",
+      flex: 2,
+      headerClassName: "custom-header",
+      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize",
+    },
+    {
+      field: "category_name",
+      headerName: "CATEGORY",
+      flex: 2,
+      headerClassName: "custom-header",
+      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize",
+    },
+    {
+      field: "final_price",
+      headerName: "Final_price",
       flex: 1,
       headerClassName: "custom-header",
       cellClassName: "px-6 py-4 text-left text-sm text-gray-800",

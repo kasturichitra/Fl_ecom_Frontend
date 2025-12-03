@@ -115,6 +115,7 @@ const ProductManager = ({ onCancel }) => {
 
   // FORM SUBMIT
   const handleSubmit = async (formData) => {
+    console.log("formData", formData);
     // Get current attributes from the ref
     const currentAttributes = attributesRef.current;
 

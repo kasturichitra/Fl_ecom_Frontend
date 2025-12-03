@@ -32,8 +32,8 @@ export const PRODUCT_STATIC_FIELDS = [
     placeholder: "e.g., 3x4",
   },
   {
-    key: "price",
-    label: "Price *",
+    key: "base_price",
+    label: "base_price*",
     type: "number",
     
     min: 0,
