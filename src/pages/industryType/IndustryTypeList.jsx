@@ -1,14 +1,16 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector.jsx";
+import { DropdownFilter } from "../../components/DropdownFilter.jsx";
+import PageHeader from "../../components/PageHeader.jsx";
 import SearchBar from "../../components/SearchBar.jsx";
 import DataTable from "../../components/Table.jsx";
 import { useDeleteIndustry, useGetAllIndustries, useUpdateIndustry } from "../../hooks/useIndustry";
+import { statusOptions } from "../../lib/constants.js";
+import { useIndustryTableHeadersStore } from "../../stores/IndustryTableHeadersStore.js";
 import IndustryTypeEditModal from "./IndustryTypeEditModal";
 import IndustryTypeManager from "./IndustryTypeManager";
-import PageHeader from "../../components/PageHeader.jsx";
-import { DropdownFilter } from "../../components/DropdownFilter.jsx";
-import { statusOptions } from "../../lib/constants.js";
 
 const IndustryTypeList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,9 +18,26 @@ const IndustryTypeList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0); // 0-based page
   const [sort, setSort] = useState("createdAt:desc");
-
+  const { industryHeaders, updateTableHeaders } = useIndustryTableHeadersStore();
   const [activeStatus, setActiveStatus] = useState("");
   // console.log("activeStatus", activeStatus);
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const handleClickOutside = useCallback((event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsDropdownOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [handleClickOutside]);
+
 
   const statusFun = () => {
     if (activeStatus === "active") return true;
@@ -81,7 +100,7 @@ const IndustryTypeList = () => {
       headerName: "UNIQUE ID",
       flex: 1,
       headerClassName: "custom-header",
-      
+
       cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize font-bold",
       renderCell: (params) => (
         <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">{params.value}</span>
@@ -104,9 +123,8 @@ const IndustryTypeList = () => {
       valueGetter: (params) => (params.value ? "Active" : "Inactive"), // Convert boolean → string
       renderCell: (params) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${
-            params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            }`}
         >
           {params.row?.is_active ? "Active" : "Inactive"}
         </span>
@@ -135,6 +153,11 @@ const IndustryTypeList = () => {
     },
   ];
 
+  const visibleColumns = columns.filter((col) => {
+    const headerConfig = industryHeaders.find((h) => h.key === col.headerName);
+    return headerConfig ? headerConfig.value : true;
+  });
+
   // Pagination handlers
 
   return (
@@ -148,13 +171,19 @@ const IndustryTypeList = () => {
         />
         <div className="flex items-center gap-4">
           <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
+          <ColumnVisibilitySelector
+           headers={industryHeaders}
+            updateTableHeaders={updateTableHeaders} 
+            setIsDropdownOpen={setIsDropdownOpen} 
+            isDropdownOpen={isDropdownOpen} 
+            dropdownRef={dropdownRef} />
           <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} />
         </div>
 
         <DataTable
           rows={industryTypes?.data || []}
           getRowId={(row) => row.industry_unique_id}
-          columns={columns}
+          columns={visibleColumns}
           page={currentPage}
           pageSize={pageSize}
           totalCount={industryTypes?.totalCount || 0}

@@ -1,15 +1,34 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import PageHeader from "../../components/PageHeader";
 import SearchBar from "../../components/SearchBar";
 import DataTable from "../../components/Table";
 import { useGetAllUsers } from "../../hooks/useUser";
 import EmployeeManager from "./EmployeeManager";
+import { useEmployeTableHeaderStore } from "../../stores/EmployeTableHeaderStore";
+import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector";
 
 const EmployeeList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
   const [showAddModal, setShowAddModal] = useState(false);
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const { employeeHeaders, updateEmployeeTableHeaders } = useEmployeTableHeaderStore();
+
+  const handleClickOutside = useCallback((event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsDropdownOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [handleClickOutside]);
 
   const {
     data: employees,
@@ -86,6 +105,12 @@ const EmployeeList = () => {
     },
   ];
 
+
+  const visibleColumns = columns.filter((col) => {
+    const headerConfig = employeeHeaders.find((h) => h.key === col.headerName);
+    return headerConfig ? headerConfig.value : true;
+  });
+
   return (
     <>
       <div className="min-h-screen bg-gray-50">
@@ -99,7 +124,7 @@ const EmployeeList = () => {
             />
 
             <div className="p-6 bg-gray-50 border-b flex items-center justify-between gap-4">
-              <div className="max-w-md w-full">
+              <div className="flex items-center gap-4">
                 <SearchBar
                   searchTerm={searchTerm}
                   onSearchChange={(value) => {
@@ -108,6 +133,12 @@ const EmployeeList = () => {
                   }}
                   placeholder="Search users by name, email, or ID..."
                 />
+                <ColumnVisibilitySelector
+                  headers={employeeHeaders}
+                  updateTableHeaders={updateEmployeeTableHeaders}
+                  setIsDropdownOpen={setIsDropdownOpen}
+                  isDropdownOpen={isDropdownOpen}
+                  dropdownRef={dropdownRef} />
               </div>
             </div>
 
@@ -120,14 +151,14 @@ const EmployeeList = () => {
                 <DataTable
                   rows={employees}
                   getRowId={(row) => row._id}
-                  columns={columns}
+                  columns={visibleColumns}
                   page={currentPage}
                   pageSize={pageSize}
                   totalCount={employees.length}
                   setCurrentPage={setCurrentPage}
                   setPageSize={setPageSize}
                   sort="" // Client-side sorting not implemented yet, or can be added if needed
-                  setSort={() => {}}
+                  setSort={() => { }}
                 />
               )}
             </div>

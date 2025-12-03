@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 
 import toast from "react-hot-toast";
@@ -16,6 +16,8 @@ import { MdDelete } from "react-icons/md";
 import { useGetAllIndustries } from "../../hooks/useIndustry.js";
 import { DropdownFilter } from "../../components/DropdownFilter.jsx";
 import { statusOptions } from "../../lib/constants.js";
+import { useCategoryTableHeadersStore } from "../../stores/CategoryTableHeaderStore.js";
+import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector.jsx";
 
 const CategoryListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -26,6 +28,26 @@ const CategoryListManager = () => {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
   const [industryId, setIndustryId] = useState("");
+  const dropdownRef = useRef(null);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { categoryHeaders, updateCategoryTableHeaders } = useCategoryTableHeadersStore();
+  const handleClickOutside = useCallback((event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsDropdownOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [handleClickOutside]);
+
+
+
+
+
 
   const [sort, setSort] = useState("createdAt:desc");
 
@@ -119,9 +141,8 @@ const CategoryListManager = () => {
 
       renderCell: (params) => (
         <span
-          className={`px-3 py-1.5 rounded-full text-xs font-bold ${
-            params?.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
+          className={`px-3 py-1.5 rounded-full text-xs font-bold ${params?.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            }`}
         >
           {params?.row?.is_active ? "Active" : "Inactive"}
         </span>
@@ -151,6 +172,10 @@ const CategoryListManager = () => {
     },
   ];
 
+  const visibleColumns = columns.filter((col) => {
+    const headerConfig = categoryHeaders.find((h) => h.key === col.headerName);
+    return headerConfig ? headerConfig.value : true;
+  });
   return (
     <div className="min-h-screen bg-gray-50 py-0">
       <div className="flex flex-col gap-y-4 border border-gray-300 rounded-lg p-4 height-full border-blck">
@@ -166,6 +191,7 @@ const CategoryListManager = () => {
         {/* <div className="p-6 bg-gray-50 border-b"> */}
         <div className="flex items-center gap-4">
           <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
+          <ColumnVisibilitySelector headers={categoryHeaders} updateTableHeaders={updateCategoryTableHeaders} setIsDropdownOpen={setIsDropdownOpen} isDropdownOpen={isDropdownOpen} dropdownRef={dropdownRef} />
           <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} />
           <DropdownFilter data={formattedIndustries} onSelect={(id) => setIndustryId(id)} />
         </div>
@@ -173,7 +199,7 @@ const CategoryListManager = () => {
 
         <DataTable
           rows={categories?.data || []}
-          columns={columns}
+          columns={visibleColumns}
           getRowId={(row) => row.category_unique_id}
           page={currentPage}
           pageSize={pageSize}
