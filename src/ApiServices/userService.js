@@ -5,8 +5,9 @@ export const storeFcmToken = (token, userId) => {
   return axiosInstance.put(`/fcm-token/${userId}`, { fcm_token: token });
 };
 
-export const getAllUsers = () => {
-  return axiosInstance.get(`${BASE_URL}`);
+export const getAllUsers = (params = {}) => {
+  const queryString = new URLSearchParams(params).toString();
+  return axiosInstance.get(`${BASE_URL}?${queryString}`);
 };
 
 export const createUser = (data) => {
