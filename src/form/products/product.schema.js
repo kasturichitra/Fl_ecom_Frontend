@@ -18,7 +18,7 @@ export const productSchema = yup.object().shape({
     .trim()
     .min(3, "Product Name must be at least 3 characters"),
 
-  price: yup
+  base_price: yup
     .number()
     .transform((value, originalValue) => (originalValue === "" ? undefined : value))
     .typeError("Price must be a valid number")

@@ -23,11 +23,11 @@ const UsersList = () => {
     role: "user",
   });
 
-  console.log("usersResponse", usersResponse);
+//   console.log("usersResponse", usersResponse);
 
   // Extract actual users array + total count
   const users = usersResponse || [];
-  console.log("users", users);
+//   console.log("users", users);
   const totalUsers = usersResponse?.total || 0;
 
   const columns = [
@@ -122,6 +122,10 @@ const UsersList = () => {
                 sort={sort}
                 setSort={(newSort) => {
                   const sortItem = newSort[0];
+                  /*
+                  { field: "createdAt", sort: "desc" }
+                  createdAt:desc
+                  */
                   setSort(sortItem ? `${sortItem.field}:${sortItem.sort}` : "");
                 }}
               />
