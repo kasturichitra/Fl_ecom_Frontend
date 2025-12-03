@@ -53,4 +53,10 @@ export const sidebarElements = [
     label: "Employees",
     icon: Users,
   },
+  {
+    id : 'createOrder',
+    path : '/createOrder',
+    label : 'Create Order',
+    icon : Users
+  }
 ];
