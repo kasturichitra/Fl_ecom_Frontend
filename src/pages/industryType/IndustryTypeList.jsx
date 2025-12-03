@@ -22,12 +22,12 @@ const IndustryTypeList = () => {
   const [activeStatus, setActiveStatus] = useState("");
   // console.log("activeStatus", activeStatus);
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   const handleClickOutside = useCallback((event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setIsOpen(false);
+      setIsDropdownOpen(false);
     }
   }, []);
 
@@ -171,7 +171,12 @@ const IndustryTypeList = () => {
         />
         <div className="flex items-center gap-4">
           <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
-          <ColumnVisibilitySelector headers={industryHeaders} updateTableHeaders={updateTableHeaders} setIsOpen={setIsOpen} isOpen={isOpen} dropdownRef={dropdownRef} />
+          <ColumnVisibilitySelector
+           headers={industryHeaders}
+            updateTableHeaders={updateTableHeaders} 
+            setIsDropdownOpen={setIsDropdownOpen} 
+            isDropdownOpen={isDropdownOpen} 
+            dropdownRef={dropdownRef} />
           <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} />
         </div>
 

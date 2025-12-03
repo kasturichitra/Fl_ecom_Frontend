@@ -29,11 +29,11 @@ const CategoryListManager = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [industryId, setIndustryId] = useState("");
   const dropdownRef = useRef(null);
-  const [isOpen, setIsOpen] = useState(false);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { categoryHeaders, updateCategoryTableHeaders } = useCategoryTableHeadersStore();
   const handleClickOutside = useCallback((event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setIsOpen(false);
+      setIsDropdownOpen(false);
     }
   }, []);
 
@@ -191,7 +191,7 @@ const CategoryListManager = () => {
         {/* <div className="p-6 bg-gray-50 border-b"> */}
         <div className="flex items-center gap-4">
           <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
-          <ColumnVisibilitySelector headers={categoryHeaders} updateTableHeaders={updateCategoryTableHeaders} setIsOpen={setIsOpen} isOpen={isOpen} dropdownRef={dropdownRef} />
+          <ColumnVisibilitySelector headers={categoryHeaders} updateTableHeaders={updateCategoryTableHeaders} setIsDropdownOpen={setIsDropdownOpen} isDropdownOpen={isDropdownOpen} dropdownRef={dropdownRef} />
           <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} />
           <DropdownFilter data={formattedIndustries} onSelect={(id) => setIndustryId(id)} />
         </div>
