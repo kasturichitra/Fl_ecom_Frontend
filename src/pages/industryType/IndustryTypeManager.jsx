@@ -13,25 +13,45 @@ const IndustryTypeManager = ({ onCancel }) => {
     if (onCancel) onCancel();
   };
 
-  const fields = [
-    {
-      key: "industry_name", label: "Industry Name", type: "text",
-    },
-    {
-      key: "industry_unique_id", label: "Unique ID", type: "text",
-    },
-    {
-      key: "description", label: "Description", type: "textarea",
-    },
-    { key: "image", label: "Upload Image", type: "file", accept: "image/*" },
-    { key: "is_active", label: "Active", type: "checkbox" },
-  ];
+ const fields = [
+  {
+    key: "industry_name",
+    label: "Industry Name",
+    type: "text",
+    width: 400, // width in px
+  },
+  {
+    key: "industry_unique_id",
+    label: "Unique ID",
+    type: "text",
+    width: 400,
+  },
+  {
+    key: "description",
+    label: "Description",
+    type: "textarea",
+    width: 400,
+  },
+  { 
+    key: "image", 
+    label: "Upload Image", 
+    type: "file", 
+    accept: "image/*",
+    width: 300,
+  },
+  { 
+    key: "is_active", 
+    label: "Active", 
+    type: "checkbox",
+    width: 150,
+  },
+];
+
 
   const handleAddIndustryType = async (formData) => {
     console.log("Fform state before AI PI call", formData);
     const result = objectToFormData(formData);
     await createIndustry(result);
-
   };
 
   return (
@@ -45,12 +65,7 @@ const IndustryTypeManager = ({ onCancel }) => {
         <IndustryTypeForm
           fields={fields}
           onSubmit={handleAddIndustryType}
-          additionalContent={
-            <FormActionButtons
-              submitLabel="Create Industry Type"
-              onCancel={handleCancel}
-            />
-          }
+          additionalContent={<FormActionButtons submitLabel="Create Industry Type" onCancel={handleCancel} />}
         />
       </div>
     </div>
