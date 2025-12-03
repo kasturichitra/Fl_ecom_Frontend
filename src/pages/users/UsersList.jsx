@@ -23,11 +23,11 @@ const UsersList = () => {
     role: "user",
   });
 
-  console.log("usersResponse", usersResponse);
+//   console.log("usersResponse", usersResponse);
 
   // Extract actual users array + total count
   const users = usersResponse || [];
-  console.log("users", users);
+//   console.log("users", users);
   const totalUsers = usersResponse?.total || 0;
 
   const columns = [

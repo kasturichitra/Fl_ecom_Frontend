@@ -7,7 +7,7 @@ import { useGetAllCategories } from "../../hooks/useCategory";
 
 const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }) => {
   // const { token, tenantId } = useSelector((state) => state.auth || {});
-
+  console.log(brand, "brand....?");
   const {
     mutateAsync: updateBrand,
     isPending: isUpdating,
@@ -36,11 +36,11 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
     brand_name: brand?.brand_name || "",
     brand_unique_id: brand?.brand_unique_id || "",
     brand_description: brand?.brand_description || "",
-    brand_image: "",
+    brand_image: brand?.brand_image || "",
     is_active: brand?.is_active ?? true,
   });
 
-  const [imagePreview, setImagePreview] = useState("");
+  const [imagePreview, setImagePreview] = useState(brand?.brand_image || "");
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 

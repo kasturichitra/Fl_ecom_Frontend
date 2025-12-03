@@ -27,7 +27,6 @@ const DynamicForm = ({
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  // Check if we're using react-hook-form
   const isUsingRHF = register !== null;
 
   return (
@@ -37,7 +36,11 @@ const DynamicForm = ({
         const hasError = !!fieldError;
 
         return (
-          <div key={field.key} className="flex flex-col gap-2">
+          <div
+            key={field.key}
+            className="flex flex-col gap-2"
+            style={{ width: field.width ? `${field.width}px` : "100%" }} // <-- width applied here
+          >
             <label className="font-semibold text-gray-700">{field.label}</label>
 
             {field.type === "text" && (
@@ -56,9 +59,7 @@ const DynamicForm = ({
                     hasError && "border-red-500 focus:ring-red-500"
                   )}
                 />
-                {hasError && (
-                  <span className="text-red-500 text-sm">{fieldError.message}</span>
-                )}
+                {hasError && <span className="text-red-500 text-sm">{fieldError.message}</span>}
               </>
             )}
 
@@ -76,9 +77,7 @@ const DynamicForm = ({
                     hasError && "border-red-500 focus:ring-red-500"
                   )}
                 />
-                {hasError && (
-                  <span className="text-red-500 text-sm">{fieldError.message}</span>
-                )}
+                {hasError && <span className="text-red-500 text-sm">{fieldError.message}</span>}
               </>
             )}
 
@@ -96,9 +95,7 @@ const DynamicForm = ({
                     hasError && "border-red-500 focus:ring-red-500"
                   )}
                 />
-                {hasError && (
-                  <span className="text-red-500 text-sm">{fieldError.message}</span>
-                )}
+                {hasError && <span className="text-red-500 text-sm">{fieldError.message}</span>}
               </>
             )}
 
@@ -113,9 +110,7 @@ const DynamicForm = ({
                   />
                   <span>{field.label}</span>
                 </label>
-                {hasError && (
-                  <span className="text-red-500 text-sm">{fieldError.message}</span>
-                )}
+                {hasError && <span className="text-red-500 text-sm">{fieldError.message}</span>}
               </>
             )}
 
@@ -155,9 +150,7 @@ const DynamicForm = ({
                   <img src={formData.currentImage} className="w-32 h-32 object-cover rounded-lg mt-2" />
                 )}
 
-                {hasError && (
-                  <span className="text-red-500 text-sm">{fieldError.message}</span>
-                )}
+                {hasError && <span className="text-red-500 text-sm">{fieldError.message}</span>}
               </div>
             )}
 
@@ -171,10 +164,7 @@ const DynamicForm = ({
                   )}
                   value={isUsingRHF ? undefined : (formData[field.key] || "")}
                   onChange={isUsingRHF ? undefined : (e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      [field.key]: e.target.value,
-                    }))
+                    setFormData((prev) => ({ ...prev, [field.key]: e.target.value }))
                   }
                 >
                   <option value="">Select</option>
@@ -184,9 +174,7 @@ const DynamicForm = ({
                     </option>
                   ))}
                 </select>
-                {hasError && (
-                  <span className="text-red-500 text-sm">{fieldError.message}</span>
-                )}
+                {hasError && <span className="text-red-500 text-sm">{fieldError.message}</span>}
               </>
             )}
 
@@ -203,16 +191,12 @@ const DynamicForm = ({
                         results={field.results || []}
                         onChange={(val) => {
                           onChange(val);
-                          if (field.onSelect) {
-                            field.onSelect({ value: val });
-                          }
+                          if (field.onSelect) field.onSelect({ value: val });
                         }}
                         onSearch={field.onSearch}
                         onSelect={(selectedItem) => {
                           onChange(selectedItem.value);
-                          if (field.onSelect) {
-                            field.onSelect(selectedItem);
-                          }
+                          if (field.onSelect) field.onSelect(selectedItem);
                         }}
                         clearResults={field.clearResults}
                       />
@@ -229,9 +213,7 @@ const DynamicForm = ({
                     clearResults={field.clearResults}
                   />
                 )}
-                {hasError && (
-                  <span className="text-red-500 text-sm">{fieldError.message}</span>
-                )}
+                {hasError && <span className="text-red-500 text-sm">{fieldError.message}</span>}
               </>
             )}
           </div>
