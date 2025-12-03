@@ -9,6 +9,9 @@ const CreateOrder = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
 
+  console.log("selectedProducts", selectedProducts);
+  console.log("showDropdown", showDropdown);
+
   // NEW STATE FOR DynamicForm
   const [customerForm, setCustomerForm] = useState({
     customerName: "",
@@ -52,6 +55,7 @@ const CreateOrder = () => {
   const handleSelectProduct = (item) => {
     setSelectedProducts((prev) => {
       const exists = prev.some((p) => p.product_unique_id === item.value);
+      console.log("exists", exists);
       return exists ? prev : [...prev, { ...item.data, quantity: 1 }];
     });
 
@@ -85,7 +89,7 @@ const CreateOrder = () => {
       payment_method: "UPI",
       payment_status: "Paid",
       order_products: selectedProducts.map((p) => ({
-        product_name : p.product_name,
+        product_name: p.product_name,
         product_unique_id: p.product_unique_id,
         quantity: p.quantity,
         price: p.price,

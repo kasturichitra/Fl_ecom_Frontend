@@ -8,12 +8,13 @@ export const useStoreFcmToken = () => {
   });
 };
 
-export const useGetAllUsers = ({ searchTerm = "", page = 1, limit = 10, role = "" }) => {
+export const useGetAllUsers = ({ searchTerm = "", sort = "", page = 1, limit = 10, role = "" }) => {
   return useQuery({
-    queryKey: ["users", searchTerm, page, limit, role],
+    queryKey: ["users", searchTerm, sort, page, limit, role],
     queryFn: () =>
       getAllUsers({
         searchTerm,
+        sort,
         page,
         limit,
         role,
