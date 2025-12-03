@@ -6,6 +6,7 @@ import DataTable from "../../components/Table";
 import { useGetAllOrders } from "../../hooks/useOrder";
 import { DropdownFilter } from "../../components/DropdownFilter";
 import { ORDER_STATUS_OPTIONS, ORDER_TYPE_OPTIONS, PAYMENT_METHOD_OPTIONS } from "../../lib/constants";
+import { toIndianCurrency } from "../../utils/toIndianCurrency";
 
 const OrderListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -123,9 +124,7 @@ const OrderListManager = () => {
       flex: 1,
       headerClassName: "custom-header",
       cellClassName: "px-6 py-4 text-left text-sm tracking-wider text-gray-700",
-      renderCell: (params) => (
-        <span className="font-semibold text-gray-900">₹ {params?.value?.toFixed(2) ?? "0.00"}</span>
-      ),
+      renderCell: (params) => <span>{toIndianCurrency(params.value)}</span>,
     },
   ];
 

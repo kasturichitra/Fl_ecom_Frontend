@@ -25,6 +25,7 @@ import { Diameter } from "lucide-react";
 import { DropdownFilter } from "../../components/DropdownFilter.jsx";
 import { useGetAllIndustries } from "../../hooks/useIndustry.js";
 import { GENDER_OPTIONS } from "../../lib/constants.js";
+import { toIndianCurrency } from "../../utils/toIndianCurrency.js";
 
 const ProductList = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -194,6 +195,7 @@ const ProductList = () => {
       flex: 1,
       headerClassName: "custom-header",
       cellClassName: "px-6 py-4 text-left text-sm text-gray-800",
+      renderCell: (params) => <span>{toIndianCurrency(params.value)}</span>,
     },
     {
       field: "stock_quantity",
