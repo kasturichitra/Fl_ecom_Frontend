@@ -1,4 +1,4 @@
-import { Home, Building2, Layers, Tag, Package, FileText, Users } from "lucide-react";
+import { Home, Building2, Layers, Tag, Package, FileText, Users, Briefcase, ClipboardPlus } from "lucide-react";
 
 /**
  * Sidebar Navigation Configuration
@@ -51,13 +51,13 @@ export const sidebarElements = [
     id: "employees",
     path: "/employee",
     label: "Employees",
-    icon: Users,
+    icon: Briefcase,
   },
   {
     id : 'createOrder',
     path : '/createOrder',
     label : 'Create Order',
-    icon : Users
+    icon : ClipboardPlus
   },
   {
     id: "users",
