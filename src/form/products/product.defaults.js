@@ -7,7 +7,7 @@ export const productDefaultValues = {
   product_color: "",
   product_size: "",
   product_image: null,
-  price: "",
+  base_price: "",
   discount_percentage: 0,
   cgst: 0,
   sgst: 0,
