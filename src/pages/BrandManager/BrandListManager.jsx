@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useDeleteBrand, useGetAllBrands } from "../../hooks/useBrand";
 
@@ -12,6 +12,8 @@ import BrandManager from "./BrandManager";
 import { DropdownFilter } from "../../components/DropdownFilter";
 import { statusOptions } from "../../lib/constants";
 import { useGetAllCategories } from "../../hooks/useCategory";
+import { useBrandTableHeadersStore } from "../../stores/BrandTableHeaderStore";
+import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector";
 
 const BrandListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,8 +27,24 @@ const BrandListManager = () => {
 
   const [caterogyId, setCaterogyId] = useState("");
   const [activeStatus, setActiveStatus] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const { brandHeaders, updateBrandTableHeaders } = useBrandTableHeadersStore();
   // console.log("activeStatus", activeStatus);
 
+
+ const handleClickOutside = useCallback((event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [handleClickOutside]);
   const statusFun = () => {
     if (activeStatus === "active") return true;
     if (activeStatus === "inactive") return false;
@@ -158,6 +176,11 @@ const BrandListManager = () => {
     // refreshBrands();
   };
 
+    const visibleColumns = columns.filter((col) => {
+    const headerConfig = brandHeaders.find((h) => h.key === col.headerName);
+    return headerConfig ? headerConfig.value : true;
+  });
+
   return (
     <div className="min-h-screen bg-gray-50 py-10">
       <div className="max-w-8xl mx-auto px-4">
@@ -173,6 +196,7 @@ const BrandListManager = () => {
           {/* SEARCH BAR */}
           <div className="px-6 py-4 flex items-center gap-4">
             <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
+            <ColumnVisibilitySelector headers={brandHeaders} updateTableHeaders={updateBrandTableHeaders} setIsOpen={setIsOpen} isOpen={isOpen} dropdownRef={dropdownRef} />
             <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} />
             <DropdownFilter data={formattedCategories} onSelect={(id) => setCaterogyId(id)} />
           </div>
@@ -185,7 +209,7 @@ const BrandListManager = () => {
               <DataTable
                 rows={data || []}
                 getRowId={(row) => row?.brand_unique_id}
-                columns={columns}
+                columns={visibleColumns}
                 page={currentPage}
                 pageSize={pageSize}
                 totalCount={brandsData?.totalCount || 0}
