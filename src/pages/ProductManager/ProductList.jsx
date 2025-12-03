@@ -1,6 +1,6 @@
 // src/pages/ProductManager/ProductList.jsx
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { useLocation } from "react-router-dom";
@@ -25,6 +25,9 @@ import { Diameter } from "lucide-react";
 import { DropdownFilter } from "../../components/DropdownFilter.jsx";
 import { useGetAllIndustries } from "../../hooks/useIndustry.js";
 import { GENDER_OPTIONS } from "../../lib/constants.js";
+import { toIndianCurrency } from "../../utils/toIndianCurrency.js";
+import { useProductTableHeadersStore } from "../../stores/ProductTableHeaderStore.js";
+import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector.jsx";
 
 const ProductList = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,6 +38,24 @@ const ProductList = () => {
   const [industryId, setIndustryId] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [selectedGender, setSelectedGender] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const { productHeaders, updateProductTableHeaders } = useProductTableHeadersStore();
+
+
+  const handleClickOutside = useCallback((event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsDropdownOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownRef]);
+
 
   const [openNotes, setOpenNotes] = useState(false); // ⬅️ REQUIRED STATE
 
@@ -190,10 +211,11 @@ const ProductList = () => {
     },
     {
       field: "final_price",
-      headerName: "Final_price",
+      headerName: "Final Price",
       flex: 1,
       headerClassName: "custom-header",
       cellClassName: "px-6 py-4 text-left text-sm text-gray-800",
+      renderCell: (params) => <span>{toIndianCurrency(params.value)}</span>,
     },
     {
       field: "stock_quantity",
@@ -243,6 +265,11 @@ const ProductList = () => {
     },
   ];
 
+    const visibleColumns = columns.filter((col) => {
+    const headerConfig = productHeaders.find((h) => h.key === col.headerName);
+    return headerConfig ? headerConfig.value : true;
+  });
+
   return (
     <>
       <div className="min-h-screen bg-gray-50">
@@ -262,6 +289,7 @@ const ProductList = () => {
 
               {/*Filters Grid / Filters Column whatever it is */}
               <div className="flex items-center gap-2">
+                <ColumnVisibilitySelector headers={productHeaders} updateTableHeaders={updateProductTableHeaders} dropdownRef={dropdownRef} setIsDropdownOpen={setIsDropdownOpen} isDropdownOpen={isDropdownOpen} />
                 <DropdownFilter data={formattedIndustries} onSelect={(id) => setIndustryId(id)} />
                 <DropdownFilter data={formattedFilterCategories} onSelect={(id) => setCategoryId(id)} />
                 <DropdownFilter data={GENDER_OPTIONS} onSelect={(value) => setSelectedGender(value)} />
@@ -297,7 +325,7 @@ const ProductList = () => {
               <DataTable
                 rows={rows}
                 getRowId={(row) => row.product_unique_id}
-                columns={columns}
+                columns={visibleColumns}
                 page={currentPage}
                 pageSize={pageSize}
                 totalCount={totalCount}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import PageHeader from "../../components/PageHeader";
 import SearchBar from "../../components/SearchBar";
@@ -6,6 +6,9 @@ import DataTable from "../../components/Table";
 import { useGetAllOrders } from "../../hooks/useOrder";
 import { DropdownFilter } from "../../components/DropdownFilter";
 import { ORDER_STATUS_OPTIONS, ORDER_TYPE_OPTIONS, PAYMENT_METHOD_OPTIONS } from "../../lib/constants";
+import { toIndianCurrency } from "../../utils/toIndianCurrency";
+import { useOrderTableHeadersStore } from "../../stores/OrderTableHeaderStore";
+import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector";
 
 const OrderListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,7 +21,22 @@ const OrderListManager = () => {
   const [paymentMethod, setPaymentMethod] = useState("");
   const [orderType, setOrderType] = useState("");
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const { orderHeaders, updateOrderHeaders } = useOrderTableHeadersStore()
 
+  const handleClickOutside = useCallback((event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsDropdownOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [handleClickOutside]);
   const { data, isLoading, isError } = useGetAllOrders({
     searchTerm: searchTerm,
     page: currentPage + 1,
@@ -39,7 +57,7 @@ const OrderListManager = () => {
       headerName: "ORDER ID",
       flex: 1,
       headerClassName: "custom-header",
-       hideable: false,
+      hideable: false,
       disableColumnMenu: true,
       cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 font-mono",
       renderCell: (params) => (
@@ -54,7 +72,7 @@ const OrderListManager = () => {
       headerName: "CUSTOMER ID",
       flex: 1,
       headerClassName: "custom-header",
-       hideable: false,
+      hideable: false,
       disableColumnMenu: true,
       cellClassName: "px-6 py-4 text-left text-sm tracking-wider text-gray-700 font-medium",
       renderCell: (params) => (
@@ -69,7 +87,7 @@ const OrderListManager = () => {
       headerName: "ORDER STATUS",
       flex: 1,
       headerClassName: "custom-header",
-       hideable: false,
+      hideable: false,
       disableColumnMenu: true,
       cellClassName: "px-6 py-4 text-left text-sm tracking-wider text-gray-700 capitalize",
       renderCell: (params) => {
@@ -81,12 +99,12 @@ const OrderListManager = () => {
         return (
           <span
             className={`px-3 py-1 rounded-full text-xs font-bold ${isDelivered
-                ? "bg-green-100 text-green-800"
-                : isPending
-                  ? "bg-yellow-100 text-yellow-800"
-                  : isCancelled
-                    ? "bg-red-100 text-red-800"
-                    : "bg-gray-100 text-gray-700"
+              ? "bg-green-100 text-green-800"
+              : isPending
+                ? "bg-yellow-100 text-yellow-800"
+                : isCancelled
+                  ? "bg-red-100 text-red-800"
+                  : "bg-gray-100 text-gray-700"
               }`}
           >
             {status}
@@ -100,7 +118,7 @@ const OrderListManager = () => {
       headerName: "PAYMENT METHOD",
       flex: 1,
       headerClassName: "custom-header",
-       hideable: false,
+      hideable: false,
       disableColumnMenu: true,
       cellClassName: "px-6 py-4 text-left text-sm tracking-wider text-gray-700 capitalize",
       renderCell: (params) => <span className="font-semibold text-gray-800">{params?.value ?? ""}</span>,
@@ -110,7 +128,7 @@ const OrderListManager = () => {
       headerName: "ORDER TYPE",
       flex: 1,
       headerClassName: "custom-header",
-       hideable: false,
+      hideable: false,
       disableColumnMenu: true,
       cellClassName: "px-6 py-4 text-left text-sm tracking-wider text-gray-700 capitalize",
       renderCell: (params) => <span className="font-semibold text-gray-800">{params?.value ?? ""}</span>,
@@ -123,11 +141,14 @@ const OrderListManager = () => {
       flex: 1,
       headerClassName: "custom-header",
       cellClassName: "px-6 py-4 text-left text-sm tracking-wider text-gray-700",
-      renderCell: (params) => (
-        <span className="font-semibold text-gray-900">₹ {params?.value?.toFixed(2) ?? "0.00"}</span>
-      ),
+      renderCell: (params) => <span>{toIndianCurrency(params.value)}</span>,
     },
   ];
+
+  const visibleColumns = columns.filter((col) => {
+    const headerConfig = orderHeaders.find((h) => h.key === col.headerName);
+    return headerConfig ? headerConfig.value : true;
+  });
 
   return (
     <div className="min-h-screen bg-gray-50 py-10">
@@ -145,6 +166,8 @@ const OrderListManager = () => {
             placeholder="Search orders..."
             className=" max-w-md"
           />
+          <ColumnVisibilitySelector headers={orderHeaders} updateTableHeaders={updateOrderHeaders} setIsDropdownOpen={setIsDropdownOpen} isDropdownOpen={isDropdownOpen} dropdownRef={dropdownRef} />
+
           <DropdownFilter
             value={orderStatus}
             onSelect={setOrderStatus}
@@ -158,7 +181,7 @@ const OrderListManager = () => {
           <DropdownFilter
             value={orderType}
             onSelect={setOrderType}
-            data={ORDER_TYPE_OPTIONS  }
+            data={ORDER_TYPE_OPTIONS}
           />
         </div>
 
@@ -170,7 +193,7 @@ const OrderListManager = () => {
             <DataTable
               rows={data?.data || []}
               getRowId={(row) => row?._id}
-              columns={columns}
+              columns={visibleColumns}
               page={currentPage}
               pageSize={pageSize}
               totalCount={data?.totalCount || 0}
