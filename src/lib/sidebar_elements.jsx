@@ -58,5 +58,11 @@ export const sidebarElements = [
     path : '/createOrder',
     label : 'Create Order',
     icon : Users
+  },
+  {
+    id: "users",
+    path: "/users",
+    label: "Users",
+    icon: Users,
   }
 ];
