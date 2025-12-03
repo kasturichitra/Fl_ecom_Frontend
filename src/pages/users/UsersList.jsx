@@ -122,6 +122,10 @@ const UsersList = () => {
                 sort={sort}
                 setSort={(newSort) => {
                   const sortItem = newSort[0];
+                  /*
+                  { field: "createdAt", sort: "desc" }
+                  createdAt:desc
+                  */
                   setSort(sortItem ? `${sortItem.field}:${sortItem.sort}` : "");
                 }}
               />
