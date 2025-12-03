@@ -21,7 +21,7 @@ const BrandListManager = () => {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0); // 0-based page
 
-  const { mutateAsync: deleteBrandMutation } = useDeleteBrand();
+  // const { mutateAsync: deleteBrandMutation } = useDeleteBrand();
 
   const [caterogyId, setCaterogyId] = useState("");
   const [activeStatus, setActiveStatus] = useState("");
@@ -128,22 +128,25 @@ const BrandListManager = () => {
           <button onClick={() => handleEdit(params.row)} className="cursor-pointer">
             <FaEdit size={18} className="text-[#4f46e5]" />
           </button>
-          <button onClick={() => handleDelete(params.row)}>
+          {/* <button onClick={() => handleDelete(params.row)}>
             <MdDelete size={18} className="text-[#4f46e5]" />
-          </button>
+          </button> */}
         </div>
       ),
     },
   ];
 
   const handleEdit = (brand) => {
+
     setEditingBrand(brand);
   };
 
-  const handleDelete = async (brand) => {
-    if (!window.confirm(`Delete brand "${brand.brand_name}"?`)) return;
-    await deleteBrandMutation(brand.brand_unique_id);
-  };
+  // const handleDelete = async (brand) => {
+  //   if (!window.confirm(`Delete brand "${brand.brand_name}"?`)) return;
+  //   console.log(brand.brand_unique_id ,'chacking brand data is get or not');
+    
+  //   await deleteBrandMutation(brand.brand_unique_id);
+  // };
 
   const handleCloseAddModal = () => {
     setShowAddModal(false);

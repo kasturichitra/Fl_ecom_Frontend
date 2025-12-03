@@ -4,4 +4,5 @@ export const brandFormDefaults = () => ({
   brand_unique_id: "",
   brand_description: "",
   brand_image: "",
+  is_active: true,
 });
