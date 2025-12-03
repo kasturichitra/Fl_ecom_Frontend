@@ -48,9 +48,9 @@ export const sidebarElements = [
     icon: FileText,
   },
   {
-    id: "users",
-    path: "/user",
-    label: "Users",
+    id: "employees",
+    path: "/employee",
+    label: "Employees",
     icon: Users,
   },
 ];
