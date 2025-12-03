@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import PageHeader from "../../components/PageHeader";
 import SearchBar from "../../components/SearchBar";
 import DataTable from "../../components/Table";
 import { useGetAllUsers } from "../../hooks/useUser";
+import { useUserTableHeaderStore } from "../../stores/UserTableHeaderStore";
+import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector";
 
 const UsersList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -10,6 +12,22 @@ const UsersList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
 
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const { userHeaders, updateUserTableHeaders } = useUserTableHeaderStore();
+
+  const handleClickOutside = useCallback((event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsDropdownOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [handleClickOutside]);
   const {
     data: usersResponse,
     isLoading,
@@ -23,11 +41,11 @@ const UsersList = () => {
     role: "user",
   });
 
-//   console.log("usersResponse", usersResponse);
+  //   console.log("usersResponse", usersResponse);
 
   // Extract actual users array + total count
   const users = usersResponse || [];
-//   console.log("users", users);
+  //   console.log("users", users);
   const totalUsers = usersResponse?.total || 0;
 
   const columns = [
@@ -78,6 +96,11 @@ const UsersList = () => {
     // },
   ];
 
+  const visibleColumns = columns.filter((col) => {
+    const headerConfig = userHeaders.find((h) => h.key === col.headerName);
+    return headerConfig ? headerConfig.value : true;
+  });
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-8xl mx-auto px-4 sm:px-6">
@@ -89,7 +112,7 @@ const UsersList = () => {
 
           {/* Search Bar */}
           <div className="p-6 bg-gray-50 border-b flex items-center justify-between gap-4">
-            <div className="max-w-md w-full">
+            <div className="flex items-center gap-4">
               <SearchBar
                 searchTerm={searchTerm}
                 onSearchChange={(value) => {
@@ -98,6 +121,12 @@ const UsersList = () => {
                 }}
                 placeholder="Search users by name, email, or ID..."
               />
+              <ColumnVisibilitySelector
+                headers={userHeaders}
+                updateTableHeaders={updateUserTableHeaders}
+                setIsDropdownOpen={setIsDropdownOpen}
+                isDropdownOpen={isDropdownOpen}
+                dropdownRef={dropdownRef} />  
             </div>
           </div>
 
@@ -113,7 +142,7 @@ const UsersList = () => {
               <DataTable
                 rows={users}
                 getRowId={(row) => row._id}
-                columns={columns}
+                columns={visibleColumns}
                 page={currentPage}
                 pageSize={pageSize}
                 totalCount={totalUsers}
