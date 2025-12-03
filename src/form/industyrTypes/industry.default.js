@@ -4,4 +4,5 @@ export const industryDefaultValues = {
   industry_name: "",
   image_url: null,        // File upload or URL
   description: "",
+  is_active: true,
 };

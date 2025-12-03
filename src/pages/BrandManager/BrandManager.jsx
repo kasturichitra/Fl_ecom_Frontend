@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useCreateBrand } from "../../hooks/useBrand";
 import BrandForm from "../../form/brands/brandsForm";
 import { useGetAllCategories } from "../../hooks/useCategory";
+import { brandFormDefaults } from "../../form/brands/brands.defaults.js";
 
 const objectToFormData = (obj) => {
   const formData = new FormData();
@@ -50,13 +51,7 @@ const BrandManager = ({ setShowAddModal, onCancel }) => {
     }
   };
 
-  const defaultValues = {
-    categories: [],
-    brand_name: "",
-    brand_unique_id: "",
-    brand_description: "",
-    brand_image: "",
-  };
+  const defaultValues = brandFormDefaults();
 
   return (
     <div>
