@@ -27,15 +27,15 @@ const BrandListManager = () => {
 
   const [caterogyId, setCaterogyId] = useState("");
   const [activeStatus, setActiveStatus] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { brandHeaders, updateBrandTableHeaders } = useBrandTableHeadersStore();
   // console.log("activeStatus", activeStatus);
 
 
- const handleClickOutside = useCallback((event) => {
+  const handleClickOutside = useCallback((event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setIsOpen(false);
+      setIsDropdownOpen(false);
     }
   }, []);
 
@@ -107,9 +107,8 @@ const BrandListManager = () => {
       valueGetter: (params) => (params.value ? "Active" : "Inactive"), // Convert boolean → string
       renderCell: (params) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${
-            params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            }`}
         >
           {params.row?.is_active ? "Active" : "Inactive"}
         </span>
@@ -162,7 +161,7 @@ const BrandListManager = () => {
   // const handleDelete = async (brand) => {
   //   if (!window.confirm(`Delete brand "${brand.brand_name}"?`)) return;
   //   console.log(brand.brand_unique_id ,'chacking brand data is get or not');
-    
+
   //   await deleteBrandMutation(brand.brand_unique_id);
   // };
 
@@ -176,7 +175,7 @@ const BrandListManager = () => {
     // refreshBrands();
   };
 
-    const visibleColumns = columns.filter((col) => {
+  const visibleColumns = columns.filter((col) => {
     const headerConfig = brandHeaders.find((h) => h.key === col.headerName);
     return headerConfig ? headerConfig.value : true;
   });
@@ -196,7 +195,7 @@ const BrandListManager = () => {
           {/* SEARCH BAR */}
           <div className="px-6 py-4 flex items-center gap-4">
             <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
-            <ColumnVisibilitySelector headers={brandHeaders} updateTableHeaders={updateBrandTableHeaders} setIsOpen={setIsOpen} isOpen={isOpen} dropdownRef={dropdownRef} />
+            <ColumnVisibilitySelector headers={brandHeaders} updateTableHeaders={updateBrandTableHeaders} setIsDropdownOpen={setIsDropdownOpen} isDropdownOpen={isDropdownOpen} dropdownRef={dropdownRef} />
             <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} />
             <DropdownFilter data={formattedCategories} onSelect={(id) => setCaterogyId(id)} />
           </div>
