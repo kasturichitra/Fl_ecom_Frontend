@@ -81,11 +81,12 @@ const CreateOrder = () => {
       customer_name: customerForm.customerName,
       mobile_number: customerForm.mobileNumber,
       // static Data
-      order_type: "Online",
+      order_type: "Offline",
       payment_method: "UPI",
-      payment_status: "Completed",
-      products: selectedProducts.map((p) => ({
-        product_id: p.product_unique_id,
+      payment_status: "Paid",
+      order_products: selectedProducts.map((p) => ({
+        product_name : p.product_name,
+        product_unique_id: p.product_unique_id,
         quantity: p.quantity,
         price: p.price,
       })),
