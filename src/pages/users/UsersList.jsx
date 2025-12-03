@@ -6,6 +6,7 @@ import { useGetAllUsers } from "../../hooks/useUser";
 
 const UsersList = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [sort, setSort] = useState("createdAt:desc");
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -16,6 +17,7 @@ const UsersList = () => {
     error,
   } = useGetAllUsers({
     searchTerm,
+    sort: decodeURIComponent(sort),
     page: currentPage + 1,
     limit: pageSize,
     role: "user",
@@ -117,8 +119,11 @@ const UsersList = () => {
                 totalCount={totalUsers}
                 setCurrentPage={setCurrentPage}
                 setPageSize={setPageSize}
-                sort=""
-                setSort={() => {}}
+                sort={sort}
+                setSort={(newSort) => {
+                  const sortItem = newSort[0];
+                  setSort(sortItem ? `${sortItem.field}:${sortItem.sort}` : "");
+                }}
               />
             )}
           </div>
