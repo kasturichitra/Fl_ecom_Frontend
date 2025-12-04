@@ -106,9 +106,8 @@ const BrandListManager = () => {
       valueGetter: (params) => (params.value ? "Active" : "Inactive"), // Convert boolean → string
       renderCell: (params) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${
-            params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            }`}
         >
           {params.row?.is_active ? "Active" : "Inactive"}
         </span>
@@ -180,8 +179,8 @@ const BrandListManager = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 py-2">
-      <div className="max-w-8xl px-2">
+    <div className="min-h-screen bg-gray-50 p-2">
+      <div className="max-w-8xl">
         {/* HEADER */}
         <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
           <PageHeader
@@ -192,7 +191,7 @@ const BrandListManager = () => {
           />
 
           {/* SEARCH BAR */}
-          <div className="px-6 py-4 flex items-center gap-4">
+          <div className="p-6 flex items-center gap-4 bg-gray-50 border-b">
             <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
             <ColumnVisibilitySelector
               headers={brandHeaders}
@@ -206,7 +205,7 @@ const BrandListManager = () => {
           </div>
 
           {/* TABLE */}
-          <div className="p-3 bg-white">
+          <div className="p-6 bg-white">
             {isError ? (
               <p className="text-red-600">Error loading brands</p>
             ) : (
