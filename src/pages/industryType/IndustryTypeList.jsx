@@ -209,15 +209,15 @@ const IndustryTypeList = () => {
       {/* Add Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-white/20 backdrop-blur-lg flex items-center justify-center z-50">
-          <div className="relative bg-white p-6 rounded-xl shadow-lg w-full max-w-lg">
-            <button
+          {/* <div className="relative bg-white p-6 rounded-xl shadow-lg w-full max-w-lg"> */}
+            {/* <button
               onClick={() => setShowAddModal(false)}
               className="absolute right-5 top-5 text-gray-700 hover:text-red-600 text-3xl"
             >
               ×
-            </button>
+            </button> */}
             <IndustryTypeManager onCancel={() => setShowAddModal(false)} />
-          </div>
+          {/* </div> */}
         </div>
       )}
 
