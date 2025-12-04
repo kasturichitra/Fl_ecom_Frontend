@@ -9,16 +9,11 @@ const CreateOrder = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
 
-  console.log("selectedProducts", selectedProducts);
-  console.log("showDropdown", showDropdown);
-
-  // NEW STATE FOR DynamicForm
   const [customerForm, setCustomerForm] = useState({
     customerName: "",
     mobileNumber: "",
   });
 
-  // DynamicForm field config
   const customerFields = [
     {
       key: "customerName",
@@ -36,11 +31,17 @@ const CreateOrder = () => {
     },
   ];
 
-  const { data: productsResponse, isLoading, isError } = useGetAllProducts({
+  const {
+    data: productsResponse,
+    isLoading,
+    isError,
+  } = useGetAllProducts({
     searchTerm,
     page: 1,
     limit: 50,
   });
+
+  console.log("productsResponse", productsResponse);
 
   const { mutateAsync: createOrder, isPending: isCreatingOrder } = useCreateOrder();
 
@@ -55,8 +56,17 @@ const CreateOrder = () => {
   const handleSelectProduct = (item) => {
     setSelectedProducts((prev) => {
       const exists = prev.some((p) => p.product_unique_id === item.value);
-      console.log("exists", exists);
-      return exists ? prev : [...prev, { ...item.data, quantity: 1 }];
+      return exists
+        ? prev
+        : [
+            ...prev,
+            {
+              ...item.data,
+              quantity: 1,
+              base_price: Number(item.data.base_price),
+              final_price: Number(item.data.final_price),
+            },
+          ];
     });
 
     setSearchTerm("");
@@ -64,27 +74,19 @@ const CreateOrder = () => {
   };
 
   const handleRemoveProduct = (productId) => {
-    setSelectedProducts((prev) =>
-      prev.filter((p) => p.product_unique_id !== productId)
-    );
+    setSelectedProducts((prev) => prev.filter((p) => p.product_unique_id !== productId));
   };
 
   const handleQuantityChange = (productId, quantity) => {
     setSelectedProducts((prev) =>
-      prev.map((p) =>
-        p.product_unique_id === productId
-          ? { ...p, quantity: parseInt(quantity) || 1 }
-          : p
-      )
+      prev.map((p) => (p.product_unique_id === productId ? { ...p, quantity: parseInt(quantity) || 1 } : p))
     );
   };
 
   const handleSubmitOrder = async () => {
-    console.log("handleSubmitOrder");
     const orderData = {
       customer_name: customerForm.customerName,
       mobile_number: customerForm.mobileNumber,
-      // static Data
       order_type: "Offline",
       payment_method: "UPI",
       payment_status: "Paid",
@@ -92,15 +94,13 @@ const CreateOrder = () => {
         product_name: p.product_name,
         product_unique_id: p.product_unique_id,
         quantity: p.quantity,
-        price: p.price,
+        unit_base_price: p.base_price, // ✅ REQUIRED FOR BACKEND
+        unit_final_price: p.final_price,
       })),
     };
 
-
-    console.log("orderData", orderData);
-
     try {
-      console.log("Creating order...");
+      console.log("Order data:", orderData);
       await createOrder(orderData);
       setCustomerForm({ customerName: "", mobileNumber: "" });
       setSelectedProducts([]);
@@ -114,11 +114,9 @@ const CreateOrder = () => {
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">Create Order</h1>
 
-        {/* Customer Details Section (Now DynamicForm) */}
+        {/* Customer Details */}
         <div className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Customer Details
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Customer Details</h2>
 
           <DynamicForm
             fields={customerFields}
@@ -128,14 +126,10 @@ const CreateOrder = () => {
           />
         </div>
 
-        {/* Product Details Section */}
+        {/* Product Search */}
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Product Details
-          </h2>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Search Products
-          </label>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Product Details</h2>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">Search Products</label>
 
           <SearchDropdown
             value={searchTerm}
@@ -160,9 +154,7 @@ const CreateOrder = () => {
         {/* Selected Products */}
         {selectedProducts.length > 0 && (
           <div className="mt-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
-              Selected Products
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Selected Products</h3>
 
             <div className="space-y-3">
               {selectedProducts.map((product) => (
@@ -173,22 +165,18 @@ const CreateOrder = () => {
                   <div>
                     <p className="font-semibold text-gray-800">{product.product_name}</p>
                     <p className="text-sm text-gray-600">
-                      ID: {product.product_unique_id} | Price: ₹{product.price}
+                      ID: {product.product_unique_id} | Price: ₹{product.final_price}
                     </p>
                   </div>
 
                   <div className="flex items-center gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-1">
-                        Quantity
-                      </label>
+                      <label className="block text-xs font-semibold text-gray-700 mb-1">Quantity</label>
                       <input
                         type="number"
                         min="1"
                         value={product.quantity}
-                        onChange={(e) =>
-                          handleQuantityChange(product.product_unique_id, e.target.value)
-                        }
+                        onChange={(e) => handleQuantityChange(product.product_unique_id, e.target.value)}
                         className="border p-2 rounded-lg w-20 text-center"
                       />
                     </div>
@@ -206,26 +194,21 @@ const CreateOrder = () => {
           </div>
         )}
 
-        {/* Save Order */}
+        {/* Submit */}
         <div className="mt-6 flex justify-end">
           <button
-            onClick={() => handleSubmitOrder()}
+            onClick={handleSubmitOrder}
             disabled={isCreatingOrder}
-            className={`px-8 py-3 rounded-lg font-semibold text-white transition ${isCreatingOrder
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-indigo-600 hover:bg-indigo-700"
-              }`}
+            className={`px-8 py-3 rounded-lg font-semibold text-white transition ${
+              isCreatingOrder ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
+            }`}
           >
             {isCreatingOrder ? "Creating Order..." : "Save Order"}
           </button>
         </div>
 
-        {isLoading && searchTerm && (
-          <p className="text-sm text-gray-500 mt-2">Loading products...</p>
-        )}
-        {isError && (
-          <p className="text-sm text-red-500 mt-2">Error loading products</p>
-        )}
+        {isLoading && searchTerm && <p className="text-sm text-gray-500 mt-2">Loading products...</p>}
+        {isError && <p className="text-sm text-red-500 mt-2">Error loading products</p>}
       </div>
     </div>
   );
