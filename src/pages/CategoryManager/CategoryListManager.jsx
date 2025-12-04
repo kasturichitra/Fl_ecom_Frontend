@@ -272,33 +272,16 @@ const CategoryListManager = () => {
 
       {/* Add Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full max-h-screen overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">Add New Category</h2>
-              <button onClick={() => setShowAddModal(false)} className="text-3xl text-gray-500 hover:text-gray-700">
-                ×
-              </button>
-            </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setShowAddModal(false)} />
+          <div className="relative bg-white rounded-2xl w-full max-w-3xl shadow-lg">
             <CategoryManager onCancel={() => setShowAddModal(false)} />
           </div>
         </div>
       )}
 
       {/* Edit Modal */}
-      {editingCategory && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">Edit Category</h2>
-              <button onClick={handleCloseEditModal} className="text-3xl text-gray-500 hover:text-gray-700">
-                ×
-              </button>
-            </div>
-            <CategoryEditModal category={editingCategory} onClose={handleCloseEditModal} />
-          </div>
-        </div>
-      )}
+      {editingCategory && <CategoryEditModal category={editingCategory} onClose={handleCloseEditModal} />}
     </div>
   );
 };
