@@ -5,8 +5,9 @@ import Navbar from "./components/Navbar";
 import { useStoreFcmToken } from "./hooks/useUser";
 import { listenForForegroundMessages, requestPermissionAndGetToken } from "./lib/notifications";
 // import UserList from "./pages/users/UserList";
-import CreateOrder from "./pages/Orders/CreateOrder";
+import NginxEC2Setup from "./docs/nginx-setup";
 import { sidebarElements } from "./lib/sidebar_elements";
+import CreateOrder from "./pages/Orders/CreateOrder";
 import OrderListManager from "./pages/Orders/OrderListManager";
 import PageNotFound from "./pages/PageNotFound/PageNotFound";
 import EmployeeList from "./pages/users/EmployeeList";
@@ -152,8 +153,11 @@ const App = () => {
               {/* <Route path="/user" element={<UserList />} /> */}
               <Route path="/createOrder" element={<CreateOrder />} />
 
+              {/* <Route path="/docs" element={<NginxEC2Setup />} /> */}
+              {/* <Route path="/docs/2" element={<NginxEC2Setup2 />} /> */}
+
               <Route path="/employee" element={<EmployeeList />} />
-              <Route path="/users" element = {<UsersList/>}/>
+              <Route path="/users" element={<UsersList />} />
 
               <Route path="*" element={<PageNotFound />} />
             </Routes>
