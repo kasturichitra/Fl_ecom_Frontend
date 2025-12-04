@@ -34,14 +34,14 @@ export const useGetOrderProductsById = (orderId) => {
   });
 };
 
-
-export const useCreateOrder = () => {
+export const useCreateOrder = (options = {}) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data) => createOrderApi(data),
     onSuccess: () => {
       toast.success("Order created successfully");
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      options?.onSuccess?.();
     },
     onError: () => {
       toast.error("Failed to create order");

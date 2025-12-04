@@ -54,8 +54,7 @@ const UsersList = () => {
       headerName: "User ID",
       flex: 1,
       headerClassName: "custom-header",
-      cellClassName:
-        "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 font-mono",
+      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 font-mono",
       renderCell: (params) => (
         <span className="font-mono text-xs bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full">
           {params.value ? params.value.slice(-6).toUpperCase() : ""}
@@ -67,8 +66,7 @@ const UsersList = () => {
       headerName: "Name",
       flex: 1,
       headerClassName: "custom-header",
-      cellClassName:
-        "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize",
+      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize",
     },
     {
       field: "email",
@@ -102,13 +100,10 @@ const UsersList = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-8xl mx-auto px-4 sm:px-6">
+    <div className="min-h-screen bg-gray-50 p-2">
+      <div className="max-w-8xl">
         <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
-          <PageHeader
-            title="Users List"
-            subtitle="Manage all registered users"
-          />
+          <PageHeader title="Users List" subtitle="Manage all registered users" />
 
           {/* Search Bar */}
           <div className="p-6 bg-gray-50 border-b flex items-center justify-between gap-4">
@@ -126,7 +121,8 @@ const UsersList = () => {
                 updateTableHeaders={updateUserTableHeaders}
                 setIsDropdownOpen={setIsDropdownOpen}
                 isDropdownOpen={isDropdownOpen}
-                dropdownRef={dropdownRef} />  
+                dropdownRef={dropdownRef}
+              />
             </div>
           </div>
 
@@ -135,9 +131,7 @@ const UsersList = () => {
             {isLoading ? (
               <div className="text-center py-10">Loading users...</div>
             ) : isError ? (
-              <div className="text-center py-10 text-red-600">
-                Error: {error.message}
-              </div>
+              <div className="text-center py-10 text-red-600">Error: {error.message}</div>
             ) : (
               <DataTable
                 rows={users}
