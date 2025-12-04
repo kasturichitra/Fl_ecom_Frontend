@@ -115,9 +115,8 @@ const CategoryListManager = () => {
       valueGetter: (params) => (params.value ? "Active" : "Inactive"),
       renderCell: (params) => (
         <span
-          className={`px-3 py-1.5 rounded-full text-xs font-bold ${
-            params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
+          className={`px-3 py-1.5 rounded-full text-xs font-bold ${params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            }`}
         >
           {params.row.is_active ? "Active" : "Inactive"}
         </span>
@@ -158,8 +157,8 @@ const CategoryListManager = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10">
-      <div className="max-w-8xl mx-auto px-4">
+    <div className="min-h-screen bg-gray-50 p-2">
+      <div className="max-w-8xl">
         <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
           {/* Header */}
           <PageHeader
@@ -170,7 +169,7 @@ const CategoryListManager = () => {
           />
 
           {/* Filters */}
-          <div className="px-6 py-4 flex flex-wrap items-center gap-4 bg-gray-50 border-b">
+          <div className="p-6 flex flex-wrap items-center gap-4 bg-gray-50 border-b">
             <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search categories..." />
             <ColumnVisibilitySelector
               headers={categoryHeaders}
@@ -216,7 +215,7 @@ const CategoryListManager = () => {
           </div> */}
 
           {/* Table - Always visible with beautiful empty state */}
-          <div className="p-4">
+          <div className="p-6 bg-white">
             <div className="bg-white rounded-xl border border-gray-300 shadow-sm overflow-hidden">
               {loading ? (
                 <div className="text-center py-12 text-gray-500">Loading categories...</div>
