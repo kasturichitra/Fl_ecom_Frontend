@@ -1,12 +1,14 @@
 import { Package, MapPin, CreditCard, ShoppingBag } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { useGetOrderProductsById } from "../../hooks/useOrder.js";
+import { toIndianCurrency } from "../../utils/toIndianCurrency.js";
 
 export default function OrderProductsDetailes() {
   const { id } = useParams();
 
   const { data: orderData, isLoading, isError } = useGetOrderProductsById(id);
-  console.log("order product data",orderData);
+  console.log("order product data", orderData);
+  console.log("Data", orderData?.order_products[0]?.total_final_price);
   const InfoCard = ({ icon: Icon, title, children, bgColor, status }) => (
     <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
       <div className="flex items-center justify-between mb-6">
@@ -61,16 +63,16 @@ export default function OrderProductsDetailes() {
               orderData?.order_status === "Delivered"
                 ? "bg-green-100 text-green-600"
                 : orderData?.order_status === "Cancelled"
-                ? "bg-red-100 text-red-600"
-                : orderData?.order_status === "Shipped"
-                ? "bg-orange-100 text-orange-600"
-                : orderData?.order_status === "Returned"
-                ? "bg-purple-100 text-purple-600"
-                : orderData?.order_status === "Processing"
-                ? "bg-blue-100 text-blue-600"
-                : orderData?.order_status === "Pending"
-                ? "bg-yellow-100 text-yellow-600"
-                : "bg-gray-100 text-gray-600" // Default color for other statuses
+                  ? "bg-red-100 text-red-600"
+                  : orderData?.order_status === "Shipped"
+                    ? "bg-orange-100 text-orange-600"
+                    : orderData?.order_status === "Returned"
+                      ? "bg-purple-100 text-purple-600"
+                      : orderData?.order_status === "Processing"
+                        ? "bg-blue-100 text-blue-600"
+                        : orderData?.order_status === "Pending"
+                          ? "bg-yellow-100 text-yellow-600"
+                          : "bg-gray-100 text-gray-600" // Default color for other statuses
             }
             status={orderData?.order_status}
           >
@@ -96,12 +98,12 @@ export default function OrderProductsDetailes() {
               orderData?.payment_status === "Paid"
                 ? "bg-green-100 text-green-600"
                 : orderData?.payment_status === "Pending"
-                ? "bg-yellow-100 text-yellow-600"
-                : orderData?.payment_status === "Failed"
-                ? "bg-red-100 text-red-600"
-                : orderData?.payment_status === "Refunded"
-                ? "bg-blue-100 text-blue-600"
-                : "bg-gray-100 text-gray-600"
+                  ? "bg-yellow-100 text-yellow-600"
+                  : orderData?.payment_status === "Failed"
+                    ? "bg-red-100 text-red-600"
+                    : orderData?.payment_status === "Refunded"
+                      ? "bg-blue-100 text-blue-600"
+                      : "bg-gray-100 text-gray-600"
             }
             status={orderData?.payment_status}
           >
@@ -162,13 +164,12 @@ export default function OrderProductsDetailes() {
                   ].map((h) => (
                     <th
                       key={h}
-                      className={`px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider ${
-                        h === "Qty"
+                      className={`px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider ${h === "Qty"
                           ? "text-center"
                           : h === "Product ID" || h === "Product Name" || h === "Color" || h === "Size" || h === "Model"
-                          ? "text-left"
-                          : "text-right"
-                      }`}
+                            ? "text-left"
+                            : "text-right"
+                        }`}
                     >
                       {h}
                     </th>
@@ -200,18 +201,21 @@ export default function OrderProductsDetailes() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                       {p?.product_details?.model_number ?? "N/A"}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right font-semibold text-gray-800">₹{p?.price}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right font-semibold text-gray-800">
+                      {toIndianCurrency(p?.total_base_price)}
+                    </td>
+
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <span className="px-3 py-1 bg-indigo-100 text-indigo-700 font-bold rounded-full">
                         {p?.quantity}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right font-semibold text-green-600">
-                      -₹{p?.discount_price}
+                      -{toIndianCurrency(p?.total_discount_price)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-600">₹{p?.tax_amount}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-gray-600">{toIndianCurrency(p?.total_tax_value)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-right font-bold text-gray-800 text-lg">
-                      ₹{p?.total_price}
+                      {toIndianCurrency(p?.total_final_price)}
                     </td>
                   </tr>
                 ))}
@@ -225,13 +229,23 @@ export default function OrderProductsDetailes() {
           <h3 className="text-xl font-bold text-gray-800 mb-6">Order Summary</h3>
           <div className="space-y-3">
             {[
-              ["Subtotal", `₹${orderData?.subtotal}`, "text-gray-700"],
+              ["Subtotal", `₹${orderData?.order_products[0]?.total_final_price}`, "text-gray-700"],
               [
                 "Shipping Charges",
                 orderData?.shipping_charges === 0 ? "FREE" : `₹${orderData?.shipping_charges}`,
                 "text-green-600",
               ],
-            //   ["Tax Amount", `₹${orderData?.tax_amount}`, "text-gray-700"],
+              [
+                "Discount",
+                orderData?.order_products[0]?.total_discount_price === 0 ? "FREE" : `₹${orderData?.order_products[0]?.total_discount_price}`,
+                "text-green-600",
+              ],
+              [
+                "Tax",
+                orderData?.order_products[0]?.total_tax_value === 0 ? "FREE" : `₹${orderData?.order_products[0]?.total_tax_value}`,
+                "text-green-600",
+              ],
+              //   ["Tax Amount", `₹${orderData?.tax_amount}`, "text-gray-700"],
             ].map(([label, value, color]) => (
               <div key={label} className="flex justify-between text-gray-700">
                 <span>{label}</span>
@@ -242,9 +256,8 @@ export default function OrderProductsDetailes() {
               <div className="flex justify-between items-center">
                 <span className="text-xl font-bold text-gray-800">Total Amount</span>
                 <div className="flex flex-row items-end text-right align-center justify-center">
-
-                <span className="text-3xl font-bold text-indigo-600">{orderData?.total_amount}</span>
-              <p className="text-right text-sm text-gray-500 mt-1">{orderData?.currency}</p>
+                  <span className="text-3xl font-bold text-indigo-600">{orderData?.total_amount}</span>
+                  <p className="text-right text-sm text-gray-500 mt-1">{orderData?.currency}</p>
                 </div>
               </div>
             </div>

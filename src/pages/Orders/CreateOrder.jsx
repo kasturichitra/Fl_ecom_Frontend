@@ -9,16 +9,11 @@ const CreateOrder = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
 
-  console.log("selectedProducts", selectedProducts);
-  console.log("showDropdown", showDropdown);
-
-  // NEW STATE FOR DynamicForm
   const [customerForm, setCustomerForm] = useState({
     customerName: "",
     mobileNumber: "",
   });
 
-  // DynamicForm field config
   const customerFields = [
     {
       key: "customerName",
@@ -36,11 +31,11 @@ const CreateOrder = () => {
     },
   ];
 
-  const { data: productsResponse, isLoading, isError } = useGetAllProducts({
-    searchTerm,
-    page: 1,
-    limit: 50,
-  });
+  const {
+    data: productsResponse,
+    isLoading,
+    isError,
+  } = useGetAllProducts({ searchTerm, page: 1, limit: 50 });
 
   const { mutateAsync: createOrder, isPending: isCreatingOrder } = useCreateOrder();
 
@@ -53,11 +48,18 @@ const CreateOrder = () => {
   }));
 
   const handleSelectProduct = (item) => {
-    setSelectedProducts((prev) => {
-      const exists = prev.some((p) => p.product_unique_id === item.value);
-      console.log("exists", exists);
-      return exists ? prev : [...prev, { ...item.data, quantity: 1 }];
-    });
+    const exists = selectedProducts.some((p) => p.product_unique_id === item.value);
+    if (exists) return;
+
+    setSelectedProducts((prev) => [
+      ...prev,
+      {
+        ...item.data,
+        quantity: 1,
+        base_price: Number(item.data.base_price),
+        final_price: Number(item.data.final_price),
+      },
+    ]);
 
     setSearchTerm("");
     setShowDropdown(false);
@@ -69,22 +71,19 @@ const CreateOrder = () => {
     );
   };
 
-  const handleQuantityChange = (productId, quantity) => {
+  const handleQuantityChange = (productId, value) => {
+    const qty = parseInt(value) || 1;
     setSelectedProducts((prev) =>
       prev.map((p) =>
-        p.product_unique_id === productId
-          ? { ...p, quantity: parseInt(quantity) || 1 }
-          : p
+        p.product_unique_id === productId ? { ...p, quantity: Math.max(1, qty) } : p
       )
     );
   };
 
   const handleSubmitOrder = async () => {
-    console.log("handleSubmitOrder");
     const orderData = {
-      customer_name: customerForm.customerName,
-      mobile_number: customerForm.mobileNumber,
-      // static Data
+      customer_name: customerForm.customerName.trim(),
+      mobile_number: customerForm.mobileNumber.trim(),
       order_type: "Offline",
       payment_method: "UPI",
       payment_status: "Paid",
@@ -92,140 +91,209 @@ const CreateOrder = () => {
         product_name: p.product_name,
         product_unique_id: p.product_unique_id,
         quantity: p.quantity,
-        price: p.price,
+        unit_base_price: p.base_price,
+        unit_final_price: p.final_price,
       })),
     };
 
-
-    console.log("orderData", orderData);
-
     try {
-      console.log("Creating order...");
       await createOrder(orderData);
       setCustomerForm({ customerName: "", mobileNumber: "" });
       setSelectedProducts([]);
-    } catch (error) {
-      console.error("Error creating order:", error);
+      alert("Order created successfully created!");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to create order");
     }
   };
 
+  const totalAmount = selectedProducts.reduce(
+    (sum, p) => sum + p.final_price * p.quantity,
+    0
+  );
+
+  const isFormValid =
+    customerForm.customerName.trim() &&
+    customerForm.mobileNumber.trim() &&
+    selectedProducts.length > 0;
+
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl p-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Create Order</h1>
+    <div className="min-h-screen bg-gray-50 py-4 px-4">
+      <div className="">
+        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6">
+            <h1 className="text-3xl font-bold text-white">
+              Create New Order
+            </h1>
+          </div>
 
-        {/* Customer Details Section (Now DynamicForm) */}
-        <div className="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Customer Details
-          </h2>
+          <div className="p-8 space-y-10">
+            {/* Customer Details */}
+            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">Customer Details</h2>
+              <DynamicForm
+                fields={customerFields}
+                formData={customerForm}
+                setFormData={setCustomerForm}
+                className="grid grid-cols-1 md:grid-cols-2 gap-6"
+              />
+            </div>
 
-          <DynamicForm
-            fields={customerFields}
-            formData={customerForm}
-            setFormData={setCustomerForm}
-            className="grid grid-cols-1 md:grid-cols-2 gap-4"
-          />
-        </div>
+            {/* Search Product */}
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">Add Products</h2>
+              <SearchDropdown
+                value={searchTerm}
+                placeholder="Search products..."
+                results={showDropdown ? formattedProducts : []}
+                onChange={(val) => {
+                  setSearchTerm(val);
+                  setShowDropdown(val.length > 0);
+                }}
+                onSearch={(val) => {
+                  setSearchTerm(val);
+                  setShowDropdown(val.length > 0);
+                }}
+                onSelect={handleSelectProduct}
+                clearResults={() => {
+                  setSearchTerm("");
+                  setShowDropdown(false);
+                }}
+              />
+              {isLoading && searchTerm && (
+                <p className="mt-2 text-sm text-indigo-600">Loading products...</p>
+              )}
+              {isError && (
+                <p className="mt-2 text-sm text-red-600">Error loading products</p>
+              )}
+            </div>
 
-        {/* Product Details Section */}
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Product Details
-          </h2>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Search Products
-          </label>
+            {/* Always Visible Product Table */}
+            <div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-6">
+                Order Items ({selectedProducts.length})
+              </h3>
 
-          <SearchDropdown
-            value={searchTerm}
-            placeholder="Search products by name..."
-            results={showDropdown ? formattedProducts : []}
-            onChange={(val) => {
-              setSearchTerm(val);
-              setShowDropdown(val.length > 0);
-            }}
-            onSearch={(val) => {
-              setSearchTerm(val);
-              setShowDropdown(val.length > 0);
-            }}
-            onSelect={handleSelectProduct}
-            clearResults={() => {
-              setSearchTerm("");
-              setShowDropdown(false);
-            }}
-          />
-        </div>
+              <div className="overflow-x-auto rounded-xl border border-gray-300 shadow">
+                <table className="w-full">
+                  <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-sm font-semibold uppercase">
+                        Product
+                      </th>
+                      <th className="px-6 py-4 text-center text-sm font-semibold uppercase">
+                        Price
+                      </th>
+                      <th className="px-6 py-4 text-center text-sm font-semibold uppercase">
+                        Qty
+                      </th>
+                      <th className="px-6 py-4 text-center text-sm font-semibold uppercase">
+                        Total
+                      </th>
+                      <th className="px-6 py-4 text-center text-sm font-semibold uppercase">
+                        Action
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {selectedProducts.length === 0 ? (
+                      <tr>
+                        <td colSpan="5" className="px-6 py-16 text-center">
+                          <div className="flex flex-col items-center text-gray-400">
+                            <svg className="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 3h18v18H3V3zM12 8v8m-4-4h8" />
+                            </svg>
+                            <p className="text-lg font-medium">No products added yet</p>
+                            <p className="text-sm">Search and select products to add them here</p>
+                          </div>
+                        </td>
+                      </tr>
+                    ) : (
+                      selectedProducts.map((product) => {
+                        const itemTotal = product.final_price * product.quantity;
+                        return (
+                          <tr key={product.product_unique_id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4">
+                              <div className="text-sm font-medium text-gray-900">
+                                {product.product_name}
+                              </div>
+                              {/* <div className="text-xs text-gray-500">
+                                ID: {product.product_unique_id}
+                              </div> */}
+                            </td>
+                            <td className="px-6 py-4 text-center font-semibold">
+                              ₹{product.final_price.toFixed(2)}
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                              <input
+                                type="number"
+                                min="1"
+                                value={product.quantity}
+                                onChange={(e) =>
+                                  handleQuantityChange(product.product_unique_id, e.target.value)
+                                }
+                                className="w-20 px-3 py-1 border border-gray-300 rounded text-center focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                              />
+                            </td>
+                            <td className="px-6 py-4 text-center font-bold text-indigo-700">
+                              ₹{itemTotal.toFixed(2)}
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                              <button
+                                onClick={() => handleRemoveProduct(product.product_unique_id)}
+                                className="text-red-600 hover:text-red-800"
+                              >
+                                <svg
+                                  className="w-6 h-6"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3m6 0h.01"
+                                  />
+                                </svg>
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                  <tfoot>
+                    <tr className="bg-gray-100 font-bold text-lg">
+                      <td colSpan="3" className="px-6 py-4 text-right">
+                        Grand Total:
+                      </td>
+                      <td className="px-6 py-4 text-center text-indigo-700">
+                        ₹{totalAmount.toFixed(2)}
+                      </td>
+                      <td></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
 
-        {/* Selected Products */}
-        {selectedProducts.length > 0 && (
-          <div className="mt-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
-              Selected Products
-            </h3>
-
-            <div className="space-y-3">
-              {selectedProducts.map((product) => (
-                <div
-                  key={product.product_unique_id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200"
-                >
-                  <div>
-                    <p className="font-semibold text-gray-800">{product.product_name}</p>
-                    <p className="text-sm text-gray-600">
-                      ID: {product.product_unique_id} | Price: ₹{product.price}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <div>
-                      <label className="block text-xs font-semibold text-gray-700 mb-1">
-                        Quantity
-                      </label>
-                      <input
-                        type="number"
-                        min="1"
-                        value={product.quantity}
-                        onChange={(e) =>
-                          handleQuantityChange(product.product_unique_id, e.target.value)
-                        }
-                        className="border p-2 rounded-lg w-20 text-center"
-                      />
-                    </div>
-
-                    <button
-                      onClick={() => handleRemoveProduct(product.product_unique_id)}
-                      className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              ))}
+            {/* Submit Button */}
+            <div className="flex justify-end">
+              <button
+                onClick={handleSubmitOrder}
+                disabled={!isFormValid || isCreatingOrder}
+                className={`px-10 py-4 rounded-xl font-bold text-white text-lg transition-all ${
+                  !isFormValid || isCreatingOrder
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105"
+                }`}
+              >
+                {isCreatingOrder ? "Creating Order..." : "Create Order"}
+              </button>
             </div>
           </div>
-        )}
-
-        {/* Save Order */}
-        <div className="mt-6 flex justify-end">
-          <button
-            onClick={() => handleSubmitOrder()}
-            disabled={isCreatingOrder}
-            className={`px-8 py-3 rounded-lg font-semibold text-white transition ${isCreatingOrder
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-indigo-600 hover:bg-indigo-700"
-              }`}
-          >
-            {isCreatingOrder ? "Creating Order..." : "Save Order"}
-          </button>
         </div>
-
-        {isLoading && searchTerm && (
-          <p className="text-sm text-gray-500 mt-2">Loading products...</p>
-        )}
-        {isError && (
-          <p className="text-sm text-red-500 mt-2">Error loading products</p>
-        )}
       </div>
     </div>
   );
