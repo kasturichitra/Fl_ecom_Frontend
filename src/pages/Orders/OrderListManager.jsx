@@ -98,15 +98,14 @@ const OrderListManager = () => {
 
         return (
           <span
-            className={`px-3 py-1 rounded-full text-xs font-bold ${
-              isDelivered
+            className={`px-3 py-1 rounded-full text-xs font-bold ${isDelivered
                 ? "bg-green-100 text-green-800"
                 : isPending
-                ? "bg-yellow-100 text-yellow-800"
-                : isCancelled
-                ? "bg-red-100 text-red-800"
-                : "bg-gray-100 text-gray-700"
-            }`}
+                  ? "bg-yellow-100 text-yellow-800"
+                  : isCancelled
+                    ? "bg-red-100 text-red-800"
+                    : "bg-gray-100 text-gray-700"
+              }`}
           >
             {status}
           </span>
@@ -159,7 +158,7 @@ const OrderListManager = () => {
         </div>
 
         {/* SEARCH (NO GAP) */}
-        <div className="p-6 bg-gray-50  border-b flex items-center gap-4">
+        <div className="p-6 bg-gray-50 border-b flex items-center gap-4">
           <SearchBar
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}

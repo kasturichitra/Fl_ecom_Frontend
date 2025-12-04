@@ -9,63 +9,49 @@ const IndustryTypeManager = ({ onCancel }) => {
       onCancel();
     },
   });
+
   const handleCancel = () => {
     if (onCancel) onCancel();
   };
 
- const fields = [
-  {
-    key: "industry_name",
-    label: "Industry Name",
-    type: "text",
-    width: 400, // width in px
-  },
-  {
-    key: "industry_unique_id",
-    label: "Unique ID",
-    type: "text",
-    width: 400,
-  },
-  {
-    key: "description",
-    label: "Description",
-    type: "textarea",
-    width: 400,
-  },
-  { 
-    key: "image", 
-    label: "Upload Image", 
-    type: "file", 
-    accept: "image/*",
-    width: 300,
-  },
-  { 
-    key: "is_active", 
-    label: "Active", 
-    type: "checkbox",
-    width: 150,
-  },
-];
-
+  const fields = [
+    { key: "industry_name", label: "Industry Name", type: "text", width: 400 },
+    { key: "industry_unique_id", label: "Unique ID", type: "text", width: 400 },
+    { key: "description", label: "Description", type: "textarea", width: 400 },
+    { key: "image", label: "Upload Image", type: "file", accept: "image/*", width: 300 },
+    { key: "is_active", label: "Active", type: "checkbox", width: 150 },
+  ];
 
   const handleAddIndustryType = async (formData) => {
-    console.log("Fform state before AI PI call", formData);
     const result = objectToFormData(formData);
     await createIndustry(result);
   };
 
   return (
-    <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
+    <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200 relative">
+
+      {/* ONLY ADDED THIS BUTTON — NO OTHER CHANGE */}
+      <button
+        onClick={onCancel}
+        className="absolute text-white right-3 top-1 text-gray-700 hover:text-red-600 text-3xl"
+      >
+        ×
+      </button>
+
       <div className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white px-8 py-10 text-center">
         <h2 className="text-4xl font-extrabold">Add New Industry Type</h2>
       </div>
 
       <div className="p-8 bg-gray-50">
-        {/* Form Fields Only */}
         <IndustryTypeForm
           fields={fields}
           onSubmit={handleAddIndustryType}
-          additionalContent={<FormActionButtons submitLabel="Create Industry Type" onCancel={handleCancel} />}
+          additionalContent={
+            <FormActionButtons
+              submitLabel="Create Industry Type"
+              onCancel={handleCancel}
+            />
+          }
         />
       </div>
     </div>

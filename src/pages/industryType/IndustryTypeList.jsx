@@ -111,9 +111,8 @@ const IndustryTypeList = () => {
       valueGetter: (params) => (params.value ? "Active" : "Inactive"),
       renderCell: (params) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${
-            params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            }`}
         >
           {params.row.is_active ? "Active" : "Inactive"}
         </span>
@@ -153,8 +152,8 @@ const IndustryTypeList = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10">
-      <div className="max-w-8xl mx-auto px-4">
+    <div className="min-h-screen bg-gray-50 p-2">
+      <div className="max-w-8xl">
         <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
           {/* Header */}
           <PageHeader
@@ -165,7 +164,7 @@ const IndustryTypeList = () => {
           />
 
           {/* Filters Row */}
-          <div className="px-6 py-4 flex flex-wrap items-center gap-4 bg-gray-50 border-b">
+          <div className="p-6 flex flex-wrap items-center gap-4 bg-gray-50 border-b">
             <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
             <ColumnVisibilitySelector
               headers={industryHeaders}
@@ -178,7 +177,7 @@ const IndustryTypeList = () => {
           </div>
 
           {/* Table */}
-          <div className="p-4">
+          <div className="p-6 bg-white">
             {loading ? (
               <div className="text-center py-12 text-gray-500">Loading industries...</div>
             ) : error ? (
@@ -209,15 +208,15 @@ const IndustryTypeList = () => {
       {/* Add Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-white/20 backdrop-blur-lg flex items-center justify-center z-50">
-          <div className="relative bg-white p-6 rounded-xl shadow-lg w-full max-w-lg">
-            <button
+          {/* <div className="relative bg-white p-6 rounded-xl shadow-lg w-full max-w-lg"> */}
+          {/* <button
               onClick={() => setShowAddModal(false)}
               className="absolute right-5 top-5 text-gray-700 hover:text-red-600 text-3xl"
             >
               ×
-            </button>
-            <IndustryTypeManager onCancel={() => setShowAddModal(false)} />
-          </div>
+            </button> */}
+          <IndustryTypeManager onCancel={() => setShowAddModal(false)} />
+          {/* </div> */}
         </div>
       )}
 
