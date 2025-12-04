@@ -95,9 +95,7 @@ const IndustryTypeList = () => {
       headerName: "UNIQUE ID",
       flex: 1,
       renderCell: (params) => (
-        <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-          {params.value}
-        </span>
+        <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">{params.value}</span>
       ),
     },
     {
@@ -114,9 +112,7 @@ const IndustryTypeList = () => {
       renderCell: (params) => (
         <span
           className={`px-3 py-1 rounded-full text-xs font-bold ${
-            params.row.is_active
-              ? "bg-green-100 text-green-800"
-              : "bg-red-100 text-red-800"
+            params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
           }`}
         >
           {params.row.is_active ? "Active" : "Inactive"}
@@ -170,11 +166,7 @@ const IndustryTypeList = () => {
 
           {/* Filters Row */}
           <div className="px-6 py-4 flex flex-wrap items-center gap-4 bg-gray-50 border-b">
-            <SearchBar
-              searchTerm={searchTerm}
-              onSearchChange={setSearchTerm}
-              placeholder="Search industry types..."
-            />
+            <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
             <ColumnVisibilitySelector
               headers={industryHeaders}
               updateTableHeaders={updateTableHeaders}
@@ -182,12 +174,7 @@ const IndustryTypeList = () => {
               setIsDropdownOpen={setIsDropdownOpen}
               dropdownRef={dropdownRef}
             />
-            <DropdownFilter
-              value={activeStatus}
-              onSelect={setActiveStatus}
-              data={statusOptions}
-              placeholder="Status"
-            />
+            <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} placeholder="Status" />
           </div>
 
           {/* Table */}
@@ -221,17 +208,14 @@ const IndustryTypeList = () => {
 
       {/* Add Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full max-h-screen overflow-y-auto">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">Add New Industry</h2>
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="text-3xl text-gray-500 hover:text-gray-700"
-              >
-                ×
-              </button>
-            </div>
+        <div className="fixed inset-0 bg-white/20 backdrop-blur-lg flex items-center justify-center z-50">
+          <div className="relative bg-white p-6 rounded-xl shadow-lg w-full max-w-lg">
+            <button
+              onClick={() => setShowAddModal(false)}
+              className="absolute right-5 top-5 text-gray-700 hover:text-red-600 text-3xl"
+            >
+              ×
+            </button>
             <IndustryTypeManager onCancel={() => setShowAddModal(false)} />
           </div>
         </div>
@@ -239,24 +223,11 @@ const IndustryTypeList = () => {
 
       {/* Edit Modal */}
       {editingIndustry && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">Edit Industry</h2>
-              <button
-                onClick={() => setEditingIndustry(null)}
-                className="text-3xl text-gray-500 hover:text-gray-700"
-              >
-                ×
-              </button>
-            </div>
-            <IndustryTypeEditModal
-              formData={editingIndustry}
-              onSubmit={handleUpdate}
-              closeModal={() => setEditingIndustry(null)}
-            />
-          </div>
-        </div>
+        <IndustryTypeEditModal
+          formData={editingIndustry}
+          onSubmit={handleUpdate}
+          closeModal={() => setEditingIndustry(null)}
+        />
       )}
     </div>
   );
