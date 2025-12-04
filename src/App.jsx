@@ -25,7 +25,7 @@ const BrandListManager = lazy(() => import("./pages/BrandManager/BrandListManage
 const OrderProductsDetailes = lazy(() => import("./pages/Orders/OrderProductsDetailes"));
 // Home Page
 const Home = () => (
-  <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-indigo-50 to-purple-100">
+  <div className="flex flex-col items-center justify-center h-screen">
     <h1 className="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-700 mb-6">
       Admin Dashboard
     </h1>
