@@ -118,11 +118,11 @@ const CreateOrder = () => {
     selectedProducts.length > 0;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gray-50 py-4 px-4">
+      <div className="">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           <div className="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6">
-            <h1 className="text-3xl font-bold text-white text-center">
+            <h1 className="text-3xl font-bold text-white">
               Create New Order
             </h1>
           </div>
