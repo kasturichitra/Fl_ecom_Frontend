@@ -42,7 +42,6 @@ const ProductList = () => {
   const dropdownRef = useRef(null);
   const { productHeaders, updateProductTableHeaders } = useProductTableHeadersStore();
 
-
   const handleClickOutside = useCallback((event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       setIsDropdownOpen(false);
@@ -55,7 +54,6 @@ const ProductList = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [dropdownRef]);
-
 
   const [openNotes, setOpenNotes] = useState(false); // ⬅️ REQUIRED STATE
 
@@ -265,15 +263,15 @@ const ProductList = () => {
     },
   ];
 
-    const visibleColumns = columns.filter((col) => {
+  const visibleColumns = columns.filter((col) => {
     const headerConfig = productHeaders.find((h) => h.key === col.headerName);
     return headerConfig ? headerConfig.value : true;
   });
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-8xl mx-auto px-4 sm:px-6">
+      <div className="min-h-screen bg-gray-50 py-2">
+        <div className="px-2">
           <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
             <PageHeader
               title="Product Manager"
@@ -289,7 +287,13 @@ const ProductList = () => {
 
               {/*Filters Grid / Filters Column whatever it is */}
               <div className="flex items-center gap-2">
-                <ColumnVisibilitySelector headers={productHeaders} updateTableHeaders={updateProductTableHeaders} dropdownRef={dropdownRef} setIsDropdownOpen={setIsDropdownOpen} isDropdownOpen={isDropdownOpen} />
+                <ColumnVisibilitySelector
+                  headers={productHeaders}
+                  updateTableHeaders={updateProductTableHeaders}
+                  dropdownRef={dropdownRef}
+                  setIsDropdownOpen={setIsDropdownOpen}
+                  isDropdownOpen={isDropdownOpen}
+                />
                 <DropdownFilter data={formattedIndustries} onSelect={(id) => setIndustryId(id)} />
                 <DropdownFilter data={formattedFilterCategories} onSelect={(id) => setCategoryId(id)} />
                 <DropdownFilter data={GENDER_OPTIONS} onSelect={(value) => setSelectedGender(value)} />
