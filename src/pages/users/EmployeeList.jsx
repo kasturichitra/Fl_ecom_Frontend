@@ -105,7 +105,6 @@ const EmployeeList = () => {
     },
   ];
 
-
   const visibleColumns = columns.filter((col) => {
     const headerConfig = employeeHeaders.find((h) => h.key === col.headerName);
     return headerConfig ? headerConfig.value : true;
@@ -113,8 +112,8 @@ const EmployeeList = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-8xl mx-auto px-4 sm:px-6">
+      <div className="min-h-screen bg-gray-50 p-2">
+        <div className="max-w-8xl">
           <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
             <PageHeader
               title="Employee Manager"
@@ -138,7 +137,8 @@ const EmployeeList = () => {
                   updateTableHeaders={updateEmployeeTableHeaders}
                   setIsDropdownOpen={setIsDropdownOpen}
                   isDropdownOpen={isDropdownOpen}
-                  dropdownRef={dropdownRef} />
+                  dropdownRef={dropdownRef}
+                />
               </div>
             </div>
 
@@ -158,7 +158,7 @@ const EmployeeList = () => {
                   setCurrentPage={setCurrentPage}
                   setPageSize={setPageSize}
                   sort="" // Client-side sorting not implemented yet, or can be added if needed
-                  setSort={() => { }}
+                  setSort={() => {}}
                 />
               )}
             </div>

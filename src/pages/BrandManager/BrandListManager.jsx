@@ -32,7 +32,6 @@ const BrandListManager = () => {
   const { brandHeaders, updateBrandTableHeaders } = useBrandTableHeadersStore();
   // console.log("activeStatus", activeStatus);
 
-
   const handleClickOutside = useCallback((event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       setIsDropdownOpen(false);
@@ -107,8 +106,9 @@ const BrandListManager = () => {
       valueGetter: (params) => (params.value ? "Active" : "Inactive"), // Convert boolean → string
       renderCell: (params) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-            }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${
+            params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+          }`}
         >
           {params.row?.is_active ? "Active" : "Inactive"}
         </span>
@@ -154,7 +154,6 @@ const BrandListManager = () => {
   ];
 
   const handleEdit = (brand) => {
-
     setEditingBrand(brand);
   };
 
@@ -181,8 +180,8 @@ const BrandListManager = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 py-10">
-      <div className="max-w-8xl mx-auto px-4">
+    <div className="min-h-screen bg-gray-50 py-2">
+      <div className="max-w-8xl px-2">
         {/* HEADER */}
         <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
           <PageHeader
@@ -195,7 +194,13 @@ const BrandListManager = () => {
           {/* SEARCH BAR */}
           <div className="px-6 py-4 flex items-center gap-4">
             <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
-            <ColumnVisibilitySelector headers={brandHeaders} updateTableHeaders={updateBrandTableHeaders} setIsDropdownOpen={setIsDropdownOpen} isDropdownOpen={isDropdownOpen} dropdownRef={dropdownRef} />
+            <ColumnVisibilitySelector
+              headers={brandHeaders}
+              updateTableHeaders={updateBrandTableHeaders}
+              setIsDropdownOpen={setIsDropdownOpen}
+              isDropdownOpen={isDropdownOpen}
+              dropdownRef={dropdownRef}
+            />
             <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} />
             <DropdownFilter data={formattedCategories} onSelect={(id) => setCaterogyId(id)} />
           </div>
