@@ -20,7 +20,7 @@ export const sidebarElements = [
   {
     id: "home",
     path: "/",
-    label: "Dashboard Home",
+    label: "Dashboard",
     icon: Home,
     end: true, // For exact path matching
   },
@@ -83,9 +83,9 @@ export const sidebarElements = [
     icon: Users,
   },
   {
-    id : "notifications",
-    path : "/notificationList",
-    label : "Notifications",
-    icon : ClipboardPlus
-  }
+    id: "notifications",
+    path: "/notificationList",
+    label: "Notifications",
+    icon: ClipboardPlus,
+  },
 ];
