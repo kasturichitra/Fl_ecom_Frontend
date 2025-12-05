@@ -10,11 +10,12 @@ import { DropdownFilter } from "../../components/DropdownFilter.jsx";
 
 import { useCategoryDelete, useGetAllCategories } from "../../hooks/useCategory.js";
 import { useGetAllIndustries } from "../../hooks/useIndustry.js";
-import { statusOptions } from "../../lib/constants.js";
+import { DEBOUNCED_DELAY, statusOptions } from "../../lib/constants.js";
 import { useCategoryTableHeadersStore } from "../../stores/CategoryTableHeaderStore.js";
 
 import CategoryEditModal from "./CategoryEditModal";
 import CategoryManager from "./CategoryManager";
+import useDebounce from "../../hooks/useDebounce.JS";
 
 const CategoryListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,6 +45,8 @@ const CategoryListManager = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [handleClickOutside]);
 
+  const debouncedSearchTerm = useDebounce(searchTerm, DEBOUNCED_DELAY);
+
   // Status filter
   const getStatusFilter = () => {
     if (activeStatus === "active") return true;
@@ -67,7 +70,7 @@ const CategoryListManager = () => {
     isLoading: loading,
     isError: error,
   } = useGetAllCategories({
-    search: searchTerm,
+    search: debouncedSearchTerm,
     page: currentPage + 1,
     limit: pageSize,
     sort,

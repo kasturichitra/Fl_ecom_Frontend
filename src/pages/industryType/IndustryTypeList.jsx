@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Activity, useCallback, useEffect, useRef, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector.jsx";
@@ -7,14 +7,15 @@ import PageHeader from "../../components/PageHeader.jsx";
 import SearchBar from "../../components/SearchBar.jsx";
 import DataTable from "../../components/Table.jsx";
 import { useDeleteIndustry, useGetAllIndustries, useUpdateIndustry } from "../../hooks/useIndustry";
-import { statusOptions } from "../../lib/constants.js";
+import { DEBOUNCED_DELAY, statusOptions } from "../../lib/constants.js";
 import { useIndustryTableHeadersStore } from "../../stores/IndustryTableHeadersStore.js";
 import IndustryTypeEditModal from "./IndustryTypeEditModal";
 import IndustryTypeManager from "./IndustryTypeManager";
+import useDebounce from "../../hooks/useDebounce.JS";
 
 const IndustryTypeList = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+  // const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
   const [sort, setSort] = useState("createdAt:desc");
@@ -30,10 +31,12 @@ const IndustryTypeList = () => {
     }
   }, []);
 
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [handleClickOutside]);
+  const debouncedSearchTerm = useDebounce(searchTerm, DEBOUNCED_DELAY);
+
+  // useEffect(() => {
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => document.removeEventListener("mousedown", handleClickOutside);
+  // }, [handleClickOutside]);
 
   const statusFun = () => {
     if (activeStatus === "active") return true;
@@ -63,13 +66,13 @@ const IndustryTypeList = () => {
   const [editingIndustry, setEditingIndustry] = useState(null);
 
   // Debounce search
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-      setCurrentPage(0);
-    }, 500);
-    return () => clearTimeout(handler);
-  }, [searchTerm]);
+  // useEffect(() => {
+  //   const handler = setTimeout(() => {
+  //     setDebouncedSearchTerm(searchTerm);
+  //     setCurrentPage(0);
+  //   }, 500);
+  //   return () => clearTimeout(handler);
+  // }, [searchTerm]);
 
   const handleUpdate = async (formData) => {
     if (!editingIndustry) return;
@@ -111,8 +114,9 @@ const IndustryTypeList = () => {
       valueGetter: (params) => (params.value ? "Active" : "Inactive"),
       renderCell: (params) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-            }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${
+            params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+          }`}
         >
           {params.row.is_active ? "Active" : "Inactive"}
         </span>
@@ -206,19 +210,12 @@ const IndustryTypeList = () => {
       </div>
 
       {/* Add Modal */}
-      {showAddModal && (
+
+      <Activity mode={showAddModal ? "visible" : "hidden"}>
         <div className="fixed inset-0 bg-white/20 backdrop-blur-lg flex items-center justify-center z-50">
-          {/* <div className="relative bg-white p-6 rounded-xl shadow-lg w-full max-w-lg"> */}
-          {/* <button
-              onClick={() => setShowAddModal(false)}
-              className="absolute right-5 top-5 text-gray-700 hover:text-red-600 text-3xl"
-            >
-              ×
-            </button> */}
           <IndustryTypeManager onCancel={() => setShowAddModal(false)} />
-          {/* </div> */}
         </div>
-      )}
+      </Activity>
 
       {/* Edit Modal */}
       {editingIndustry && (
@@ -228,6 +225,13 @@ const IndustryTypeList = () => {
           closeModal={() => setEditingIndustry(null)}
         />
       )}
+      {/* <Activity mode={editingIndustry ? "visible" : "hidden"}>
+        <IndustryTypeEditModal
+          formData={editingIndustry}
+          onSubmit={handleUpdate}
+          closeModal={() => setEditingIndustry(null)}
+        />
+      </Activity> */}
     </div>
   );
 };

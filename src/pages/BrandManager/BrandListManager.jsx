@@ -10,10 +10,11 @@ import DataTable from "../../components/Table";
 import BrandEditModal from "./BrandEditModal";
 import BrandManager from "./BrandManager";
 import { DropdownFilter } from "../../components/DropdownFilter";
-import { statusOptions } from "../../lib/constants";
+import { DEBOUNCED_DELAY, statusOptions } from "../../lib/constants";
 import { useGetAllCategories } from "../../hooks/useCategory";
 import { useBrandTableHeadersStore } from "../../stores/BrandTableHeaderStore";
 import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector";
+import useDebounce from "../../hooks/useDebounce.JS";
 
 const BrandListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,6 +45,10 @@ const BrandListManager = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [handleClickOutside]);
+
+
+  const debouncedSearchTerm = useDebounce(searchTerm, DEBOUNCED_DELAY);
+
   const statusFun = () => {
     if (activeStatus === "active") return true;
     if (activeStatus === "inactive") return false;
@@ -65,7 +70,7 @@ const BrandListManager = () => {
   });
 
   const { data: brandsData, isError } = useGetAllBrands({
-    searchTerm,
+    debouncedSearchTerm,
     page: currentPage + 1, // API pages are 1-based
     limit: pageSize,
     is_active: statusFun(),
