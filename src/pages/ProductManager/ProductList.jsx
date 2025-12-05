@@ -5,9 +5,10 @@ import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 
 import { FaFileDownload, FaFileUpload } from "react-icons/fa";
+import BulkProductResultModal from "../../components/BulkProductResultModal.jsx";
 import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector.jsx";
 import { DropdownFilter } from "../../components/DropdownFilter.jsx";
-import ImportantNotesDialog from "../../components/ImportantNotesDialog.jsx"; // ⬅️ ADD THIS IMPORT
+import ImportantNotesDialog from "../../components/ImportantNotesDialog.jsx";
 import PageHeader from "../../components/PageHeader";
 import SearchBar from "../../components/SearchBar";
 import DataTable from "../../components/Table";
@@ -40,6 +41,10 @@ const ProductList = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { productHeaders, updateProductTableHeaders } = useProductTableHeadersStore();
+
+  // Bulk product result modal state
+  const [showBulkResultModal, setShowBulkResultModal] = useState(false);
+  const [bulkResultData, setBulkResultData] = useState(null);
 
   const handleClickOutside = useCallback((event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -112,9 +117,12 @@ const ProductList = () => {
   const { mutateAsync: downloadExcel } = useDownloadProductExcel({
     onSuccess: () => setIsOpen(false),
   });
-  
+
   const { mutateAsync: createBulkProducts } = useCreateBulkProducts({
-    
+    onSuccess: (response) => {
+      setBulkResultData(response?.data?.data);
+      setShowBulkResultModal(true);
+    },
   });
   const { mutateAsync: updateProduct } = useUpdateProduct();
 
@@ -369,7 +377,6 @@ const ProductList = () => {
           </div>
         </div>
       </Activity>
-      
 
       <Activity mode={editingProduct ? "visible" : "hidden"}>
         <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -402,6 +409,17 @@ const ProductList = () => {
           setIsOpen(true);
         }}
       />
+
+      <Activity mode={showBulkResultModal ? "visible" : "hidden"}>
+        <BulkProductResultModal
+          open={showBulkResultModal}
+          onClose={() => {
+            setShowBulkResultModal(false);
+            setBulkResultData(null);
+          }}
+          resultData={bulkResultData}
+        />
+      </Activity>
     </>
   );
 };
