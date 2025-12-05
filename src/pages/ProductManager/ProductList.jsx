@@ -1,15 +1,19 @@
 // src/pages/ProductManager/ProductList.jsx
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Activity, useCallback, useEffect, useRef, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
-import { useLocation } from "react-router-dom";
 
+import { FaFileDownload, FaFileUpload } from "react-icons/fa";
+import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector.jsx";
+import { DropdownFilter } from "../../components/DropdownFilter.jsx";
+import ImportantNotesDialog from "../../components/ImportantNotesDialog.jsx"; // ⬅️ ADD THIS IMPORT
 import PageHeader from "../../components/PageHeader";
 import SearchBar from "../../components/SearchBar";
 import DataTable from "../../components/Table";
 import DownloadXLExcel from "../../components/xlDownloadModel.jsx";
 import { useGetAllCategories } from "../../hooks/useCategory";
+import { useGetAllIndustries } from "../../hooks/useIndustry.js";
 import {
   useCreateBulkProducts,
   useDeleteProduct,
@@ -17,17 +21,12 @@ import {
   useGetAllProducts,
   useUpdateProduct,
 } from "../../hooks/useProduct";
+import { DEBOUNCED_DELAY, GENDER_OPTIONS } from "../../lib/constants.js";
+import { useProductTableHeadersStore } from "../../stores/ProductTableHeaderStore.js";
+import { toIndianCurrency } from "../../utils/toIndianCurrency.js";
 import ProductEditModal from "./ProductEditModal";
 import ProductManager from "./ProductManager";
-import { FaFileDownload, FaFileUpload } from "react-icons/fa";
-import ImportantNotesDialog from "../../components/ImportantNotesDialog.jsx"; // ⬅️ ADD THIS IMPORT
-import { Diameter } from "lucide-react";
-import { DropdownFilter } from "../../components/DropdownFilter.jsx";
-import { useGetAllIndustries } from "../../hooks/useIndustry.js";
-import { GENDER_OPTIONS } from "../../lib/constants.js";
-import { toIndianCurrency } from "../../utils/toIndianCurrency.js";
-import { useProductTableHeadersStore } from "../../stores/ProductTableHeaderStore.js";
-import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector.jsx";
+import useDebounce from "../../hooks/useDebounce.js";
 
 const ProductList = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -61,12 +60,14 @@ const ProductList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
 
+  const deboouncedSearchTerm = useDebounce(searchTerm, DEBOUNCED_DELAY);
+
   const {
     data: productsResponse,
     isLoading: loading,
     isError: error,
   } = useGetAllProducts({
-    searchTerm,
+    searchTerm: deboouncedSearchTerm,
     industry_unique_id: industryId,
     category_unique_id: categoryId,
     gender: selectedGender,
@@ -74,8 +75,6 @@ const ProductList = () => {
     page: currentPage + 1,
     limit: pageSize,
   });
-
-  console.log("productsResponse", productsResponse);
 
   const { data: industries } = useGetAllIndustries();
 
@@ -112,7 +111,10 @@ const ProductList = () => {
   const { mutateAsync: downloadExcel } = useDownloadProductExcel({
     onSuccess: () => setIsOpen(false),
   });
-  const { mutateAsync: createBulkProducts } = useCreateBulkProducts();
+  
+  const { mutateAsync: createBulkProducts } = useCreateBulkProducts({
+    
+  });
   const { mutateAsync: updateProduct } = useUpdateProduct();
 
   const [showAddModal, setShowAddModal] = useState(false);
@@ -343,16 +345,16 @@ const ProductList = () => {
               />
             </div>
 
-            {error && (
+            <Activity mode={error ? "visible" : "hidden"}>
               <div className="mx-6 mb-6 p-5 bg-red-50 border border-red-300 text-red-700 rounded-xl text-center">
                 Error loading products.
               </div>
-            )}
+            </Activity>
           </div>
         </div>
       </div>
 
-      {showAddModal && (
+      <Activity mode={showAddModal ? "visible" : "hidden"}>
         <div className="fixed inset-0 bg-white/30 backdrop-blur-lg border border-white/20 shadow-xl flex items-center justify-center z-50">
           <div className="relative">
             <button
@@ -364,7 +366,7 @@ const ProductList = () => {
             <ProductManager onCancel={handleCloseAdd} />
           </div>
         </div>
-      )}
+      </Activity>
 
       {editingProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -389,7 +391,6 @@ const ProductList = () => {
         handleSelect={handleExcelCategorySelect}
       />
 
-      {/* ⬇️ REQUIRED: IMPORTANT EXCEL NOTES POPUP */}
       <ImportantNotesDialog
         open={openNotes}
         onClose={() => setOpenNotes(false)}
