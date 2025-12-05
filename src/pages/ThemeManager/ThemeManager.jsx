@@ -1,18 +1,25 @@
-import { useState } from "react";
-import { FaPalette, FaFont, FaSave, FaCheckCircle } from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { FaCheckCircle } from "react-icons/fa";
 import PageHeader from "../../components/PageHeader";
+import { useGetCurrentConfig, useUpdateConfig } from "../../hooks/useConfigs";
+import ColorPicker from "../../components/configs/ColorPicker";
+import TypographyPicker from "../../components/configs/TypographyPicker";
 
 const ThemeManager = () => {
   // Single theme state - only one theme can be saved
   const [savedTheme, setSavedTheme] = useState(null);
+  const { data: currentConfig } = useGetCurrentConfig();
 
   // Form state for theme configuration
   const [theme, setTheme] = useState({
+    mode: "light",
     colors: {
       primary: "#4f46e5",
       secondary: "#9333ea",
       background: "#ffffff",
       text: "#1f2937",
+      ghost: "#f3f4f6",
+      destructive: "#ef4444",
     },
     typography: {
       font_family: "Inter",
@@ -20,6 +27,37 @@ const ThemeManager = () => {
       body_size: 16,
     },
   });
+
+  const { mutateAsync: updateConfig } = useUpdateConfig({
+    onSuccess: () => {
+      setSavedTheme({
+        ...theme,
+        savedAt: new Date().toLocaleString(),
+      });
+    },
+  });
+
+  // Load initial theme from config
+  useEffect(() => {
+    if (currentConfig?.theme) {
+      setTheme({
+        mode: currentConfig.theme.mode || "light",
+        colors: {
+          primary: currentConfig.theme.colors?.primary || "#4f46e5",
+          secondary: currentConfig.theme.colors?.secondary || "#9333ea",
+          background: currentConfig.theme.colors?.background || "#ffffff",
+          text: currentConfig.theme.colors?.text || "#1f2937",
+          ghost: currentConfig.theme.colors?.ghost || "#f3f4f6",
+          destructive: currentConfig.theme.colors?.destructive || "#ef4444",
+        },
+        typography: {
+          font_family: currentConfig.theme.typography?.font_family || "Inter",
+          heading_size: currentConfig.theme.typography?.heading_size || 32,
+          body_size: currentConfig.theme.typography?.body_size || 16,
+        },
+      });
+    }
+  }, [currentConfig]);
 
   // Popular fonts from Google Fonts
   const popularFonts = [
@@ -62,20 +100,45 @@ const ThemeManager = () => {
   };
 
   // Save the theme
-  const handleSaveTheme = () => {
-    setSavedTheme({
-      ...theme,
-      savedAt: new Date().toLocaleString(),
-    });
-    console.log("Saved Theme:", {
-      ...theme,
-      savedAt: new Date().toLocaleString(),
+  const handleSaveTheme = async () => {
+    if (!currentConfig?._id) {
+      console.error("Config ID not found");
+      return;
+    }
+
+    // Prepare data in the required format
+    const themeData = {
+      theme: {
+        mode: theme.mode,
+        colors: {
+          primary: theme.colors.primary,
+          secondary: theme.colors.secondary,
+          background: theme.colors.background,
+          text: theme.colors.text,
+          ghost: theme.colors.ghost,
+          destructive: theme.colors.destructive,
+        },
+        typography: {
+          font_family: theme.typography.font_family,
+          heading_size: theme.typography.heading_size,
+          body_size: theme.typography.body_size,
+        },
+      },
+    };
+
+    console.log("Theme data before going to API", themeData);
+    // return;
+
+    // Update config via API
+    await updateConfig({
+      id: currentConfig._id,
+      data: themeData,
     });
   };
 
   return (
     <div className="min-h-screen bg-gray-50 p-2">
-      <div className="max-w-7xl mx-auto">
+      <div className="">
         <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
           <PageHeader
             title="Theme Manager"
@@ -88,247 +151,20 @@ const ThemeManager = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Left Column - Colors */}
               <div className="space-y-6">
-                <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl p-6 border border-indigo-200">
-                  <div className="flex items-center gap-3 mb-6">
-                    <FaPalette className="text-indigo-600 text-2xl" />
-                    <h2 className="text-2xl font-bold text-gray-800">Color Settings</h2>
-                  </div>
-
-                  {/* Primary Color */}
-                  <div className="mb-5">
-                    <label className="block mb-2">
-                      <span className="text-sm font-semibold text-gray-700">Primary Color</span>
-                    </label>
-                    <div className="flex items-center gap-4">
-                      <input
-                        type="color"
-                        value={theme.colors.primary}
-                        onChange={(e) => handleColorChange("primary", e.target.value)}
-                        className="w-20 h-12 rounded-lg cursor-pointer border-2 border-gray-300 shadow-sm hover:border-indigo-500 transition-colors"
-                      />
-                      <div className="flex-1">
-                        <input
-                          type="text"
-                          value={theme.colors.primary}
-                          onChange={(e) => handleColorChange("primary", e.target.value)}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
-                          placeholder="#4f46e5"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Secondary Color */}
-                  <div className="mb-5">
-                    <label className="block mb-2">
-                      <span className="text-sm font-semibold text-gray-700">Secondary Color</span>
-                    </label>
-                    <div className="flex items-center gap-4">
-                      <input
-                        type="color"
-                        value={theme.colors.secondary}
-                        onChange={(e) => handleColorChange("secondary", e.target.value)}
-                        className="w-20 h-12 rounded-lg cursor-pointer border-2 border-gray-300 shadow-sm hover:border-purple-500 transition-colors"
-                      />
-                      <div className="flex-1">
-                        <input
-                          type="text"
-                          value={theme.colors.secondary}
-                          onChange={(e) => handleColorChange("secondary", e.target.value)}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
-                          placeholder="#9333ea"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Background Color */}
-                  <div className="mb-5">
-                    <label className="block mb-2">
-                      <span className="text-sm font-semibold text-gray-700">Background Color</span>
-                    </label>
-                    <div className="flex items-center gap-4">
-                      <input
-                        type="color"
-                        value={theme.colors.background}
-                        onChange={(e) => handleColorChange("background", e.target.value)}
-                        className="w-20 h-12 rounded-lg cursor-pointer border-2 border-gray-300 shadow-sm hover:border-blue-500 transition-colors"
-                      />
-                      <div className="flex-1">
-                        <input
-                          type="text"
-                          value={theme.colors.background}
-                          onChange={(e) => handleColorChange("background", e.target.value)}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                          placeholder="#ffffff"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Text Color */}
-                  <div className="mb-5">
-                    <label className="block mb-2">
-                      <span className="text-sm font-semibold text-gray-700">Text Color</span>
-                    </label>
-                    <div className="flex items-center gap-4">
-                      <input
-                        type="color"
-                        value={theme.colors.text}
-                        onChange={(e) => handleColorChange("text", e.target.value)}
-                        className="w-20 h-12 rounded-lg cursor-pointer border-2 border-gray-300 shadow-sm hover:border-gray-500 transition-colors"
-                      />
-                      <div className="flex-1">
-                        <input
-                          type="text"
-                          value={theme.colors.text}
-                          onChange={(e) => handleColorChange("text", e.target.value)}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-gray-500 focus:border-transparent outline-none"
-                          placeholder="#1f2937"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Color Preview */}
-                  <div className="mt-6 p-4 rounded-xl border-2 border-gray-200 bg-white">
-                    <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">Color Preview</p>
-                    <div className="grid grid-cols-4 gap-2">
-                      <div className="text-center">
-                        <div
-                          className="w-full h-16 rounded-lg shadow-md border-2 border-white mb-1"
-                          style={{ backgroundColor: theme.colors.primary }}
-                        ></div>
-                        <p className="text-xs text-gray-600">Primary</p>
-                      </div>
-                      <div className="text-center">
-                        <div
-                          className="w-full h-16 rounded-lg shadow-md border-2 border-white mb-1"
-                          style={{ backgroundColor: theme.colors.secondary }}
-                        ></div>
-                        <p className="text-xs text-gray-600">Secondary</p>
-                      </div>
-                      <div className="text-center">
-                        <div
-                          className="w-full h-16 rounded-lg shadow-md border-2 border-gray-300 mb-1"
-                          style={{ backgroundColor: theme.colors.background }}
-                        ></div>
-                        <p className="text-xs text-gray-600">Background</p>
-                      </div>
-                      <div className="text-center">
-                        <div
-                          className="w-full h-16 rounded-lg shadow-md border-2 border-white mb-1"
-                          style={{ backgroundColor: theme.colors.text }}
-                        ></div>
-                        <p className="text-xs text-gray-600">Text</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <ColorPicker
+                  theme={theme}
+                  onColorChange={handleColorChange}
+                  onModeChange={(mode) => setTheme((prev) => ({ ...prev, mode }))}
+                />
               </div>
 
               {/* Right Column - Typography */}
               <div className="space-y-6">
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200">
-                  <div className="flex items-center gap-3 mb-6">
-                    <FaFont className="text-purple-600 text-2xl" />
-                    <h2 className="text-2xl font-bold text-gray-800">Typography Settings</h2>
-                  </div>
-
-                  {/* Font Family */}
-                  <div className="mb-5">
-                    <label className="block mb-2">
-                      <span className="text-sm font-semibold text-gray-700">Font Family</span>
-                    </label>
-                    <div className="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
-                      {popularFonts.map((font) => (
-                        <button
-                          key={font}
-                          onClick={() => handleTypographyChange("font_family", font)}
-                          className={`w-full px-4 py-3 rounded-lg text-left transition-all duration-200 ${
-                            theme.typography.font_family === font
-                              ? "bg-purple-600 text-white shadow-lg scale-105"
-                              : "bg-white text-gray-800 hover:bg-purple-100 shadow-sm border border-gray-200"
-                          }`}
-                        >
-                          <span className="font-semibold text-sm">{font}</span>
-                          <p
-                            className={`text-xs mt-1 ${
-                              theme.typography.font_family === font ? "text-purple-100" : "text-gray-500"
-                            }`}
-                            style={{ fontFamily: font }}
-                          >
-                            The quick brown fox jumps
-                          </p>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Heading Size */}
-                  <div className="mb-5">
-                    <label className="block mb-2">
-                      <span className="text-sm font-semibold text-gray-700">Heading Size (px)</span>
-                    </label>
-                    <input
-                      type="number"
-                      value={theme.typography.heading_size}
-                      onChange={(e) => handleTypographyChange("heading_size", e.target.value)}
-                      min="16"
-                      max="72"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
-                      placeholder="32"
-                    />
-                  </div>
-
-                  {/* Body Size */}
-                  <div className="mb-5">
-                    <label className="block mb-2">
-                      <span className="text-sm font-semibold text-gray-700">Body Size (px)</span>
-                    </label>
-                    <input
-                      type="number"
-                      value={theme.typography.body_size}
-                      onChange={(e) => handleTypographyChange("body_size", e.target.value)}
-                      min="12"
-                      max="24"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
-                      placeholder="16"
-                    />
-                  </div>
-
-                  {/* Typography Preview */}
-                  <div
-                    className="mt-6 p-5 rounded-xl border-2 border-gray-200"
-                    style={{
-                      backgroundColor: theme.colors.background,
-                      fontFamily: theme.typography.font_family,
-                    }}
-                  >
-                    <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">
-                      Typography Preview
-                    </p>
-                    <h3
-                      style={{
-                        fontSize: `${theme.typography.heading_size}px`,
-                        color: theme.colors.primary,
-                        fontFamily: theme.typography.font_family,
-                      }}
-                      className="font-bold mb-2"
-                    >
-                      Heading Text
-                    </h3>
-                    <p
-                      style={{
-                        fontSize: `${theme.typography.body_size}px`,
-                        color: theme.colors.text,
-                        fontFamily: theme.typography.font_family,
-                      }}
-                    >
-                      This is body text preview. The quick brown fox jumps over the lazy dog.
-                    </p>
-                  </div>
-                </div>
+                <TypographyPicker
+                  theme={theme}
+                  onTypographyChange={handleTypographyChange}
+                  popularFonts={popularFonts}
+                />
               </div>
             </div>
 
@@ -348,6 +184,10 @@ const ThemeManager = () => {
                   <div className="bg-white rounded-xl p-4 shadow-sm">
                     <h4 className="text-sm font-semibold text-gray-700 mb-3 uppercase tracking-wide">Colors</h4>
                     <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Mode:</span>
+                        <span className="text-sm font-semibold text-gray-800 capitalize">{savedTheme.mode}</span>
+                      </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Primary:</span>
                         <div className="flex items-center gap-2">
@@ -386,6 +226,26 @@ const ThemeManager = () => {
                             style={{ backgroundColor: savedTheme.colors.text }}
                           ></div>
                           <span className="text-sm font-mono text-gray-800">{savedTheme.colors.text}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Ghost:</span>
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-8 h-8 rounded border-2 border-gray-200"
+                            style={{ backgroundColor: savedTheme.colors.ghost }}
+                          ></div>
+                          <span className="text-sm font-mono text-gray-800">{savedTheme.colors.ghost}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Destructive:</span>
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-8 h-8 rounded border-2 border-gray-200"
+                            style={{ backgroundColor: savedTheme.colors.destructive }}
+                          ></div>
+                          <span className="text-sm font-mono text-gray-800">{savedTheme.colors.destructive}</span>
                         </div>
                       </div>
                     </div>
