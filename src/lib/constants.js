@@ -39,3 +39,6 @@ export const GENDER_OPTIONS = [
     { label: "Kids", value: "Kids" },
     { label: "Other", value: "Other" },
 ]
+
+
+export const DEBOUNCED_DELAY = 500;
