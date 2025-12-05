@@ -1,6 +1,6 @@
 // src/pages/ProductManager/ProductList.jsx
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Activity, useCallback, useEffect, useRef, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { useLocation } from "react-router-dom";
@@ -56,6 +56,7 @@ const ProductList = () => {
   }, [dropdownRef]);
 
   const [openNotes, setOpenNotes] = useState(false); // ⬅️ REQUIRED STATE
+  const debouncedSearchTerm = useDebounce(searchTerm, DEBOUNCED_DELAY);
 
   // Pagination state
   const [pageSize, setPageSize] = useState(10);
@@ -66,7 +67,7 @@ const ProductList = () => {
     isLoading: loading,
     isError: error,
   } = useGetAllProducts({
-    searchTerm,
+    searchTerm : debouncedSearchTerm,
     industry_unique_id: industryId,
     category_unique_id: categoryId,
     gender: selectedGender,
@@ -352,7 +353,8 @@ const ProductList = () => {
         </div>
       </div>
 
-      {showAddModal && (
+      {/* {showAddModal && ( */}
+      <Activity mode={showAddModal ? "visible" : "hidden"}>
         <div className="fixed inset-0 bg-white/30 backdrop-blur-lg border border-white/20 shadow-xl flex items-center justify-center z-50">
           <div className="relative">
             <button
@@ -364,9 +366,10 @@ const ProductList = () => {
             <ProductManager onCancel={handleCloseAdd} />
           </div>
         </div>
-      )}
+      </Activity>
+      
 
-      {editingProduct && (
+      <Activity mode={editingProduct ? "visible" : "hidden"}>
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="relative bg-white rounded-xl shadow-xl w-full max-w-6xl mx-4 p-6">
             <button onClick={handleCloseEdit} className="absolute right-4 top-4 text-gray-700 text-3xl">
@@ -375,7 +378,7 @@ const ProductList = () => {
             <ProductEditModal formData={editingProduct} onSuccess={handleUpdate} closeModal={handleCloseEdit} />
           </div>
         </div>
-      )}
+      </Activity>
 
       <DownloadXLExcel
         isOpen={isOpen}

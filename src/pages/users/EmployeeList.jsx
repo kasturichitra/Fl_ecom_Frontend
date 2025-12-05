@@ -6,6 +6,8 @@ import { useGetAllUsers } from "../../hooks/useUser";
 import EmployeeManager from "./EmployeeManager";
 import { useEmployeTableHeaderStore } from "../../stores/EmployeTableHeaderStore";
 import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector";
+import useDebounce from "../../hooks/useDebounce.JS";
+import { DEBOUNCED_DELAY } from "../../lib/constants";
 
 const EmployeeList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,6 +25,8 @@ const EmployeeList = () => {
     }
   }, []);
 
+  const debouncedSearchTerm = useDebounce(searchTerm, DEBOUNCED_DELAY);
+
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
@@ -36,7 +40,7 @@ const EmployeeList = () => {
     isError,
     error,
   } = useGetAllUsers({
-    searchTerm,
+    searchTerm : debouncedSearchTerm,
     page: currentPage + 1,
     limit: pageSize,
     role: "employee",
