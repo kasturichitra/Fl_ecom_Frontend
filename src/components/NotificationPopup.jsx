@@ -8,7 +8,9 @@ const NotificationPopup = ({ open }) => {
   const { data } = useNotification();
   const navigate = useNavigate();
 
-  const notifications = data?.map((notification) => ({
+
+  // console.log("data", data);
+  const notifications = data?.data?.map((notification) => ({
     path: notification.link,
     message: notification.message,
   }));
