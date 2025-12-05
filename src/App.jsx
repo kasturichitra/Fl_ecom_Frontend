@@ -5,7 +5,6 @@ import Navbar from "./components/Navbar";
 import { useStoreFcmToken } from "./hooks/useUser";
 import { listenForForegroundMessages, requestPermissionAndGetToken } from "./lib/notifications";
 // import UserList from "./pages/users/UserList";
-import NginxEC2Setup from "./docs/nginx-setup";
 import { sidebarElements } from "./lib/sidebar_elements";
 import CreateOrder from "./pages/Orders/CreateOrder";
 import OrderListManager from "./pages/Orders/OrderListManager";
