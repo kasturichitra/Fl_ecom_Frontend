@@ -1,16 +1,14 @@
-import { useQuery } from "@tanstack/react-query"
-import { getNotificationApi } from "../ApiServices/notificationService"
+import { useQuery } from "@tanstack/react-query";
+import { getNotificationApi } from "../ApiServices/notificationService";
 
+export const useNotification = ({ search = "", page = 1, limit = 10, sort = "", fromDate = "", toDate = "" } = {}) => {
+  const queryKey = ["notifications", search || "", page, limit, sort, fromDate, toDate];
 
-
-
-
-export const useNotification = () => {
-
-    return useQuery({
-        queryKey: ["notification"],
-        queryFn: () => getNotificationApi(),
-        select: (res) => res.data.respones,
-    })
-
-}
+  return useQuery({
+    queryKey,
+    queryFn: () => getNotificationApi({ search, page, limit, sort, fromDate, toDate }),
+    select: (res) => res?.data,
+    staleTime: 5 * 60 * 1000,
+    refetchOnMount: false,
+  });
+};
