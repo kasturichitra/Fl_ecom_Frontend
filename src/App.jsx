@@ -12,6 +12,7 @@ import OrderListManager from "./pages/Orders/OrderListManager";
 import PageNotFound from "./pages/PageNotFound/PageNotFound";
 import EmployeeList from "./pages/users/EmployeeList";
 import UsersList from "./pages/users/UsersList";
+import NotificationList from "./pages/Notifications/NotificationList";
 
 // Lazy-loaded pages
 const CategoryManager = lazy(() => import("./pages/CategoryManager/CategoryManager"));
@@ -158,6 +159,7 @@ const App = () => {
 
               <Route path="/employee" element={<EmployeeList />} />
               <Route path="/users" element={<UsersList />} />
+              <Route  path="/notificationList" element = {<NotificationList />} />
 
               <Route path="*" element={<PageNotFound />} />
             </Routes>

@@ -24,10 +24,11 @@ import ImportantNotesDialog from "../../components/ImportantNotesDialog.jsx"; //
 import { Diameter } from "lucide-react";
 import { DropdownFilter } from "../../components/DropdownFilter.jsx";
 import { useGetAllIndustries } from "../../hooks/useIndustry.js";
-import { GENDER_OPTIONS } from "../../lib/constants.js";
+import { DEBOUNCED_DELAY, GENDER_OPTIONS } from "../../lib/constants.js";
 import { toIndianCurrency } from "../../utils/toIndianCurrency.js";
 import { useProductTableHeadersStore } from "../../stores/ProductTableHeaderStore.js";
 import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector.jsx";
+import useDebounce from "../../hooks/useDebounce.JS";
 
 const ProductList = () => {
   const [isOpen, setIsOpen] = useState(false);

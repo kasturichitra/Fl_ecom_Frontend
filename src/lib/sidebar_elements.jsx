@@ -64,5 +64,11 @@ export const sidebarElements = [
     path: "/users",
     label: "Users",
     icon: Users,
+  },
+  {
+    id : "notifications",
+    path : "/notificationList",
+    label : "Notifications",
+    icon : ClipboardPlus
   }
 ];
