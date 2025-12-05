@@ -70,7 +70,7 @@ const BrandListManager = () => {
   });
 
   const { data: brandsData, isError } = useGetAllBrands({
-    debouncedSearchTerm,
+    searchTerm : debouncedSearchTerm,
     page: currentPage + 1, // API pages are 1-based
     limit: pageSize,
     is_active: statusFun(),

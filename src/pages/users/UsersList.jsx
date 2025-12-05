@@ -5,6 +5,8 @@ import DataTable from "../../components/Table";
 import { useGetAllUsers } from "../../hooks/useUser";
 import { useUserTableHeaderStore } from "../../stores/UserTableHeaderStore";
 import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector";
+import useDebounce from "../../hooks/useDebounce.JS";
+import { DEBOUNCED_DELAY } from "../../lib/constants";
 
 const UsersList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,6 +17,8 @@ const UsersList = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { userHeaders, updateUserTableHeaders } = useUserTableHeaderStore();
+
+  const debouncedSearchTerm = useDebounce(searchTerm, DEBOUNCED_DELAY); // useDebounce(searchTerm, DEBOUNCED_DELAY);
 
   const handleClickOutside = useCallback((event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -34,7 +38,7 @@ const UsersList = () => {
     isError,
     error,
   } = useGetAllUsers({
-    searchTerm,
+    searchTerm : debouncedSearchTerm,
     sort: decodeURIComponent(sort),
     page: currentPage + 1,
     limit: pageSize,
