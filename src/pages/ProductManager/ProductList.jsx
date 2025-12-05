@@ -3,13 +3,18 @@
 import { Activity, useCallback, useEffect, useRef, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
-import { useLocation } from "react-router-dom";
 
+import { FaFileDownload, FaFileUpload } from "react-icons/fa";
+import BulkProductResultModal from "../../components/BulkProductResultModal.jsx";
+import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector.jsx";
+import { DropdownFilter } from "../../components/DropdownFilter.jsx";
+import ImportantNotesDialog from "../../components/ImportantNotesDialog.jsx";
 import PageHeader from "../../components/PageHeader";
 import SearchBar from "../../components/SearchBar";
 import DataTable from "../../components/Table";
 import DownloadXLExcel from "../../components/xlDownloadModel.jsx";
 import { useGetAllCategories } from "../../hooks/useCategory";
+import { useGetAllIndustries } from "../../hooks/useIndustry.js";
 import {
   useCreateBulkProducts,
   useDeleteProduct,
@@ -17,6 +22,9 @@ import {
   useGetAllProducts,
   useUpdateProduct,
 } from "../../hooks/useProduct";
+import { DEBOUNCED_DELAY, GENDER_OPTIONS } from "../../lib/constants.js";
+import { useProductTableHeadersStore } from "../../stores/ProductTableHeaderStore.js";
+import { toIndianCurrency } from "../../utils/toIndianCurrency.js";
 import ProductEditModal from "./ProductEditModal";
 import ProductManager from "./ProductManager";
 import { FaFileDownload, FaFileUpload } from "react-icons/fa";
@@ -43,6 +51,10 @@ const ProductList = () => {
   const dropdownRef = useRef(null);
   const { productHeaders, updateProductTableHeaders } = useProductTableHeadersStore();
 
+  // Bulk product result modal state
+  const [showBulkResultModal, setShowBulkResultModal] = useState(false);
+  const [bulkResultData, setBulkResultData] = useState(null);
+
   const handleClickOutside = useCallback((event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       setIsDropdownOpen(false);
@@ -63,12 +75,14 @@ const ProductList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(0);
 
+  const deboouncedSearchTerm = useDebounce(searchTerm, DEBOUNCED_DELAY);
+
   const {
     data: productsResponse,
     isLoading: loading,
     isError: error,
   } = useGetAllProducts({
-    searchTerm : debouncedSearchTerm,
+    searchTerm: deboouncedSearchTerm,
     industry_unique_id: industryId,
     category_unique_id: categoryId,
     gender: selectedGender,
@@ -76,8 +90,6 @@ const ProductList = () => {
     page: currentPage + 1,
     limit: pageSize,
   });
-
-  console.log("productsResponse", productsResponse);
 
   const { data: industries } = useGetAllIndustries();
 
@@ -114,7 +126,13 @@ const ProductList = () => {
   const { mutateAsync: downloadExcel } = useDownloadProductExcel({
     onSuccess: () => setIsOpen(false),
   });
-  const { mutateAsync: createBulkProducts } = useCreateBulkProducts();
+
+  const { mutateAsync: createBulkProducts } = useCreateBulkProducts({
+    onSuccess: (response) => {
+      setBulkResultData(response?.data?.data);
+      setShowBulkResultModal(true);
+    },
+  });
   const { mutateAsync: updateProduct } = useUpdateProduct();
 
   const [showAddModal, setShowAddModal] = useState(false);
@@ -345,11 +363,11 @@ const ProductList = () => {
               />
             </div>
 
-            {error && (
+            <Activity mode={error ? "visible" : "hidden"}>
               <div className="mx-6 mb-6 p-5 bg-red-50 border border-red-300 text-red-700 rounded-xl text-center">
                 Error loading products.
               </div>
-            )}
+            </Activity>
           </div>
         </div>
       </div>
@@ -368,7 +386,6 @@ const ProductList = () => {
           </div>
         </div>
       </Activity>
-      
 
       <Activity mode={editingProduct ? "visible" : "hidden"}>
         <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -393,7 +410,6 @@ const ProductList = () => {
         handleSelect={handleExcelCategorySelect}
       />
 
-      {/* ⬇️ REQUIRED: IMPORTANT EXCEL NOTES POPUP */}
       <ImportantNotesDialog
         open={openNotes}
         onClose={() => setOpenNotes(false)}
@@ -402,6 +418,17 @@ const ProductList = () => {
           setIsOpen(true);
         }}
       />
+
+      <Activity mode={showBulkResultModal ? "visible" : "hidden"}>
+        <BulkProductResultModal
+          open={showBulkResultModal}
+          onClose={() => {
+            setShowBulkResultModal(false);
+            setBulkResultData(null);
+          }}
+          resultData={bulkResultData}
+        />
+      </Activity>
     </>
   );
 };

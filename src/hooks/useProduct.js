@@ -95,13 +95,14 @@ export const useDownloadProductExcel = (options = {}) => {
   });
 };
 
-export const useCreateBulkProducts = () => {
+export const useCreateBulkProducts = (options = {}) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data) => createBulkProductsApi(data),
-    onSuccess: () => {
+    onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast.success("Bulk products created successfully");
+      options?.onSuccess?.(response);
     },
     onError: () => {
       toast.error("Failed to create bulk products");

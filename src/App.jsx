@@ -25,6 +25,7 @@ const IndustryTypeList = lazy(() => import("./pages/industryType/IndustryTypeLis
 const CategoryListManager = lazy(() => import("./pages/CategoryManager/CategoryListManager"));
 const BrandListManager = lazy(() => import("./pages/BrandManager/BrandListManager"));
 const OrderProductsDetailes = lazy(() => import("./pages/Orders/OrderProductsDetailes"));
+const ThemeManager = lazy(() => import("./pages/ThemeManager/ThemeManager"));
 // Home Page
 const Home = () => (
   <div className="flex flex-col items-center justify-center h-screen">
@@ -158,6 +159,7 @@ const App = () => {
               {/* <Route path="/docs/2" element={<NginxEC2Setup2 />} /> */}
 
               <Route path="/employee" element={<EmployeeList />} />
+              <Route path="/theme" element={<ThemeManager />} />
               <Route path="/users" element={<UsersList />} />
               <Route  path="/notificationList" element = {<NotificationList />} />
 
