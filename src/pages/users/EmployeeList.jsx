@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Activity, useCallback, useEffect, useRef, useState } from "react";
 import PageHeader from "../../components/PageHeader";
 import SearchBar from "../../components/SearchBar";
 import DataTable from "../../components/Table";
@@ -40,7 +40,7 @@ const EmployeeList = () => {
     isError,
     error,
   } = useGetAllUsers({
-    searchTerm : debouncedSearchTerm,
+    searchTerm: debouncedSearchTerm,
     page: currentPage + 1,
     limit: pageSize,
     role: "employee",
@@ -170,7 +170,7 @@ const EmployeeList = () => {
         </div>
       </div>
 
-      {showAddModal && (
+      {/* {showAddModal && (
         <div className="fixed inset-0 bg-white/30 backdrop-blur-lg border border-white/20 shadow-xl flex items-center justify-center z-50">
           <div className="relative w-full max-w-4xl">
             <button
@@ -182,7 +182,21 @@ const EmployeeList = () => {
             <EmployeeManager onCancel={handleCloseAdd} />
           </div>
         </div>
-      )}
+      )} */}
+
+      <Activity mode={showAddModal ? "visible" : "hidden"}>
+        <div className="fixed inset-0 bg-white/30 backdrop-blur-lg border border-white/20 shadow-xl flex items-center justify-center z-50">
+          <div className="relative w-full max-w-4xl">
+            <button
+              onClick={handleCloseAdd}
+              className="absolute right-5 top-5 text-gray-700 hover:text-red-600 text-3xl z-10"
+            >
+              ×
+            </button>
+            <EmployeeManager onCancel={handleCloseAdd} />
+          </div>
+        </div>
+      </Activity>
     </>
   );
 };

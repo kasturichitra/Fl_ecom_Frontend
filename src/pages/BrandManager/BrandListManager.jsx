@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Activity, useCallback, useEffect, useRef, useState } from "react";
 
 import { useDeleteBrand, useGetAllBrands } from "../../hooks/useBrand";
 
@@ -46,7 +46,6 @@ const BrandListManager = () => {
     };
   }, [handleClickOutside]);
 
-
   const debouncedSearchTerm = useDebounce(searchTerm, DEBOUNCED_DELAY);
 
   const statusFun = () => {
@@ -70,7 +69,7 @@ const BrandListManager = () => {
   });
 
   const { data: brandsData, isError } = useGetAllBrands({
-    searchTerm : debouncedSearchTerm,
+    searchTerm: debouncedSearchTerm,
     page: currentPage + 1, // API pages are 1-based
     limit: pageSize,
     is_active: statusFun(),
@@ -111,8 +110,9 @@ const BrandListManager = () => {
       valueGetter: (params) => (params.value ? "Active" : "Inactive"), // Convert boolean → string
       renderCell: (params) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-            }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${
+            params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+          }`}
         >
           {params.row?.is_active ? "Active" : "Inactive"}
         </span>
@@ -230,7 +230,8 @@ const BrandListManager = () => {
       </div>
 
       {/* ADD BRAND MODAL */}
-      {showAddModal && (
+
+      <Activity mode={showAddModal ? "visible" : "hidden"}>
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-lg bg-black/40 z-50">
           <div className="bg-white rounded-xl shadow-xl p-8 max-w-3xl w-full relative">
             <button
@@ -242,7 +243,7 @@ const BrandListManager = () => {
             <BrandManager setShowAddModal={setShowAddModal} onCancel={handleCloseAddModal} />
           </div>
         </div>
-      )}
+      </Activity>
 
       {/* EDIT BRAND MODAL */}
       {editingBrand && (
