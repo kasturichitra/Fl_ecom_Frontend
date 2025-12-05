@@ -55,6 +55,7 @@ const ProductList = () => {
   }, [dropdownRef]);
 
   const [openNotes, setOpenNotes] = useState(false); // ⬅️ REQUIRED STATE
+  const debouncedSearchTerm = useDebounce(searchTerm, DEBOUNCED_DELAY);
 
   // Pagination state
   const [pageSize, setPageSize] = useState(10);
@@ -354,6 +355,7 @@ const ProductList = () => {
         </div>
       </div>
 
+      {/* {showAddModal && ( */}
       <Activity mode={showAddModal ? "visible" : "hidden"}>
         <div className="fixed inset-0 bg-white/30 backdrop-blur-lg border border-white/20 shadow-xl flex items-center justify-center z-50">
           <div className="relative">
@@ -367,8 +369,9 @@ const ProductList = () => {
           </div>
         </div>
       </Activity>
+      
 
-      {editingProduct && (
+      <Activity mode={editingProduct ? "visible" : "hidden"}>
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="relative bg-white rounded-xl shadow-xl w-full max-w-6xl mx-4 p-6">
             <button onClick={handleCloseEdit} className="absolute right-4 top-4 text-gray-700 text-3xl">
@@ -377,7 +380,7 @@ const ProductList = () => {
             <ProductEditModal formData={editingProduct} onSuccess={handleUpdate} closeModal={handleCloseEdit} />
           </div>
         </div>
-      )}
+      </Activity>
 
       <DownloadXLExcel
         isOpen={isOpen}
