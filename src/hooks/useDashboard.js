@@ -10,3 +10,13 @@ export const useGetOrdersTrend = () => {
     cacheTime: 10 * 60 * 1000,
   });
 };
+
+export const useGetUsersTrend = () => {
+  return useQuery({
+    queryKey: ["users-trend"],
+    queryFn: () => getOrdersTrend(),
+    select: (res) => res?.data?.data,
+    staleTime: 3 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
+  });
+};

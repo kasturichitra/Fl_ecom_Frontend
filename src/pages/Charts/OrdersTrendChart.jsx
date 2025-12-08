@@ -1,4 +1,4 @@
-import { useGetOrdersTrend } from "../../hooks/useGetOrdersTrend";
+import { useGetOrdersTrend } from "../../hooks/useDashboard";
 import { MONTHS } from "../../lib/constants";
 import ReusableLineChart from "./ReusableLineChart";
 
