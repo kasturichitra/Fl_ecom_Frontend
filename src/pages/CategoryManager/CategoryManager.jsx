@@ -101,12 +101,12 @@ const CategoryManager = ({ onCancel }) => {
       type: "text",
       placeholder: "e.g. Electronics, Fashion",
     },
-    {
-      key: "category_unique_id",
-      label: "Category Unique ID",
-      type: "text",
-      placeholder: "e.g. CAT001",
-    },
+    // {
+    //   key: "category_unique_id",
+    //   label: "Category Unique ID",
+    //   type: "text",
+    //   placeholder: "e.g. CAT001",
+    // },
     {
       key: "image",
       label: "Category Image",
