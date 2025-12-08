@@ -1,21 +1,52 @@
-import React from "react";
+import React, { useState } from "react";
 import Orders from "./Charts/OrdersStatus";
 import OrderTypeChart from "./Charts/OrderTypeChart";
 import PaymentMethodChart from "./Charts/PaymentMethodChart";
 import OrdersLineChart from "./Charts/OrdersLineChart";
+import UsersLineChart from "./Charts/UsersLineChart";
+import OverallTabComponent from "./Charts/Tabs/OverallTabComponent";
+import PerformanceTabComponent from "./Charts/Tabs/PerformanceTabComponent";
+import InventoryTabComponent from "./Charts/Tabs/InventoryTabComponent";
 
 const Dashboard = () => {
-  return (
-    <div className="p-6 grid gap-6 grid-cols-1 md:grid-cols-3">
-      {/* Top row: 3 charts */}
-      <Orders />
-      <OrderTypeChart />
-      <PaymentMethodChart />
+  const [activeTab, setActiveTab] = useState("overall");
 
-      {/* Second row: Line chart */}
-      <div className="md:col-span-1 mt-6 md:mt-0">
-        <OrdersLineChart />
+  return (
+    <div className="flex flex-col gap-6">
+      
+      {/* --- TABS HEADER --- */}
+      <div className="flex gap-4 border-b pb-2">
+        {["overall", "performance", "inventory"].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`px-4 py-2 text-sm font-medium rounded-t-md transition ${
+              activeTab === tab
+                ? "bg-blue-600 text-white shadow"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
+          >
+            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+          </button>
+        ))}
       </div>
+
+      {/* --- TAB CONTENT --- */}
+
+      {/* === OVERALL TAB === */}
+      {activeTab === "overall" && (
+        <OverallTabComponent />
+      )}
+
+      {/* === PERFORMANCE TAB === */}
+      {activeTab === "performance" && (
+        <PerformanceTabComponent />
+      )}
+
+      {/* === INVENTORY TAB === */}
+      {activeTab === "inventory" && (
+        <InventoryTabComponent />
+      )}
     </div>
   );
 };

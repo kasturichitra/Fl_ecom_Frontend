@@ -157,7 +157,7 @@ const OrderListManager = () => {
     <div className="min-h-screen bg-gray-50 p-2">
       <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
         {/* HEADER */}
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white">
+        <div className="bg-linear-to-r from-indigo-600 to-purple-700 text-white">
           <PageHeader title="Orders" subtitle="Manage customer orders" />
         </div>
 

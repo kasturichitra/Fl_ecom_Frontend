@@ -60,15 +60,14 @@ const PaymentMethodChart = () => {
   const counts = paymentStats.map((s) => s.count);
 
   // 6 soft modern colors
-  const classicColors = [
-    "#60a5fa", // Cash
-    "#a78bfa", // Credit Card
-    "#93c5fd", // Debit Card
-    "#6ee7b7", // Net Banking
-    "#fb923c", // UPI
-    "#f87171", // Wallet
-  ];
-
+const classicColors = [
+  "#4F46E5", // Cash – Indigo
+  "#06B6D4", // Credit Card – Teal
+  "#10B981", // Debit Card – Emerald
+  "#F59E0B", // Net Banking – Amber
+  "#EC4899", // UPI – Pink
+  "#8B5CF6", // Wallet – Violet
+];
   const chartData = {
     labels,
     datasets: [

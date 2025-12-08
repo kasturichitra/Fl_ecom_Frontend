@@ -17,6 +17,7 @@ import OrderTypeChart from "./pages/Charts/OrderTypeChart";
 import PaymentMethodChart from "./pages/Charts/PaymentMethodChart";
 import OrdersLineChart from "./pages/Charts/OrdersLineChart";
 import Dashboard from "./pages/Dashboard";
+import UsersLineChart from "./pages/Charts/UsersLineChart";
 
 // Lazy-loaded pages
 const CategoryManager = lazy(() => import("./pages/CategoryManager/CategoryManager"));
@@ -31,19 +32,20 @@ const BrandListManager = lazy(() => import("./pages/BrandManager/BrandListManage
 const OrderProductsDetailes = lazy(() => import("./pages/Orders/OrderProductsDetailes"));
 const ThemeManager = lazy(() => import("./pages/ThemeManager/ThemeManager"));
 // Home Page
-const Home = () => (
-  <div className="flex flex-col gap-4">
-    <div className="grid grid-cols-3 gap-4">
-      <Orders />
-      <OrderTypeChart />
-      <PaymentMethodChart />
-    </div>
-    <div className="grid grid-cols-2 gap-4">
-      <OrdersLineChart />
-    </div>
-    {/* <Dashboard /> */}
-  </div>
-);
+// const Home = () => (
+//   <div className="flex flex-col gap-4">
+//     <div className="grid grid-cols-3 gap-4">
+//       <Orders />
+//       <OrderTypeChart />
+//       <PaymentMethodChart />
+//     </div>
+//     <div className="grid grid-cols-2 gap-4">
+//       <OrdersLineChart />
+//       <UsersLineChart />
+//     </div>
+//     {/* <Dashboard /> */} 
+//   </div>
+// );
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -86,7 +88,7 @@ const App = () => {
       <aside className="fixed top-0 left-0 h-screen w-72 bg-gray-900 text-white shadow-2xl z-50 overflow-y-auto">
         <div className="p-8 border-b border-gray-800">
           <Link to={"/"}>
-            <h1 className="text-3xl font-bold tracking-wider bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold tracking-wider bg-linear-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
               Admin Panel
             </h1>
             <p className="text-gray-400 text-sm mt-2">Management System</p>
@@ -112,7 +114,7 @@ const App = () => {
                 className={({ isActive }) =>
                   `flex items-center gap-4 px-6 py-4 rounded-xl text-lg font-medium transition-all duration-300 ${
                     isActive
-                      ? "bg-gradient-to-r from-indigo-600 to-purple-600 shadow-xl text-white scale-105"
+                      ? "bg-linear-to-r from-indigo-600 to-purple-600 shadow-xl text-white scale-105"
                       : "text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-2"
                   }`
                 }
@@ -129,7 +131,7 @@ const App = () => {
       <Navbar />
 
       {/* Main Content Area */}
-      <main className="ml-72 pt-16 min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50">
+      <main className="ml-72 pt-16 min-h-screen bg-linear-to-br from-gray-50 to-indigo-50">
         <div className="p-4">
           <Suspense
             fallback={
@@ -139,7 +141,7 @@ const App = () => {
             }
           >
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<Dashboard />} />
 
               {/* List Pages */}
               <Route path="/industryTypeList" element={<IndustryTypeList />} />

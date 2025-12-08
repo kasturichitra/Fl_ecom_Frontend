@@ -38,7 +38,7 @@ export default function OrderProductsDetailes() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 p-6 flex items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-white to-purple-50 p-6 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading order details...</p>
@@ -137,7 +137,7 @@ export default function OrderProductsDetailes() {
 
         {/* Products Table */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 mb-6">
-          <div className="p-6 bg-gradient-to-r from-indigo-50 to-purple-50 border-b border-gray-200">
+          <div className="p-6 bg-linear-to-r from-indigo-50 to-purple-50 border-b border-gray-200">
             <div className="flex items-center gap-3">
               <div className="bg-indigo-100 p-3 rounded-xl">
                 <ShoppingBag className="w-6 h-6 text-indigo-600" />
@@ -228,7 +228,7 @@ export default function OrderProductsDetailes() {
         </div>
 
         {/* Order Summary */}
-        <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl shadow-lg p-6 border border-indigo-100">
+        <div className="bg-linear-to-br from-indigo-50 to-purple-50 rounded-2xl shadow-lg p-6 border border-indigo-100">
           <h3 className="text-xl font-bold text-gray-800 mb-6">Order Summary</h3>
           <div className="space-y-3">
             {[
