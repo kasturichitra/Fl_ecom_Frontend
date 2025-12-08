@@ -149,16 +149,19 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
       placeholder: "e.g., apple1",
     },
     // use the shared static fields, with a small override for edit mode
-    ...PRODUCT_STATIC_FIELDS.map((field) => {
-      if (field.key === "product_unique_id") {
-        return { ...field, disabled: true, required: false };
-      }
-      if (field.key === "product_image") {
-        // in edit mode we don't force re-upload
-        return { ...field, required: false };
-      }
-      return field;
-    }),
+  ...PRODUCT_STATIC_FIELDS.map((field) => {
+    // enable field but disable user editing
+    if (field.key === "product_unique_id") {
+      return { ...field, disabled: true, required: false };
+    }
+
+    // image not required on edit
+    if (field.key === "product_image") {
+      return { ...field, required: false };
+    }
+
+    return field;
+  }),
   ];
 
   // callback from AttributeRepeater to update product_attributes on the form

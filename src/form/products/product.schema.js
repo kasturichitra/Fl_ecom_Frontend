@@ -6,11 +6,11 @@ export const productSchema = yup.object().shape({
 
   brand_unique_id: yup.string().required("Brand is required").trim(),
 
-  product_unique_id: yup
-    .string()
-    .required("Product Unique ID is required")
-    .trim()
-    .min(1, "Product Unique ID cannot be empty"),
+  // product_unique_id: yup
+  //   .string()
+  //   .required("Product Unique ID is required")
+  //   .trim()
+  //   .min(1, "Product Unique ID cannot be empty"),
 
   product_name: yup
     .string()

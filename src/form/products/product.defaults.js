@@ -1,7 +1,7 @@
 export const productDefaultValues = {
   category_unique_id: "",
   brand_unique_id: "",
-  product_unique_id: "",
+  // product_unique_id: "",
   product_name: "",
   product_description: "",
   product_color: "",
