@@ -1,19 +1,13 @@
-import React, { useState } from "react";
-import Orders from "./Charts/OrdersStatus";
-import OrderTypeChart from "./Charts/OrderTypeChart";
-import PaymentMethodChart from "./Charts/PaymentMethodChart";
-import OrdersLineChart from "./Charts/OrdersLineChart";
-import UsersLineChart from "./Charts/UsersLineChart";
+import { useState } from "react";
+import InventoryTabComponent from "./Charts/Tabs/InventoryTabComponent";
 import OverallTabComponent from "./Charts/Tabs/OverallTabComponent";
 import PerformanceTabComponent from "./Charts/Tabs/PerformanceTabComponent";
-import InventoryTabComponent from "./Charts/Tabs/InventoryTabComponent";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("overall");
 
   return (
     <div className="flex flex-col gap-6">
-      
       {/* --- TABS HEADER --- */}
       <div className="flex gap-4 border-b pb-2">
         {["overall", "performance", "inventory"].map((tab) => (
@@ -21,9 +15,7 @@ const Dashboard = () => {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 text-sm font-medium rounded-t-md transition ${
-              activeTab === tab
-                ? "bg-blue-600 text-white shadow"
-                : "text-gray-600 hover:bg-gray-100"
+              activeTab === tab ? "bg-blue-600 text-white shadow" : "text-gray-600 hover:bg-gray-100"
             }`}
           >
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -34,19 +26,13 @@ const Dashboard = () => {
       {/* --- TAB CONTENT --- */}
 
       {/* === OVERALL TAB === */}
-      {activeTab === "overall" && (
-        <OverallTabComponent />
-      )}
+      {activeTab === "overall" && <OverallTabComponent />}
 
       {/* === PERFORMANCE TAB === */}
-      {activeTab === "performance" && (
-        <PerformanceTabComponent />
-      )}
+      {activeTab === "performance" && <PerformanceTabComponent />}
 
       {/* === INVENTORY TAB === */}
-      {activeTab === "inventory" && (
-        <InventoryTabComponent />
-      )}
+      {activeTab === "inventory" && <InventoryTabComponent />}
     </div>
   );
 };

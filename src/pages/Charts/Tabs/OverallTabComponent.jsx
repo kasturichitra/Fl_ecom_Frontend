@@ -1,10 +1,8 @@
-import React from "react";
-import Orders from "../OrdersStatus";
+import OrdersStatusChart from "../OrdersStatus";
 import OrderTypeChart from "../OrderTypeChart";
 import PaymentMethodChart from "../PaymentMethodChart";
-import OrdersLineChart from "../OrdersLineChart";
-import UsersLineChart from "../UsersLineChart";
-import OrdersStatusChart from "../OrdersStatus";
+import OrdersTrendChart from "../OrdersTrendChart";
+import UsersTrendChart from "../UsersTrendChart";
 
 const OverallTabComponent = () => {
   return (
@@ -16,8 +14,8 @@ const OverallTabComponent = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <OrdersLineChart />
-        <UsersLineChart />
+        <OrdersTrendChart />
+        <UsersTrendChart />
       </div>
     </div>
   );

@@ -1,8 +1,8 @@
 export const statusOptions = [
-    { label: "Select Status", value: "" },
-    { label: "All", value: "" },
-    { label: "Active", value: "active" },
-    { label: "Inactive", value: "inactive" },
+  { label: "Select Status", value: "" },
+  { label: "All", value: "" },
+  { label: "Active", value: "active" },
+  { label: "Inactive", value: "inactive" },
 ];
 export const ORDER_STATUS_OPTIONS = [
   { label: "All", value: "" },
@@ -31,14 +31,28 @@ export const ORDER_TYPE_OPTIONS = [
 ];
 
 export const GENDER_OPTIONS = [
-    { label: "All Genders", value: "" },
-    // { label: "All", value: "" },
-    { label: "Men", value: "Men" },
-    { label: "Women", value: "Women" },
-    { label: "Unisex", value: "Unisex" },
-    { label: "Kids", value: "Kids" },
-    { label: "Other", value: "Other" },
-]
-
+  { label: "All Genders", value: "" },
+  // { label: "All", value: "" },
+  { label: "Men", value: "Men" },
+  { label: "Women", value: "Women" },
+  { label: "Unisex", value: "Unisex" },
+  { label: "Kids", value: "Kids" },
+  { label: "Other", value: "Other" },
+];
 
 export const DEBOUNCED_DELAY = 500;
+
+export const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
