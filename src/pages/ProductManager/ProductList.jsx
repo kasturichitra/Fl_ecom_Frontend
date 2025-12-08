@@ -29,7 +29,6 @@ import { useProductTableHeadersStore } from "../../stores/ProductTableHeaderStor
 import { toIndianCurrency } from "../../utils/toIndianCurrency.js";
 import ProductEditModal from "./ProductEditModal";
 import ProductManager from "./ProductManager";
-import useDebounce from "../../hooks/useDebounce.JS";
 
 const ProductList = () => {
   const [isOpen, setIsOpen] = useState(false);
