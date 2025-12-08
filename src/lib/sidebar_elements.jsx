@@ -20,7 +20,7 @@ export const sidebarElements = [
   {
     id: "home",
     path: "/",
-    label: "Dashboard Home",
+    label: "Dashboard",
     icon: Home,
     end: true, // For exact path matching
   },
