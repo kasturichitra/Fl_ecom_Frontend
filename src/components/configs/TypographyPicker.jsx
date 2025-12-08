@@ -1,4 +1,5 @@
-import { FaFont } from "react-icons/fa";
+import React, { useState } from "react";
+import { FaFont, FaPlus } from "react-icons/fa";
 
 // Reusable Size Input Component
 const SizeInput = ({ label, value, onChange, min, max, placeholder }) => {
@@ -20,12 +21,19 @@ const SizeInput = ({ label, value, onChange, min, max, placeholder }) => {
   );
 };
 
-const TypographyPicker = ({ theme, onTypographyChange, popularFonts }) => {
+const TypographyPicker = ({
+  theme,
+  onTypographyChange,
+  popularFonts,
+  setCustomFont,
+}) => {
   return (
     <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200">
       <div className="flex items-center gap-3 mb-6">
         <FaFont className="text-purple-600 text-2xl" />
-        <h2 className="text-2xl font-bold text-gray-800">Typography Settings</h2>
+        <h2 className="text-2xl font-bold text-gray-800">
+          Typography Settings
+        </h2>
       </div>
 
       {/* Heading Size */}
@@ -51,8 +59,26 @@ const TypographyPicker = ({ theme, onTypographyChange, popularFonts }) => {
       {/* Font Family */}
       <div className="mb-5">
         <label className="block mb-2">
-          <span className="text-sm font-semibold text-gray-700">Font Family</span>
+          <span className="text-sm font-semibold text-gray-700">
+            Font Family
+          </span>
         </label>
+
+        {/* Custom Font Input Section */}
+        <div className="mb-4 p-4 bg-white rounded-lg border-2 border-purple-200 shadow-sm">
+          <p className="text-xs font-semibold text-gray-600 mb-3 uppercase tracking-wide">
+            Add Custom Font
+          </p>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              placeholder="Enter Your Custom Font"
+              value={theme.typography.font_family}
+              onChange={(e) => onTypographyChange("font_family", e.target.value)}
+              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
+            />
+          </div>
+        </div>
         <div className="space-y-2 max-h-128 overflow-y-auto pr-2 custom-scrollbar">
           {popularFonts.map((font) => (
             <button
@@ -67,7 +93,9 @@ const TypographyPicker = ({ theme, onTypographyChange, popularFonts }) => {
               <span className="font-semibold text-sm">{font}</span>
               <p
                 className={`text-xs mt-1 ${
-                  theme.typography.font_family === font ? "text-purple-100" : "text-gray-500"
+                  theme.typography.font_family === font
+                    ? "text-purple-100"
+                    : "text-gray-500"
                 }`}
                 style={{ fontFamily: font }}
               >
@@ -86,7 +114,9 @@ const TypographyPicker = ({ theme, onTypographyChange, popularFonts }) => {
           fontFamily: theme.typography.font_family,
         }}
       >
-        <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">Typography Preview</p>
+        <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">
+          Typography Preview
+        </p>
         <h3
           style={{
             fontSize: `${theme.typography.heading_size}px`,
@@ -104,7 +134,8 @@ const TypographyPicker = ({ theme, onTypographyChange, popularFonts }) => {
             fontFamily: theme.typography.font_family,
           }}
         >
-          This is body text preview. The quick brown fox jumps over the lazy dog.
+          This is body text preview. The quick brown fox jumps over the lazy
+          dog.
         </p>
       </div>
     </div>
