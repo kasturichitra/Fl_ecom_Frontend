@@ -32,20 +32,20 @@ const BrandListManager = lazy(() => import("./pages/BrandManager/BrandListManage
 const OrderProductsDetailes = lazy(() => import("./pages/Orders/OrderProductsDetailes"));
 const ThemeManager = lazy(() => import("./pages/ThemeManager/ThemeManager"));
 // Home Page
-const Home = () => (
-  <div className="flex flex-col gap-4">
-    <div className="grid grid-cols-3 gap-4">
-      <Orders />
-      <OrderTypeChart />
-      <PaymentMethodChart />
-    </div>
-    <div className="grid grid-cols-2 gap-4">
-      <OrdersLineChart />
-      <UsersLineChart />
-    </div>
-    {/* <Dashboard /> */}
-  </div>
-);
+// const Home = () => (
+//   <div className="flex flex-col gap-4">
+//     <div className="grid grid-cols-3 gap-4">
+//       <Orders />
+//       <OrderTypeChart />
+//       <PaymentMethodChart />
+//     </div>
+//     <div className="grid grid-cols-2 gap-4">
+//       <OrdersLineChart />
+//       <UsersLineChart />
+//     </div>
+//     {/* <Dashboard /> */} 
+//   </div>
+// );
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -141,7 +141,7 @@ const App = () => {
             }
           >
             <Routes>
-              <Route path="/" element={<Home />} />
+              <Route path="/" element={<Dashboard />} />
 
               {/* List Pages */}
               <Route path="/industryTypeList" element={<IndustryTypeList />} />
