@@ -5,10 +5,11 @@ import SearchBar from "../../components/SearchBar";
 import DataTable from "../../components/Table";
 import { useGetAllOrders } from "../../hooks/useOrder";
 import { DropdownFilter } from "../../components/DropdownFilter";
-import { ORDER_STATUS_OPTIONS, ORDER_TYPE_OPTIONS, PAYMENT_METHOD_OPTIONS } from "../../lib/constants";
+import { DEBOUNCED_DELAY, ORDER_STATUS_OPTIONS, ORDER_TYPE_OPTIONS, PAYMENT_METHOD_OPTIONS } from "../../lib/constants";
 import { toIndianCurrency } from "../../utils/toIndianCurrency";
 import { useOrderTableHeadersStore } from "../../stores/OrderTableHeaderStore";
 import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector";
+import useDebounce from "../../hooks/useDebounce.JS";
 
 const OrderListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -37,8 +38,11 @@ const OrderListManager = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [handleClickOutside]);
+
+  const debouncedSearchTerm = useDebounce(searchTerm, DEBOUNCED_DELAY);
+
   const { data, isLoading, isError } = useGetAllOrders({
-    searchTerm: searchTerm,
+    searchTerm: debouncedSearchTerm,
     page: currentPage + 1,
     limit: pageSize,
     order_status: orderStatus,

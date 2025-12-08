@@ -4,9 +4,7 @@ import axiosInstance from "../axios/axiosInstance";
 
 const BASE_URL = "/notifications";
 
-export const getNotificationApi = () => {
-    // http://{{IP}}:3000/notifications?role=Admin
-    const data = { role: "Admin" };
-    const queryString = new URLSearchParams(data).toString();
+export const getNotificationApi = (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
     return axiosInstance.get(`${BASE_URL}${queryString ? `?${queryString}` : ""}`);
 };
