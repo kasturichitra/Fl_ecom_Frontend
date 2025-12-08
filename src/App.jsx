@@ -12,6 +12,12 @@ import PageNotFound from "./pages/PageNotFound/PageNotFound";
 import EmployeeList from "./pages/users/EmployeeList";
 import UsersList from "./pages/users/UsersList";
 import NotificationList from "./pages/Notifications/NotificationList";
+import Orders from "./pages/Charts/OrdersStatus";
+import OrderTypeChart from "./pages/Charts/OrderTypeChart";
+import PaymentMethodChart from "./pages/Charts/PaymentMethodChart";
+import OrdersLineChart from "./pages/Charts/OrdersLineChart";
+import Dashboard from "./pages/Dashboard";
+import UsersLineChart from "./pages/Charts/UsersLineChart";
 
 // Lazy-loaded pages
 const CategoryManager = lazy(() => import("./pages/CategoryManager/CategoryManager"));
@@ -27,17 +33,17 @@ const OrderProductsDetailes = lazy(() => import("./pages/Orders/OrderProductsDet
 const ThemeManager = lazy(() => import("./pages/ThemeManager/ThemeManager"));
 // Home Page
 const Home = () => (
-  <div className="flex flex-col items-center justify-center h-screen">
-    <h1 className="text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-700 mb-6">
-      Admin Dashboard
-    </h1>
-    <p className="text-xl text-gray-700 mb-10">Manage your store with ease</p>
-    <NavLink
-      to="/industryTypeList"
-      className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white px-10 py-5 rounded-2xl font-bold text-xl shadow-2xl hover:shadow-purple-500/50 transform hover:scale-110 transition duration-300"
-    >
-      Get Started
-    </NavLink>
+  <div className="flex flex-col gap-4">
+    <div className="grid grid-cols-3 gap-4">
+      <Orders />
+      <OrderTypeChart />
+      <PaymentMethodChart />
+    </div>
+    <div className="grid grid-cols-2 gap-4">
+      <OrdersLineChart />
+      <UsersLineChart />
+    </div>
+    {/* <Dashboard /> */}
   </div>
 );
 
@@ -126,7 +132,7 @@ const App = () => {
 
       {/* Main Content Area */}
       <main className="ml-72 pt-16 min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50">
-        <div className="p-8">
+        <div className="p-4">
           <Suspense
             fallback={
               <div className="flex items-center justify-center h-screen">
@@ -160,7 +166,7 @@ const App = () => {
               <Route path="/employee" element={<EmployeeList />} />
               <Route path="/theme" element={<ThemeManager />} />
               <Route path="/users" element={<UsersList />} />
-              <Route  path="/notificationList" element = {<NotificationList />} />
+              <Route path="/notificationList" element={<NotificationList />} />
 
               <Route path="*" element={<PageNotFound />} />
             </Routes>

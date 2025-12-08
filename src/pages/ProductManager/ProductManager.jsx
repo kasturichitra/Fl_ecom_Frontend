@@ -105,7 +105,7 @@ const ProductManager = ({ onCancel }) => {
       },
       placeholder: "e.g., apple1",
     },
-    ...PRODUCT_STATIC_FIELDS,
+     ...PRODUCT_STATIC_FIELDS.filter(field => !field.isEditOnly),
   ];
 
   // CALLBACK: Update attributes ref

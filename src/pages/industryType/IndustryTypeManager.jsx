@@ -16,7 +16,7 @@ const IndustryTypeManager = ({ onCancel }) => {
 
   const fields = [
     { key: "industry_name", label: "Industry Name", type: "text", width: 400 },
-    { key: "industry_unique_id", label: "Unique ID", type: "text", width: 400 },
+    // { key: "industry_unique_id", label: "Unique ID", type: "text", width: 400 },
     { key: "description", label: "Description", type: "textarea", width: 400 },
     { key: "image", label: "Upload Image", type: "file", accept: "image/*", width: 300 },
     { key: "is_active", label: "Active", type: "checkbox", width: 150 },

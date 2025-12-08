@@ -14,11 +14,11 @@ export const brandSchema = yup.object().shape({
     .min(2, "Brand Name must be at least 2 characters")
     .max(100, "Brand Name cannot exceed 100 characters"),
 
-  brand_unique_id: yup
-    .string()
-    .required("Brand Unique ID is required")
-    .trim()
-    .min(1, "Brand Unique ID cannot be empty"),
+  // brand_unique_id: yup
+  //   .string()
+  //   .required("Brand Unique ID is required")
+  //   .trim()
+  //   .min(1, "Brand Unique ID cannot be empty"),
 
   brand_description: yup
     .string()
