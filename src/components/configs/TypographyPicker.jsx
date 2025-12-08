@@ -25,7 +25,6 @@ const TypographyPicker = ({
   theme,
   onTypographyChange,
   popularFonts,
-  setCustomFont,
 }) => {
   return (
     <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200">
