@@ -3,20 +3,15 @@ export const PRODUCT_STATIC_FIELDS = [
     key: "product_unique_id",
     label: "Product Unique ID *",
     type: "text",
-    
+
     placeholder: "e.g., HF1-002",
+    isEditOnly: true,
   },
   {
     key: "product_name",
     label: "Product Name *",
     type: "text",
     
-    placeholder: "e.g., Premium Cotton Bedsheet",
-  },
-  {
-    key: "product_description",
-    label: "Product Description",
-    type: "textarea",
     placeholder: "e.g., Premium Cotton Bedsheet",
   },
   {
@@ -87,6 +82,12 @@ export const PRODUCT_STATIC_FIELDS = [
       { label: "Men", value: "Men" },
       { label: "Women", value: "Women" },
     ],
+  },
+    {
+    key: "product_description",
+    label: "Product Description",
+    type: "textarea",
+    placeholder: "e.g., Premium Cotton Bedsheet",
   },
   {
     key: "product_image",

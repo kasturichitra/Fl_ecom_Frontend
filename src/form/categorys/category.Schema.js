@@ -6,10 +6,10 @@ export const categorySchema = yup.object().shape({
     .trim()
     .required("Industry is required"),
 
-  category_unique_id: yup
-    .string()
-    .trim()
-    .required("Category Unique ID is required"),
+  // category_unique_id: yup
+  //   .string()
+  //   .trim()
+  //   .required("Category Unique ID is required"),
 
   category_name: yup
     .string()

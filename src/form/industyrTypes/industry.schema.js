@@ -1,11 +1,11 @@
 import * as yup from "yup";
 
 export const industryTypeSchema = yup.object().shape({
-    industry_unique_id: yup
-        .string()
-        .required("Industry Unique ID is required")
-        .trim()
-        .min(1, "Industry Unique ID cannot be empty"),
+    // industry_unique_id: yup
+    //     .string()
+    //     .required("Industry Unique ID is required")
+    //     .trim()
+    //     .min(1, "Industry Unique ID cannot be empty"),
 
     industry_name: yup
         .string()
