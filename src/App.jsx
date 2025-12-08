@@ -17,6 +17,7 @@ import OrderTypeChart from "./pages/Charts/OrderTypeChart";
 import PaymentMethodChart from "./pages/Charts/PaymentMethodChart";
 import OrdersLineChart from "./pages/Charts/OrdersLineChart";
 import Dashboard from "./pages/Dashboard";
+import UsersLineChart from "./pages/Charts/UsersLineChart";
 
 // Lazy-loaded pages
 const CategoryManager = lazy(() => import("./pages/CategoryManager/CategoryManager"));
@@ -40,6 +41,7 @@ const Home = () => (
     </div>
     <div className="grid grid-cols-2 gap-4">
       <OrdersLineChart />
+      <UsersLineChart />
     </div>
     {/* <Dashboard /> */}
   </div>
