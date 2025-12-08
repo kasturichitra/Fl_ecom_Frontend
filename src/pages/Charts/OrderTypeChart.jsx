@@ -1,121 +1,44 @@
 import React from "react";
+import CommonPieChart from "./CommonPieChart";
 import { useGetAllOrders } from "../../hooks/useOrder";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { Pie } from "react-chartjs-2";
-import ChartDataLabels from "chartjs-plugin-datalabels";
 import { toIndianCurrency } from "../../utils/toIndianCurrency";
 
-ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
-
 const OrderTypeChart = () => {
-  const {
-    data: OrdersData,
-    isLoading,
-    isError,
-  } = useGetAllOrders({
+  const { data: OrdersData, isLoading, isError } = useGetAllOrders({
     page: 1,
     limit: 1000,
-    order_status: "",
-    order_type: "",
-    payment_method: "",
   });
 
-  if (isLoading)
-    return (
-      <p className="text-center py-6 text-gray-500 text-sm">
-        Loading order types...
-      </p>
-    );
-
-  if (isError)
-    return (
-      <p className="text-center text-red-600 font-medium text-sm">
-        Error loading order types
-      </p>
-    );
+  if (isLoading) return <p>Loading...</p>;
+  if (isError) return <p>Error loading order types</p>;
 
   const orders = OrdersData?.data || [];
-
-  // FIXED: ORDER TYPES
   const labels = ["Online", "Offline"];
 
-  const typeStats = labels.map((type) => {
+  const stats = labels.map((type) => {
     const filtered = orders.filter((o) => o?.order_type === type);
     const count = filtered.length;
-    const totalAmount = filtered.reduce(
-      (sum, o) => sum + parseFloat(o?.total_amount || o?.amount || 0),
-      0
-    );
-    return { count, totalAmount: totalAmount.toFixed(2) };
+    const total = filtered.reduce((sum, o) => sum + (o?.total_amount || 0), 0);
+
+    return {
+      count,
+      totalAmount: toIndianCurrency(total),
+      percentage: orders.length ? ((count / orders.length) * 100).toFixed(1) : 0,
+    };
   });
 
-  const counts = typeStats.map((s) => s.count);
+  const counts = stats.map((s) => s.count);
 
-  // SAME COLOR PALETTE
-  const classicColors = ["#60a5fa", "#fb923c"]; // Online, Offline
-
-  const chartData = {
-    labels,
-    datasets: [
-      {
-        data: counts,
-        backgroundColor: classicColors,
-        borderColor: "#ffffff",
-        borderWidth: 3,
-        hoverBorderWidth: 4,
-      },
-    ],
-  };
-
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "bottom",
-        labels: { padding: 5, font: { size: 14 } },
-      },
-      tooltip: {
-        backgroundColor: "rgba(15, 23, 42, 0.95)",
-        cornerRadius: 8,
-        padding: 10,
-        titleFont: { size: 14, weight: "bold" },
-        bodyFont: { size: 12 },
-        callbacks: {
-          title: (ctx) => ctx[0].label,
-          label: (ctx) => {
-            const i = ctx.dataIndex;
-            const { count, totalAmount } = typeStats[i];
-            const perc = orders.length
-              ? ((count / orders.length) * 100).toFixed(1)
-              : 0;
-
-            return [
-              `Orders : ${count}`,
-              `Value : ${toIndianCurrency(totalAmount)}`,
-              `Share : ${perc}%`,
-            ];
-          },
-        },
-      },
-      datalabels: { display: false },
-    },
-  };
+  const colors = ["#60a5fa", "#fb923c"];
 
   return (
-    <div className="">
-      <div className="bg-white rounded-2xl shadow-xl p-8">
-        <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">
-          Orders by Type (Online / Offline)
-        </h1>
-
-        <div className="flex items-center justify-center">
-          <div className="w-full max-w-md h-96 flex items-center justify-center">
-            <Pie data={chartData} options={options} />
-          </div>
-        </div>
-      </div>
-    </div>
+    <CommonPieChart
+      title="Orders by Type"
+      labels={labels}
+      counts={counts}
+      stats={stats}
+      colors={colors}
+    />
   );
 };
 
