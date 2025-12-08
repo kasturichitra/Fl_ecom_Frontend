@@ -1,7 +1,7 @@
 import { useGetAllOrders } from "../../../hooks/useOrder";
 import { useGetAllUsers } from "../../../hooks/useUser";
 import { MONTHS } from "../../../lib/constants";
-import Orders from "../OrdersStatus";
+import OrdersStatusChart from "../OrdersStatus";
 import OrderTypeChart from "../OrderTypeChart";
 import PaymentMethodChart from "../PaymentMethodChart";
 import ReusableLineChart from "../ReusableLineChart";
@@ -43,7 +43,7 @@ const OverallTabComponent = () => {
   return (
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-3 gap-4">
-        <Orders />
+        <OrdersStatusChart />
         <OrderTypeChart />
         <PaymentMethodChart />
       </div>
