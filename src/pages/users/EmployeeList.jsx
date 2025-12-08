@@ -6,7 +6,7 @@ import { useGetAllUsers } from "../../hooks/useUser";
 import EmployeeManager from "./EmployeeManager";
 import { useEmployeTableHeaderStore } from "../../stores/EmployeTableHeaderStore";
 import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector";
-import useDebounce from "../../hooks/useDebounce.JS";
+import useDebounce from "../../hooks/useDebounce.js";
 import { DEBOUNCED_DELAY } from "../../lib/constants";
 
 const EmployeeList = () => {
@@ -162,7 +162,7 @@ const EmployeeList = () => {
                   setCurrentPage={setCurrentPage}
                   setPageSize={setPageSize}
                   sort="" // Client-side sorting not implemented yet, or can be added if needed
-                  setSort={() => {}}
+                  setSort={() => { }}
                 />
               )}
             </div>

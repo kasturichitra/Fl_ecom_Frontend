@@ -15,7 +15,7 @@ import { useCategoryTableHeadersStore } from "../../stores/CategoryTableHeaderSt
 
 import CategoryEditModal from "./CategoryEditModal";
 import CategoryManager from "./CategoryManager";
-import useDebounce from "../../hooks/useDebounce.JS";
+import useDebounce from "../../hooks/useDebounce.js";
 
 const CategoryListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");

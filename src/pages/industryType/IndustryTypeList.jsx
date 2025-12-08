@@ -11,7 +11,7 @@ import { DEBOUNCED_DELAY, statusOptions } from "../../lib/constants.js";
 import { useIndustryTableHeadersStore } from "../../stores/IndustryTableHeadersStore.js";
 import IndustryTypeEditModal from "./IndustryTypeEditModal";
 import IndustryTypeManager from "./IndustryTypeManager";
-import useDebounce from "../../hooks/useDebounce.JS";
+import useDebounce from "../../hooks/useDebounce.js";
 import { industryTypeColumns } from "../../lib/columns.jsx";
 
 const IndustryTypeList = () => {
