@@ -9,7 +9,7 @@ import { DEBOUNCED_DELAY, ORDER_STATUS_OPTIONS, ORDER_TYPE_OPTIONS, PAYMENT_METH
 import { toIndianCurrency } from "../../utils/toIndianCurrency";
 import { useOrderTableHeadersStore } from "../../stores/OrderTableHeaderStore";
 import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector";
-import useDebounce from "../../hooks/useDebounce.JS";
+import useDebounce from "../../hooks/useDebounce.js";
 
 const OrderListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -103,12 +103,12 @@ const OrderListManager = () => {
         return (
           <span
             className={`px-3 py-1 rounded-full text-xs font-bold ${isDelivered
-                ? "bg-green-100 text-green-800"
-                : isPending
-                  ? "bg-yellow-100 text-yellow-800"
-                  : isCancelled
-                    ? "bg-red-100 text-red-800"
-                    : "bg-gray-100 text-gray-700"
+              ? "bg-green-100 text-green-800"
+              : isPending
+                ? "bg-yellow-100 text-yellow-800"
+                : isCancelled
+                  ? "bg-red-100 text-red-800"
+                  : "bg-gray-100 text-gray-700"
               }`}
           >
             {status}

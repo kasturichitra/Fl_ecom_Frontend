@@ -23,13 +23,12 @@ import {
   useUpdateProduct,
 } from "../../hooks/useProduct";
 
-import useDebounce from "../../hooks/useDebounce.JS";
 import { DEBOUNCED_DELAY, GENDER_OPTIONS } from "../../lib/constants.js";
 import { useProductTableHeadersStore } from "../../stores/ProductTableHeaderStore.js";
 import { toIndianCurrency } from "../../utils/toIndianCurrency.js";
 import ProductEditModal from "./ProductEditModal";
 import ProductManager from "./ProductManager";
-import useDebounce from "../../hooks/useDebounce.JS";
+import useDebounce from "../../hooks/useDebounce.js";
 
 const ProductList = () => {
   const [isOpen, setIsOpen] = useState(false);
