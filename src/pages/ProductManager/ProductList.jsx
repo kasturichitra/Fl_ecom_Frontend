@@ -1,4 +1,3 @@
-// src/pages/ProductManager/ProductList.jsx
 
 import { Activity, useCallback, useEffect, useRef, useState } from "react";
 import { FaEdit } from "react-icons/fa";
@@ -13,6 +12,7 @@ import PageHeader from "../../components/PageHeader";
 import SearchBar from "../../components/SearchBar";
 import DataTable from "../../components/Table";
 import DownloadXLExcel from "../../components/xlDownloadModel.jsx";
+import UploadXLExcel from "../../components/xlUploadModel.jsx";
 import { useGetAllCategories } from "../../hooks/useCategory";
 import { useGetAllIndustries } from "../../hooks/useIndustry.js";
 import {
@@ -29,7 +29,6 @@ import { useProductTableHeadersStore } from "../../stores/ProductTableHeaderStor
 import { toIndianCurrency } from "../../utils/toIndianCurrency.js";
 import ProductEditModal from "./ProductEditModal";
 import ProductManager from "./ProductManager";
-import { Diameter } from "lucide-react";
 import useDebounce from "../../hooks/useDebounce.JS";
 
 const ProductList = () => {
@@ -37,6 +36,12 @@ const ProductList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [excelSearchTerm, setExcelSearchTerm] = useState("");
   const [showExcelDropdown, setShowExcelDropdown] = useState(false);
+
+  // Upload Excel Modal State
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [uploadSearchTerm, setUploadSearchTerm] = useState("");
+  const [showUploadDropdown, setShowUploadDropdown] = useState(false);
+  const [selectedCategoryForUpload, setSelectedCategoryForUpload] = useState(null);
   const [sort, setSort] = useState("createdAt:desc");
   const [industryId, setIndustryId] = useState("");
   const [categoryId, setCategoryId] = useState("");
@@ -133,7 +138,7 @@ const ProductList = () => {
   const [editingProduct, setEditingProduct] = useState(null);
 
   const { data: categories } = useGetAllCategories({
-    search: excelSearchTerm,
+    search: excelSearchTerm || uploadSearchTerm,
   });
 
   const formattedCategories = categories?.data?.map((cat) => ({
@@ -161,12 +166,32 @@ const ProductList = () => {
     window.URL.revokeObjectURL(url);
   };
 
+  const handleUploadCategorySelect = (item) => {
+    console.log(item);
+
+    setSelectedCategoryForUpload(item);
+    setUploadSearchTerm(item.label);
+  };
+
   const handleExcelUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    if (!selectedCategoryForUpload) {
+      alert("Please select a category first");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("file", file);
+    formData.append("category_unique_id", selectedCategoryForUpload.value);
+
     await createBulkProducts(formData);
+
+    // Reset and close modal
+    setIsUploadOpen(false);
+    setSelectedCategoryForUpload(null);
+    setUploadSearchTerm("");
   };
 
   const handleUpdate = async (formData) => {
@@ -322,20 +347,13 @@ const ProductList = () => {
                   Download Excel
                 </button>
 
-                <label
-                  htmlFor="excel-upload"
+                <button
+                  onClick={() => setIsUploadOpen(true)}
                   className="bg-white text-indigo-600 font-bold px-5 py-3 rounded-lg shadow hover:bg-indigo-50 flex items-center gap-2 cursor-pointer"
                 >
                   <FaFileUpload />
                   Upload Excel
-                </label>
-                <input
-                  id="excel-upload"
-                  type="file"
-                  accept=".xlsx,.xls"
-                  className="hidden"
-                  onChange={handleExcelUpload}
-                />
+                </button>
               </div>
             </div>
 
@@ -411,6 +429,19 @@ const ProductList = () => {
           setOpenNotes(false);
           setIsOpen(true);
         }}
+      />
+
+      <UploadXLExcel
+        isOpen={isUploadOpen}
+        setIsOpen={setIsUploadOpen}
+        modelInputPlaceholder="Search category..."
+        data={formattedCategories}
+        searchTerm={uploadSearchTerm}
+        setSearchTerm={setUploadSearchTerm}
+        showDropdown={showUploadDropdown}
+        setShowDropdown={setShowUploadDropdown}
+        handleSelect={handleUploadCategorySelect}
+        onFileChange={handleExcelUpload}
       />
 
       <Activity mode={showBulkResultModal ? "visible" : "hidden"}>
