@@ -5,7 +5,7 @@ import DataTable from "../../components/Table";
 import { useGetAllUsers } from "../../hooks/useUser";
 import { useUserTableHeaderStore } from "../../stores/UserTableHeaderStore";
 import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector";
-import useDebounce from "../../hooks/useDebounce.JS";
+import useDebounce from "../../hooks/useDebounce.js";
 import { DEBOUNCED_DELAY } from "../../lib/constants";
 
 const UsersList = () => {
@@ -38,7 +38,7 @@ const UsersList = () => {
     isError,
     error,
   } = useGetAllUsers({
-    searchTerm : debouncedSearchTerm,
+    searchTerm: debouncedSearchTerm,
     sort: decodeURIComponent(sort),
     page: currentPage + 1,
     limit: pageSize,

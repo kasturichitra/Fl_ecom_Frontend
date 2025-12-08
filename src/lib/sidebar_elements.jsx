@@ -83,9 +83,9 @@ export const sidebarElements = [
     icon: Users,
   },
   {
-    id : "notifications",
-    path : "/notificationList",
-    label : "Notifications",
-    icon : ClipboardPlus
-  }
+    id: "notifications",
+    path: "/notificationList",
+    label: "Notifications",
+    icon: ClipboardPlus,
+  },
 ];
