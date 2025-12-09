@@ -1,11 +1,11 @@
 import React from "react";
-import TopBrands from "./TopBrands.jsx";
+import TopBrands from "../TopBrandsChart.jsx";
 
-const PerformanceTabComponent = () => {
+const PerformanceTabComponent = ({ activeTab }) => {
   return (
     <div className="grid grid-cols-2 gap-4">
       {/* <p>Performance analytics will appear here...</p> */}
-      <TopBrands/>
+      <TopBrands activeTab={activeTab} />
     </div>
   );
 };

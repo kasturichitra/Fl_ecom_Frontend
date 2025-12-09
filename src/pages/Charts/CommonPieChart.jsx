@@ -1,11 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import { DropdownFilter } from "../../components/DropdownFilter";
+import SearchDropdown from "../../components/SearchDropdown";
 
 ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
-const CommonPieChart = ({ title, labels, counts, stats, colors }) => {
+const CommonPieChart = ({ title, labels, counts, stats, colors, activeTab, data, setSearch, search }) => {
+  const [showDropdown, setShowDropdown] = useState(false);
   const chartData = {
     labels,
     datasets: [
@@ -69,11 +72,20 @@ const CommonPieChart = ({ title, labels, counts, stats, colors }) => {
   },
 };
 
+
+
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8">
-      <h1 className="text-2xl font-bold text-gray-800 text-center mb-6">
+      <h1 className={`text-2xl font-bold text-gray-800 text-center mb-6 ${activeTab === "performance" ? "flex items-center justify-between" : ""}`}>
         {title}
       </h1>
+      {activeTab === "performance" && <SearchDropdown value={search} onChange={(value) => {
+        setSearch(value)
+        setShowDropdown(true)
+      }} results={showDropdown ? data : []} onSelect={(value) => {
+        setSearch(value)
+        setShowDropdown(false)
+      }} />}
 
       <div className="flex items-center justify-center">
         <div className="w-full max-w-md h-96 flex items-center justify-center">
