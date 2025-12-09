@@ -29,7 +29,7 @@ const UsersTrendChart = () => {
       </div>
 
       {/* Chart */}
-      <div className="h-96">
+      <div className="">
         {isLoading ? (
           <p className="text-center py-6 text-gray-500">Loading...</p>
         ) : isError ? (
