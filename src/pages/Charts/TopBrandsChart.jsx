@@ -7,7 +7,6 @@ const TopBrands = ({ activeTab }) => {
   const colors = ["#a78bfa", "#60a5fa", "#93c5fd", "#6ee7b7", "#f87171", "#fb923c"];
   const [searchLabel, setSearchLabel] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
-  console.log(selectedCategoryId, "selectedCategoryId....?")
   const { data: categories } = useGetAllCategories({ search: searchLabel });
 
   let formattedCategories =
@@ -17,9 +16,12 @@ const TopBrands = ({ activeTab }) => {
     })) || [];
 
   const { data, isLoading, isError } = useGetTopBrands({ category_unique_id: selectedCategoryId });
-  console.log(data, "data....?")
-  // extract brands correctly
-  const brands = data?.[0]?.brands || []; // because your API returns one category
+
+  const brands =
+    data?.[0]?.brands ||    
+    data?.brands ||          
+    (Array.isArray(data) ? data : []) || 
+    [];
 
   const totalCount = brands.reduce((acc, curr) => acc + (Number(curr?.count) || 0), 0);
 
