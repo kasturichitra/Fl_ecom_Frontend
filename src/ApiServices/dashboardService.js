@@ -13,10 +13,14 @@ export const getUsersTrend = () => {
 
 
 export const getTopBrands = (params = {}) => {
-  console.log(params,"params.... top brands")
   const queryString = new URLSearchParams(params).toString();
   return axiosInstance.get(`${BASE_URL}/topbrands${queryString ? `?${queryString}` : ""}`);
 };
+
+export const getTopProducts = (params = {}) => {
+  const queryString = new URLSearchParams(params).toString();
+  return axiosInstance.get(`${BASE_URL}/topproducts${queryString ? `?${queryString}` : ""}`);
+}
 
 
 export const getOrdersStatus = (params = {}) => {
