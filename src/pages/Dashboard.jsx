@@ -29,7 +29,7 @@ const Dashboard = () => {
       {activeTab === "overall" && <OverallTabComponent />}
 
       {/* === PERFORMANCE TAB === */}
-      {activeTab === "performance" && <PerformanceTabComponent />}
+      {activeTab === "performance" && <PerformanceTabComponent activeTab={activeTab} />}
 
       {/* === INVENTORY TAB === */}
       {activeTab === "inventory" && <InventoryTabComponent />}
