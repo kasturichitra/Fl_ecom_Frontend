@@ -1,34 +1,32 @@
 import React from "react";
 import CommonPieChart from "./CommonPieChart";
-import { useGetAllOrders } from "../../hooks/useOrder";
-import { toIndianCurrency } from "../../utils/toIndianCurrency";
+import { useGetOrdersStatus } from "../../hooks/useDashboard";
 
 const OrdersStatusChart = () => {
-  const { data: OrdersData, isLoading, isError } = useGetAllOrders({
-    page: 1,
-    limit: 1000,
-  });
+  const { data: orderStatusData, isLoading, isError } = useGetOrdersStatus();
+  // console.log(orderStatusData,"orderStatusData");
+  
 
   if (isLoading) return <p>Loading...</p>;
-  if (isError) return <p>Error loading orders</p>;
+  if (isError || !orderStatusData) return <p>Error loading order status</p>;
 
-  const orders = OrdersData?.data || [];
+  // Convert object → arrays
+  const labels = Object.keys(orderStatusData);                 // ["pending", "processing", ...]
+  const counts = Object.values(orderStatusData).map(i => i.count);
+  const values = Object.values(orderStatusData).map(i => i.value);
 
-  const labels = ["Pending", "Processing", "Shipped", "Delivered", "Cancelled", "Returned"];
+  // console.log("labels", labels);
+  // console.log("counts", counts);
+  // console.log("values", values);
 
-  const stats = labels.map((status) => {
-    const filtered = orders.filter((o) => o?.order_status === status);
-    const count = filtered.length;
-    const total = filtered.reduce((sum, o) => sum + (o?.total_amount || 0), 0);
-
-    return {
-      count,
-      totalAmount: toIndianCurrency(total),
-      percentage: orders.length ? ((count / orders.length) * 100).toFixed(1) : 0,
-    };
-  });
-
-  const counts = stats.map((s) => s.count);
+  // Prepare stats for tooltip if needed
+  const stats = labels.map((label, i) => ({
+    count: counts[i],
+    totalAmount: values[i],
+    percentage: counts.reduce((a, b) => a + b, 0)
+      ? ((counts[i] / counts.reduce((a, b) => a + b, 0)) * 100).toFixed(1)
+      : 0,
+  }));
 
   const colors = ["#a78bfa", "#60a5fa", "#93c5fd", "#6ee7b7", "#f87171", "#fb923c"];
 

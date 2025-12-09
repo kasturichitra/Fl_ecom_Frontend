@@ -22,38 +22,55 @@ const CommonPieChart = ({ title, labels, counts, stats, colors, activeTab, data,
     ],
   };
 
-  const options = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "bottom",
-        labels: { padding: 5, font: { size: 14 } },
-      },
-      tooltip: {
-        backgroundColor: "rgba(15, 23, 42, 0.95)",
-        cornerRadius: 8,
-        padding: 10,
-        titleFont: { size: 14, weight: "bold" },
-        bodyFont: { size: 12 },
-        callbacks: {
-          title: (ctx) => ctx[0].label,
-          label: (ctx) => {
-            const i = ctx.dataIndex;
-            // Ensure stats is available and has data at index i
-            const item = (stats && stats[i]) ? stats[i] : {};
-            const { count = 0, totalAmount = 0, percentage = 0 } = item;
-            return [
-              `Orders: ${count}`,
-              `Value: ${totalAmount}`,
-              `Share: ${percentage}%`,
-            ];
-          },
+ const options = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      position: "bottom",
+      labels: {
+        padding: 5,
+        font: { size: 14 },
+        generateLabels: (chart) => {
+          const data = chart.data;
+          const counts = data.datasets[0].data;
+
+          return data.labels.map((label, index) => ({
+            text: `${label} - (${counts[index]})`, // ← Append count here
+            fillStyle: data.datasets[0].backgroundColor[index],
+            strokeStyle: data.datasets[0].backgroundColor[index],
+            lineWidth: 2,
+            hidden: isNaN(counts[index]),
+            index,
+          }));
         },
       },
-      datalabels: { display: false },
     },
-  };
+
+    tooltip: {
+      backgroundColor: "rgba(15, 23, 42, 0.95)",
+      cornerRadius: 8,
+      padding: 10,
+      titleFont: { size: 14, weight: "bold" },
+      bodyFont: { size: 12 },
+      callbacks: {
+        title: (ctx) => ctx[0].label,
+        label: (ctx) => {
+          const i = ctx.dataIndex;
+          const { count, totalAmount, percentage } = stats[i];
+
+          return [
+            `Orders: ${count}`,
+            `Value: ${totalAmount}`,
+            `Share: ${percentage}%`,
+          ];
+        },
+      },
+    },
+
+    datalabels: { display: false },
+  },
+};
 
 
 

@@ -1,35 +1,30 @@
 import React from "react";
 import CommonPieChart from "./CommonPieChart";
-import { useGetAllOrders } from "../../hooks/useOrder";
+import { useGetOrdersByType } from "../../hooks/useDashboard";
 import { toIndianCurrency } from "../../utils/toIndianCurrency";
 
 const OrderTypeChart = () => {
-  const { data: OrdersData, isLoading, isError } = useGetAllOrders({
-    page: 1,
-    limit: 1000,
-  });
+  const { data: ordersByTypeData, isLoading, isError } = useGetOrdersByType();
 
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Error loading order types</p>;
 
-  const orders = OrdersData?.data || [];
-  const labels = ["Online", "Offline"];
+  const response = ordersByTypeData || {};
 
-  const stats = labels.map((type) => {
-    const filtered = orders.filter((o) => o?.order_type === type);
-    const count = filtered.length;
-    const total = filtered.reduce((sum, o) => sum + (o?.total_amount || 0), 0);
+  // Extract labels, counts, and values from response
+  const labels = Object.keys(response); // e.g., ["pending", "processing", "completed"]
+  const counts = Object.values(response).map((i) => i.count);
+  const values = Object.values(response).map((i) => i.value);
 
-    return {
-      count,
-      totalAmount: toIndianCurrency(total),
-      percentage: orders.length ? ((count / orders.length) * 100).toFixed(1) : 0,
-    };
-  });
+  // Prepare stats array
+  const totalOrders = counts.reduce((a, b) => a + b, 0);
+  const stats = labels.map((label, index) => ({
+    count: counts[index],
+    totalAmount: toIndianCurrency(values[index]),
+    percentage: totalOrders ? ((counts[index] / totalOrders) * 100).toFixed(1) : 0,
+  }));
 
-  const counts = stats.map((s) => s.count);
-
-  const colors = ["#60a5fa", "#fb923c"];
+  const colors = ["#60a5fa", "#fb923c", "#10b981", "#f59e0b", "#ec4899"]; // Add more if needed
 
   return (
     <CommonPieChart
