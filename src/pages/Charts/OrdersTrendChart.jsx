@@ -28,7 +28,7 @@ const OrdersTrendChart = () => {
       </div>
 
       {/* Chart */}
-      <div className="">
+      <div className="h-96">
         {isLoading ? (
           <p className="text-center py-6 text-gray-500">Loading...</p>
         ) : isError ? (

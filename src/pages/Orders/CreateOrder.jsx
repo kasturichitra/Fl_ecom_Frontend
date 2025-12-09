@@ -156,7 +156,7 @@ const CreateOrder = () => {
 
               <div className="overflow-x-auto rounded-xl border border-gray-300 shadow">
                 <table className="w-full">
-                  <thead className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
+                  <thead className="bg-linear-to-r from-indigo-600 to-purple-600 text-white">
                     <tr>
                       <th className="px-6 py-4 text-left text-sm font-semibold uppercase">Product</th>
                       <th className="px-6 py-4 text-center text-sm font-semibold uppercase">Price</th>
@@ -246,7 +246,7 @@ const CreateOrder = () => {
                 className={`px-10 py-4 rounded-xl font-bold text-white text-lg transition-all ${
                   !isFormValid || isCreatingOrder
                     ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105"
+                    : "bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:scale-105"
                 }`}
               >
                 {isCreatingOrder ? "Creating Order..." : "Create Order"}

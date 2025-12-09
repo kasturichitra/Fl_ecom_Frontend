@@ -40,18 +40,54 @@ const ReusableLineChart = ({
     ],
   };
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: { position: "top" },
-      title: { display: true, text: chartTitle },
-      tooltip: {
-        callbacks: {
-          label: (ctx) => `${tooltipLabel}: ${ctx.parsed.y}`,
+  // const options = {
+  //   responsive: true,
+  //   plugins: {
+  //     legend: { position: "top" },
+  //     title: { display: true, text: chartTitle },
+  //     tooltip: {
+  //       callbacks: {
+  //         label: (ctx) => `${tooltipLabel}: ${ctx.parsed.y}`,
+  //       },
+  //     },
+  //   },
+  // };
+
+  const totalOrders = dataValues.reduce((sum, val) => sum + val, 0);
+
+const options = {
+  responsive: true,
+  plugins: {
+    legend: {
+      position: "top",
+      labels: {
+        generateLabels: (chart) => {
+          return chart.data.datasets.map((dataset, i) => ({
+            text: `${dataset.label} - (Total: ${totalOrders})`,
+            fillStyle: dataset.backgroundColor,
+            strokeStyle: dataset.borderColor,
+            lineWidth: 2,
+            hidden: false,
+            index: i,
+          }));
         },
       },
     },
-  };
+    title: {
+      display: true,
+      text: `Orders Overview`,
+    },
+    tooltip: {
+      callbacks: {
+        label: (ctx) => `${tooltipLabel}: ${ctx.parsed.y}`,
+      },
+    },
+  },
+  scales: {
+    y: { beginAtZero: true },
+  },
+};
+
 
   return (
     <div className="bg-white rounded-2xl shadow-xl p-6">
