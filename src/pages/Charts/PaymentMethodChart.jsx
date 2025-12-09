@@ -1,34 +1,37 @@
 import React from "react";
 import CommonPieChart from "./CommonPieChart";
-import { useGetAllOrders } from "../../hooks/useOrder";
+import { useGetOrdersByPaymentMethod } from "../../hooks/useDashboard";
 import { toIndianCurrency } from "../../utils/toIndianCurrency";
 
 const PaymentMethodChart = () => {
-  const { data: OrdersData, isLoading, isError } = useGetAllOrders({
-    page: 1,
-    limit: 1000,
-  });
+  const {
+    data: ordersByPaymentMethodData,
+    isLoading,
+    isError,
+  } = useGetOrdersByPaymentMethod();
 
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Error loading payments</p>;
 
-  const orders = OrdersData?.data || [];
+  const response = ordersByPaymentMethodData || {};
 
-  const labels = ["Cash", "Credit Card", "Debit Card", "Net Banking", "UPI", "Wallet"];
+  // Extract labels, counts, and total values from response
+  const labels = Object.keys(response);
+  const counts = Object.values(response).map((i) => i.count);
+  const values = Object.values(response).map((i) => i.value);
 
-  const stats = labels.map((method) => {
-    const filtered = orders.filter((o) => o?.payment_method === method);
-    const count = filtered.length;
-    const total = filtered.reduce((sum, o) => sum + (o?.total_amount || 0), 0);
+  // console.log("labels", labels);
+  // console.log("counts", counts);
+  // console.log("values", values);
 
-    return {
-      count,
-      totalAmount: toIndianCurrency(total),
-      percentage: orders.length ? ((count / orders.length) * 100).toFixed(1) : 0,
-    };
-  });
-
-  const counts = stats.map((s) => s.count);
+  // Prepare stats array
+  const stats = labels.map((label, index) => ({
+    count: counts[index],
+    totalAmount: toIndianCurrency(values[index]),
+    percentage: counts.reduce((a, b) => a + b, 0)
+      ? ((counts[index] / counts.reduce((a, b) => a + b, 0)) * 100).toFixed(1)
+      : 0,
+  }));
 
   const colors = ["#4F46E5", "#06B6D4", "#10B981", "#F59E0B", "#EC4899", "#8B5CF6"];
 
