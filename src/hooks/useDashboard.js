@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getOrdersTrend, getUsersTrend, getOrdersStatus, getOrdersByPaymentMethod, getOrdersType, getTopBrands } from "../ApiServices/dashboardService";
+import { getOrdersTrend, getUsersTrend, getOrdersStatus, getOrdersByPaymentMethod, getOrdersType, getTopBrands, getTopProducts } from "../ApiServices/dashboardService";
 
 export const useGetOrdersTrend = ({ year = "2025" } = {}) => {
   return useQuery({
@@ -56,6 +56,16 @@ export const useGetTopBrands = ({ category_unique_id = "" }) => {
   return useQuery({
     queryKey: ["top-brands", category_unique_id],
     queryFn: () => getTopBrands({ category_unique_id }),
+    select: (res) => res?.data?.data,
+    staleTime: 3 * 60 * 1000,
+    cacheTime: 10 * 60 * 1000,
+  });
+};
+
+export const useGetTopProducts = ({ category_unique_id = "" }) => {
+  return useQuery({
+    queryKey: ["top-products", category_unique_id],
+    queryFn: () => getTopProducts({ category_unique_id }),
     select: (res) => res?.data?.data,
     staleTime: 3 * 60 * 1000,
     cacheTime: 10 * 60 * 1000,
