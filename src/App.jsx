@@ -27,6 +27,7 @@ const ProductManager = lazy(() => import("./pages/ProductManager/ProductManager"
 
 const ProductList = lazy(() => import("./pages/ProductManager/ProductList"));
 const IndustryTypeList = lazy(() => import("./pages/industryType/IndustryTypeList"));
+const SaleTrends = lazy(() => import("./pages/SaleTrends/SaleTrends"));
 const CategoryListManager = lazy(() => import("./pages/CategoryManager/CategoryListManager"));
 const BrandListManager = lazy(() => import("./pages/BrandManager/BrandListManager"));
 const OrderProductsDetailes = lazy(() => import("./pages/Orders/OrderProductsDetailes"));
@@ -112,10 +113,9 @@ const App = () => {
                 to={item.path}
                 end={item.end}
                 className={({ isActive }) =>
-                  `flex items-center gap-4 px-6 py-4 rounded-xl text-lg font-medium transition-all duration-300 ${
-                    isActive
-                      ? "bg-linear-to-r from-indigo-600 to-purple-600 shadow-xl text-white scale-105"
-                      : "text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-2"
+                  `flex items-center gap-4 px-6 py-4 rounded-xl text-lg font-medium transition-all duration-300 ${isActive
+                    ? "bg-linear-to-r from-indigo-600 to-purple-600 shadow-xl text-white scale-105"
+                    : "text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-2"
                   }`
                 }
               >
@@ -145,6 +145,7 @@ const App = () => {
 
               {/* List Pages */}
               <Route path="/industryTypeList" element={<IndustryTypeList />} />
+              <Route path="/saleTrends" element={<SaleTrends />} />
               <Route path="/CategoryList" element={<CategoryListManager />} />
               <Route path="/brands" element={<BrandListManager />} />
               <Route path="/productList" element={<ProductList />} />

@@ -88,4 +88,10 @@ export const sidebarElements = [
     label: "Notifications",
     icon: ClipboardPlus,
   },
+  {
+    id: "sale-trends",
+    path: "/saleTrends",
+    label: "Sale Trends",
+    icon: ClipboardPlus, // Using a placeholder icon, you might want to import FaChartLine or similar if available within lucide-react or react-icons
+  },
 ];
