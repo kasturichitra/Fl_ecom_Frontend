@@ -1,0 +1,4 @@
+export const readPermission = ["read-industry", "read-category", "read-brand", "read-product", "read-order", "read-employee", "read-user", "read-notification", "read-sale-trend", "read-theme"];
+export const createPermission = ["create-industry", "create-category", "create-brand", "create-product", "create-order", "create-employee", "create-sale-trend", "create-theme"];
+export const updatePermission = ["update-industry", "update-category", "update-brand", "update-product", "update-sale-trend", "update-theme"];
+export const deletePermission = ["delete-industry", "delete-category", "delete-product", "delete-sale-trend"];
