@@ -30,13 +30,17 @@ export const useCreateSaleTrend = (options = {}) => {
   });
 };
 
-export const useUpdateSaleTrend = () => {
+export const useUpdateSaleTrend = (options = {}) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }) => updateSaleTrend(id, data),
     onSuccess: () => {
       toast.success("Sale Trend updated successfully");
       queryClient.invalidateQueries({ queryKey: ["saleTrends"] });
+      options?.onSuccess?.();
+    },
+    onSettled: () => {
+      options?.onSettled?.();
     },
     onError: () => {
       toast.error("Failed to update Sale Trend");
