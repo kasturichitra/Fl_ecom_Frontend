@@ -1,13 +1,16 @@
-import { Activity, useState } from "react";
+import { Activity, useCallback, useState } from "react";
+import { FaEdit } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
 import PageHeader from "../../components/PageHeader.jsx";
 import SearchBar from "../../components/SearchBar.jsx";
 import DataTable from "../../components/Table.jsx";
 import { DropdownFilter } from "../../components/DropdownFilter.jsx";
 import { statusOptions } from "../../lib/constants.js";
-import { useGetAllSaleTrends } from "../../hooks/useSaleTrend.js";
+import { useGetAllSaleTrends, useUpdateSaleTrend, useDeleteSaleTrend } from "../../hooks/useSaleTrend.js";
 import formatDate from "../../utils/formatDate.js";
 import { useNavigate } from "react-router-dom";
 import SaleTrendsManager from "./SaleTrendsManager.jsx";
+import SaleTrendEditModal from "./SaleTrendEditModal.jsx";
 
 const SaleTrends = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,6 +19,7 @@ const SaleTrends = () => {
   const [sort, setSort] = useState("createdAt:desc");
   const [activeStatus, setActiveStatus] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [editingTrend, setEditingTrend] = useState(null);
 
   const navigate = useNavigate();
 
@@ -25,6 +29,12 @@ const SaleTrends = () => {
     limit: pageSize,
     sort,
   });
+
+  const { mutateAsync: updateSaleTrend } = useUpdateSaleTrend({
+    onSettled: () => setEditingTrend(null),
+  });
+
+  const { mutateAsync: deleteSaleTrend } = useDeleteSaleTrend();
 
   console.log("saleTrendsData", saleTrendsData);
 
@@ -72,6 +82,24 @@ const SaleTrends = () => {
   //     },
   //   ];
 
+  const handleEdit = useCallback((item) => {
+    setEditingTrend(item);
+  }, []);
+
+  const handleDelete = useCallback(async (item) => {
+    if (window.confirm(`Delete ${item.trend_name}?`)) {
+      await deleteSaleTrend(item.trend_unique_id);
+    }
+  }, [deleteSaleTrend]);
+
+  const handleUpdate = async (formData) => {
+    if (!editingTrend) return;
+    await updateSaleTrend({
+      id: editingTrend.trend_unique_id,
+      data: formData,
+    });
+  };
+
   const columns = [
     {
       field: "trend_name",
@@ -83,13 +111,13 @@ const SaleTrends = () => {
       field: "trend_from",
       headerName: "FROM",
       flex: 1,
-      renderCell: (params) => <span className="text-gray-600">{params.value}</span>,
+      renderCell: (params) => <span className="text-gray-600">{formatDate(params.value)}</span>,
     },
     {
       field: "trend_to",
       headerName: "TO",
       flex: 1,
-      renderCell: (params) => <span className="text-gray-600">{params.value}</span>,
+      renderCell: (params) => <span className="text-gray-600">{formatDate(params.value)}</span>,
     },
     // {
     //   field: "trend_products",
@@ -103,20 +131,49 @@ const SaleTrends = () => {
       flex: 1,
       renderCell: (params) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${
-            params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            }`}
         >
           {params.row.is_active ? "Active" : "Inactive"}
         </span>
+      ),
+    },
+    {
+      field: "actions",
+      headerName: "ACTIONS",
+      width: 120,
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => (
+        <div className="flex gap-3 items-center">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleEdit(params.row);
+            }}
+            className="text-indigo-600 hover:text-indigo-800 transition"
+            title="Edit"
+          >
+            <FaEdit size={18} />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDelete(params.row);
+            }}
+            className="text-indigo-600 hover:text-indigo-800 transition"
+            title="Delete"
+          >
+            <MdDelete size={18} />
+          </button>
+        </div>
       ),
     },
   ];
 
   const tableData = saleTrendsData?.data?.map((item) => ({
     ...item,
-    trend_from: formatDate(item.trend_from),
-    trend_to: formatDate(item.trend_to),
   }));
 
   const handleRowClick = (params) => {
@@ -175,6 +232,15 @@ const SaleTrends = () => {
             <SaleTrendsManager onCancel={() => setShowModal(false)} />
           </div>
         </Activity>
+
+        {/* Edit Modal */}
+        {editingTrend && (
+          <SaleTrendEditModal
+            formData={editingTrend}
+            onSubmit={handleUpdate}
+            closeModal={() => setEditingTrend(null)}
+          />
+        )}
       </div>
     </div>
   );
