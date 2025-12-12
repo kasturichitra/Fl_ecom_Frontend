@@ -6,7 +6,6 @@ const SaleTrendsManager = ({ onCancel }) => {
     const { mutateAsync: createSaleTrend } = useCreateSaleTrend({
         onSuccess: () => {
             onCancel();
-            // toast.success("Sale trend added successfully");
         },
     });
 
@@ -21,7 +20,6 @@ const SaleTrendsManager = ({ onCancel }) => {
     ];
 
     const handleAddSaleTrend = async (formData) => {
-
         await createSaleTrend(formData);
     };
 

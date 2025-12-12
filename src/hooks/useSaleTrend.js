@@ -15,13 +15,14 @@ export const useGetAllSaleTrends = ({ searchTerm = "", page = 1, limit = 10, sor
   });
 };
 
-export const useCreateSaleTrend = () => {
+export const useCreateSaleTrend = (options = {}) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data) => createSaleTrend(data),
     onSuccess: () => {
       toast.success("Sale Trend created successfully");
       queryClient.invalidateQueries({ queryKey: ["saleTrends"] });
+      options?.onSuccess?.();
     },
     onError: () => {
       toast.error("Failed to create brand");

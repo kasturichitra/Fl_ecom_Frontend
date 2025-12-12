@@ -14,7 +14,7 @@ const SaleTrendForm = (
         formState: { errors },
         watch,
         setValue,
-        // reset,
+        reset,
     } = useForm({
         resolver: yupResolver(saleTrendSchema),
         defaultValues: saleTrendDefaultValues,
@@ -30,10 +30,16 @@ const SaleTrendForm = (
         });
     };
 
+    const handleFormSubmit = async (data) => {
+        await onSubmit(data);
+        // Reset form after successful submission
+        reset(saleTrendDefaultValues);
+    };
+
     console.log("Form data", formData);
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(handleFormSubmit)}>
             <DynamicForm
                 fields={fields}
                 formData={formData}
@@ -51,3 +57,4 @@ const SaleTrendForm = (
 }
 
 export default SaleTrendForm;
+
