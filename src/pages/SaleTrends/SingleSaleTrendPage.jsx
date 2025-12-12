@@ -1,15 +1,23 @@
 import { ArrowLeft, ArrowRight, Check, Search, ShoppingBag, Trash2, Loader2 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import PageHeader from "../../components/PageHeader";
 import { useGetAllProducts } from "../../hooks/useProduct";
+import { useGetAllBrands } from "../../hooks/useBrand";
+import { useGetAllCategories } from "../../hooks/useCategory";
+import { useGetSaleTrendByUniqueId, useUpdateSaleTrend } from "../../hooks/useSaleTrend";
 import useDebounce from "../../hooks/useDebounce";
 
 const SingleSaleTrendPage = () => {
+  // --- URL PARAMS ---
+  const { id: trendUniqueId } = useParams();
+  const navigate = useNavigate();
+
   // --- STATE ---
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  // Filters (mock for now for visual consistency, or can be wired up later)
+  // Filters
   const [brandFilter, setBrandFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
 
@@ -20,7 +28,32 @@ const SingleSaleTrendPage = () => {
   const [selectedAvailable, setSelectedAvailable] = useState(new Set());
   const [selectedTrend, setSelectedTrend] = useState(new Set());
 
-  // --- QUERY ---
+  // --- QUERY: SALE TREND DATA ---
+  const { data: saleTrendData, isLoading: trendLoading } = useGetSaleTrendByUniqueId(trendUniqueId);
+
+  // Populate trendProducts when data loads
+  useEffect(() => {
+    if (saleTrendData?.data?.trend_products) {
+      setTrendProducts(saleTrendData.data.trend_products);
+    }
+  }, [saleTrendData]);
+
+  // --- QUERY: FILTERS ---
+  const { data: brandsData } = useGetAllBrands({
+    limit: 100, // Fetch reasonable amount for dropdown
+    is_active: true,
+    category_unique_id: categoryFilter,
+  });
+
+  const { data: categoriesData } = useGetAllCategories({
+    limit: 100,
+    is_active: true,
+  });
+
+  const brands = brandsData?.data || [];
+  const categories = categoriesData?.data || [];
+
+  // --- QUERY: PRODUCTS ---
   const {
     data: productsResponse,
     isLoading,
@@ -28,9 +61,9 @@ const SingleSaleTrendPage = () => {
   } = useGetAllProducts({
     searchTerm: debouncedSearchTerm,
     page: 1,
-    limit: 100, // Fetching a larger batch for better UX in this "picker" view
-    // category_unique_id: categoryFilter, // Can enable if we map IDs later
-    // sort: "",
+    limit: 100,
+    category_unique_id: categoryFilter,
+    brand_unique_id: brandFilter,
   });
 
   const availableProductsData = useMemo(() => {
@@ -100,6 +133,27 @@ const SingleSaleTrendPage = () => {
     return "https://placehold.co/100x100?text=No+Image";
   };
 
+  // --- MUTATION: UPDATE SALE TREND ---
+  const { mutate: updateSaleTrend, isPending: isSaving } = useUpdateSaleTrend();
+
+  // --- SAVE HANDLERS ---
+  const handleSave = () => {
+    // Extract only product_unique_id for the API
+    const productIds = trendProducts.map((p, index) => ({
+      product_unique_id: p.product_unique_id,
+      priority: index + 1,
+    }));
+
+    updateSaleTrend({
+      id: trendUniqueId,
+      data: { trend_products: productIds },
+    });
+  };
+
+  const handleCancel = () => {
+    navigate("/saleTrends");
+  };
+
   // --- RENDER ---
   return (
     <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
@@ -128,22 +182,29 @@ const SingleSaleTrendPage = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              {/* Note: Filters are UI-only placeholders for now as we need ID integration for real filtering */}
               <select
-                className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer max-w-[150px]"
                 value={brandFilter}
                 onChange={(e) => setBrandFilter(e.target.value)}
               >
                 <option value="">All Brands</option>
-                {/* Dynamically populate later */}
+                {brands.map((brand) => (
+                  <option key={brand.brand_unique_id} value={brand.brand_unique_id}>
+                    {brand.brand_name}
+                  </option>
+                ))}
               </select>
               <select
-                className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer max-w-[150px]"
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
               >
                 <option value="">All Categories</option>
-                {/* Dynamically populate later */}
+                {categories.map((cat) => (
+                  <option key={cat.category_unique_id} value={cat.category_unique_id}>
+                    {cat.category_name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -313,12 +374,24 @@ const SingleSaleTrendPage = () => {
 
       {/* 3. Global Sticky Page Footer */}
       <div className="bg-white border-t border-gray-200 p-4 shrink-0 flex justify-between items-center z-20 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-        <button className="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors">
+        <button
+          onClick={handleCancel}
+          className="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
+        >
           Cancel
         </button>
-        <div className="text-sm text-gray-500">{/* Optional status text can go here */}</div>
-        <button className="px-8 py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-700 text-white font-bold shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-purple-800 transform hover:-translate-y-0.5 transition-all">
-          Save Changes
+        <div className="text-sm text-gray-500">{isSaving && <span className="text-indigo-600">Saving...</span>}</div>
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className={`px-8 py-2.5 rounded-lg bg-linear-to-r from-indigo-600 to-purple-700 text-white font-bold shadow-md transition-all
+            ${
+              isSaving
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:shadow-lg hover:from-indigo-700 hover:to-purple-800 transform hover:-translate-y-0.5"
+            }`}
+        >
+          {isSaving ? "Saving..." : "Save Changes"}
         </button>
       </div>
     </div>
