@@ -28,6 +28,9 @@ const SingleSaleTrendPage = () => {
   const [selectedAvailable, setSelectedAvailable] = useState(new Set());
   const [selectedTrend, setSelectedTrend] = useState(new Set());
 
+  // Drag-drop state
+  const [draggedIndex, setDraggedIndex] = useState(null);
+
   // --- QUERY: SALE TREND DATA ---
   const { data: saleTrendData, isLoading: trendLoading } = useGetSaleTrendByUniqueId(trendUniqueId);
 
@@ -77,6 +80,11 @@ const SingleSaleTrendPage = () => {
     return availableProductsData.filter((p) => !trendIds.has(p.product_unique_id));
   }, [availableProductsData, trendProducts]);
 
+  // Sorted trend products by priority
+  const sortedTrendProducts = useMemo(() => {
+    return [...trendProducts].sort((a, b) => (a.priority || 0) - (b.priority || 0));
+  }, [trendProducts]);
+
   // --- HANDLERS ---
 
   // Toggle selection in Left Panel
@@ -100,7 +108,14 @@ const SingleSaleTrendPage = () => {
     // Find full objects for selected IDs
     const toMove = displayedAvailableProducts.filter((p) => selectedAvailable.has(p.product_unique_id));
 
-    setTrendProducts((prev) => [...prev, ...toMove]);
+    // Assign new priorities (append to end)
+    const maxPriority = trendProducts.length > 0 ? Math.max(...trendProducts.map((p) => p.priority || 0)) : 0;
+    const productsWithPriority = toMove.map((p, idx) => ({
+      ...p,
+      priority: maxPriority + idx + 1,
+    }));
+
+    setTrendProducts((prev) => [...prev, ...productsWithPriority]);
     setSelectedAvailable(new Set()); // Clear left selection
   };
 
@@ -123,6 +138,43 @@ const SingleSaleTrendPage = () => {
       newSet.delete(product.product_unique_id);
       setSelectedTrend(newSet);
     }
+  };
+
+  // --- DRAG & DROP HANDLERS ---
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (e, dropIndex) => {
+    e.preventDefault();
+
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      return;
+    }
+
+    const updatedProducts = [...sortedTrendProducts];
+    const [draggedProduct] = updatedProducts.splice(draggedIndex, 1);
+    updatedProducts.splice(dropIndex, 0, draggedProduct);
+
+    // Reassign priorities based on new order
+    const reorderedProducts = updatedProducts.map((p, idx) => ({
+      ...p,
+      priority: idx + 1,
+    }));
+
+    setTrendProducts(reorderedProducts);
+    setDraggedIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
   };
 
   // --- HELPER: Image URL ---
@@ -299,17 +351,35 @@ const SingleSaleTrendPage = () => {
               <Check className="w-5 h-5 mr-2 text-green-600" />
               Products in This Trend
             </h2>
-            <p className="text-sm text-gray-500 ml-7">{trendProducts.length} products selected</p>
+            <p className="text-sm text-gray-500 ml-7">{trendProducts.length} products selected • Drag to reorder</p>
           </div>
 
           {/* Selected List - Scrollable */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-white">
-            {trendProducts.map((product) => (
+            {sortedTrendProducts.map((product, index) => (
               <div
                 key={product.product_unique_id}
-                className={`group flex items-center p-3 rounded-xl border border-gray-100 transition-all hover:border-red-200 hover:shadow-sm
-                   ${selectedTrend.has(product.product_unique_id) ? "bg-red-50 border-red-200" : "bg-white"}`}
+                draggable
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
+                className={`group flex items-center p-3 rounded-xl border transition-all cursor-move
+                   ${
+                     selectedTrend.has(product.product_unique_id)
+                       ? "bg-red-50 border-red-200"
+                       : "bg-white border-gray-100"
+                   }
+                   ${draggedIndex === index ? "opacity-50" : ""}
+                   hover:border-indigo-300 hover:shadow-md`}
               >
+                {/* Priority Badge */}
+                <div className="mr-3 shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm">
+                    {product.priority || index + 1}
+                  </div>
+                </div>
+
                 <div onClick={() => toggleTrendSelect(product.product_unique_id)} className="cursor-pointer mr-4">
                   <div
                     className={`w-5 h-5 rounded border flex items-center justify-center transition-colors
