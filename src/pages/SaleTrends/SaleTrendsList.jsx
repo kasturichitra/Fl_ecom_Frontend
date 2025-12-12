@@ -6,6 +6,7 @@ import { DropdownFilter } from "../../components/DropdownFilter.jsx";
 import { statusOptions } from "../../lib/constants.js";
 import { useGetAllSaleTrends } from "../../hooks/useSaleTrend.js";
 import formatDate from "../../utils/formatDate.js";
+import { useNavigate } from "react-router-dom";
 import SaleTrendsManager from "./SaleTrendsManager.jsx";
 
 const SaleTrends = () => {
@@ -15,6 +16,8 @@ const SaleTrends = () => {
   const [sort, setSort] = useState("createdAt:desc");
   const [activeStatus, setActiveStatus] = useState("");
   const [showModal, setShowModal] = useState(false);
+
+  const navigate = useNavigate();
 
   const { data: saleTrendsData } = useGetAllSaleTrends({
     searchTerm,
@@ -100,8 +103,9 @@ const SaleTrends = () => {
       flex: 1,
       renderCell: (params) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-            }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${
+            params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+          }`}
         >
           {params.row.is_active ? "Active" : "Inactive"}
         </span>
@@ -115,13 +119,15 @@ const SaleTrends = () => {
     trend_to: formatDate(item.trend_to),
   }));
 
+  const handleRowClick = (params) => {
+    const trend_unique_id = params.row.trend_unique_id;
+    navigate(`/saleTrends/${trend_unique_id}`);
+  };
+
   // Filtering logic for dummy data
   //   const filteredData = dummyData.filter((item) => {
   //     const matchesSearch = item.trend_name.toLowerCase().includes(searchTerm.toLowerCase());
   //     const matchesStatus = activeStatus === "" ? true : activeStatus === "active" ? item.is_active : !item.is_active;
-
-  //     return matchesSearch && matchesStatus;
-  //   });
 
   return (
     <div className="min-h-screen bg-gray-50 p-2">
@@ -152,6 +158,7 @@ const SaleTrends = () => {
               pageSize={pageSize}
               //   totalCount={filteredData.length}
               setCurrentPage={setCurrentPage}
+              onRowClick={handleRowClick}
               setPageSize={setPageSize}
               sort={sort}
               setSort={(newSort) => {
@@ -174,4 +181,3 @@ const SaleTrends = () => {
 };
 
 export default SaleTrends;
-
