@@ -18,6 +18,7 @@ import PaymentMethodChart from "./pages/Charts/PaymentMethodChart";
 import OrdersLineChart from "./pages/Charts/OrdersLineChart";
 import Dashboard from "./pages/Dashboard";
 import UsersLineChart from "./pages/Charts/UsersLineChart";
+import SingleSaleTrendPage from "./pages/SaleTrends/SingleSaleTrendPage";
 
 // Lazy-loaded pages
 const CategoryManager = lazy(() => import("./pages/CategoryManager/CategoryManager"));
@@ -44,7 +45,7 @@ const ThemeManager = lazy(() => import("./pages/ThemeManager/ThemeManager"));
 //       <OrdersLineChart />
 //       <UsersLineChart />
 //     </div>
-//     {/* <Dashboard /> */} 
+//     {/* <Dashboard /> */}
 //   </div>
 // );
 
@@ -113,9 +114,10 @@ const App = () => {
                 to={item.path}
                 end={item.end}
                 className={({ isActive }) =>
-                  `flex items-center gap-4 px-6 py-4 rounded-xl text-lg font-medium transition-all duration-300 ${isActive
-                    ? "bg-linear-to-r from-indigo-600 to-purple-600 shadow-xl text-white scale-105"
-                    : "text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-2"
+                  `flex items-center gap-4 px-6 py-4 rounded-xl text-lg font-medium transition-all duration-300 ${
+                    isActive
+                      ? "bg-linear-to-r from-indigo-600 to-purple-600 shadow-xl text-white scale-105"
+                      : "text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-2"
                   }`
                 }
               >
@@ -146,6 +148,7 @@ const App = () => {
               {/* List Pages */}
               <Route path="/industryTypeList" element={<IndustryTypeList />} />
               <Route path="/saleTrends" element={<SaleTrends />} />
+              <Route path="/saleTrends/:id" element={<SingleSaleTrendPage />} />
               <Route path="/CategoryList" element={<CategoryListManager />} />
               <Route path="/brands" element={<BrandListManager />} />
               <Route path="/productList" element={<ProductList />} />

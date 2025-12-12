@@ -6,6 +6,7 @@ import { DropdownFilter } from "../../components/DropdownFilter.jsx";
 import { statusOptions } from "../../lib/constants.js";
 import { useGetAllSaleTrends } from "../../hooks/useSaleTrend.js";
 import formatDate from "../../utils/formatDate.js";
+import { useNavigate } from "react-router-dom";
 
 const SaleTrends = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -14,57 +15,59 @@ const SaleTrends = () => {
   const [sort, setSort] = useState("createdAt:desc");
   const [activeStatus, setActiveStatus] = useState("");
 
+  const navigate = useNavigate();
+
   const { data: saleTrendsData } = useGetAllSaleTrends({
     searchTerm,
     page: currentPage + 1,
     limit: pageSize,
     sort,
   });
-   
+
   console.log("saleTrendsData", saleTrendsData);
   // Dummy Data
-//   const dummyData = [
-//     {
-//       id: 1,
-//       trend_name: "Summer Splash",
-//       trend_from: "2024-06-01",
-//       trend_to: "2024-08-31",
-//       trend_products: "Swimwear, Sunglasses, Beach Towels",
-//       is_active: true,
-//     },
-//     {
-//       id: 2,
-//       trend_name: "Winter Warmers",
-//       trend_from: "2024-11-01",
-//       trend_to: "2025-02-28",
-//       trend_products: "Jackets, Scarves, Gloves",
-//       is_active: true,
-//     },
-//     {
-//       id: 3,
-//       trend_name: "Back to School",
-//       trend_from: "2024-08-15",
-//       trend_to: "2024-09-15",
-//       trend_products: "Backpacks, Notebooks, Pens",
-//       is_active: false,
-//     },
-//     {
-//       id: 4,
-//       trend_name: "Spring Fling",
-//       trend_from: "2024-03-01",
-//       trend_to: "2024-05-31",
-//       trend_products: "Floral Dresses, Light Jackets",
-//       is_active: true,
-//     },
-//     {
-//       id: 5,
-//       trend_name: "Holiday Special",
-//       trend_from: "2024-12-01",
-//       trend_to: "2024-12-25",
-//       trend_products: "Gift Sets, Decorations",
-//       is_active: false,
-//     },
-//   ];
+  //   const dummyData = [
+  //     {
+  //       id: 1,
+  //       trend_name: "Summer Splash",
+  //       trend_from: "2024-06-01",
+  //       trend_to: "2024-08-31",
+  //       trend_products: "Swimwear, Sunglasses, Beach Towels",
+  //       is_active: true,
+  //     },
+  //     {
+  //       id: 2,
+  //       trend_name: "Winter Warmers",
+  //       trend_from: "2024-11-01",
+  //       trend_to: "2025-02-28",
+  //       trend_products: "Jackets, Scarves, Gloves",
+  //       is_active: true,
+  //     },
+  //     {
+  //       id: 3,
+  //       trend_name: "Back to School",
+  //       trend_from: "2024-08-15",
+  //       trend_to: "2024-09-15",
+  //       trend_products: "Backpacks, Notebooks, Pens",
+  //       is_active: false,
+  //     },
+  //     {
+  //       id: 4,
+  //       trend_name: "Spring Fling",
+  //       trend_from: "2024-03-01",
+  //       trend_to: "2024-05-31",
+  //       trend_products: "Floral Dresses, Light Jackets",
+  //       is_active: true,
+  //     },
+  //     {
+  //       id: 5,
+  //       trend_name: "Holiday Special",
+  //       trend_from: "2024-12-01",
+  //       trend_to: "2024-12-25",
+  //       trend_products: "Gift Sets, Decorations",
+  //       is_active: false,
+  //     },
+  //   ];
 
   const columns = [
     {
@@ -108,18 +111,23 @@ const SaleTrends = () => {
   ];
 
   const tableData = saleTrendsData?.data?.map((item) => ({
-    ...item, 
+    ...item,
     trend_from: formatDate(item.trend_from),
     trend_to: formatDate(item.trend_to),
   }));
 
-  // Filtering logic for dummy data
-//   const filteredData = dummyData.filter((item) => {
-//     const matchesSearch = item.trend_name.toLowerCase().includes(searchTerm.toLowerCase());
-//     const matchesStatus = activeStatus === "" ? true : activeStatus === "active" ? item.is_active : !item.is_active;
+  const handleRowClick = (params) => {
+    const trend_unique_id = params.row.trend_unique_id;
+    navigate(`/saleTrends/${trend_unique_id}`);
+  };
 
-//     return matchesSearch && matchesStatus;
-//   });
+  // Filtering logic for dummy data
+  //   const filteredData = dummyData.filter((item) => {
+  //     const matchesSearch = item.trend_name.toLowerCase().includes(searchTerm.toLowerCase());
+  //     const matchesStatus = activeStatus === "" ? true : activeStatus === "active" ? item.is_active : !item.is_active;
+
+  //     return matchesSearch && matchesStatus;
+  //   });
 
   return (
     <div className="min-h-screen bg-gray-50 p-2">
@@ -148,8 +156,9 @@ const SaleTrends = () => {
               columns={columns}
               page={currentPage}
               pageSize={pageSize}
-            //   totalCount={filteredData.length}
+              //   totalCount={filteredData.length}
               setCurrentPage={setCurrentPage}
+              onRowClick={handleRowClick}
               setPageSize={setPageSize}
               sort={sort}
               setSort={(newSort) => {
