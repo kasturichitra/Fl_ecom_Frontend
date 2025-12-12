@@ -14,14 +14,14 @@ import SearchDropdown from "./SearchDropdown";
  * @param {string} className - Additional CSS classes
  */
 
-const DynamicForm = ({ 
-  fields = [], 
-  formData, 
-  setFormData, 
-  register = null, 
-  errors = {}, 
+const DynamicForm = ({
+  fields = [],
+  formData,
+  setFormData,
+  register = null,
+  errors = {},
   control = null,
-  className = "" 
+  className = ""
 }) => {
   const handleChange = (key, value) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -85,6 +85,24 @@ const DynamicForm = ({
               <>
                 <textarea
                   rows={field.rows || 4}
+                  {...(isUsingRHF ? register(field.key) : {})}
+                  value={isUsingRHF ? undefined : (formData[field.key] || "")}
+                  placeholder={field.placeholder}
+                  required={field.required}
+                  onChange={isUsingRHF ? undefined : (e) => handleChange(field.key, e.target.value)}
+                  className={cn(
+                    "border p-3 rounded-lg w-full",
+                    hasError && "border-red-500 focus:ring-red-500"
+                  )}
+                />
+                {hasError && <span className="text-red-500 text-sm">{fieldError.message}</span>}
+              </>
+            )}
+
+            {field.type === "date" && (
+              <>
+                <input
+                  type="date"
                   {...(isUsingRHF ? register(field.key) : {})}
                   value={isUsingRHF ? undefined : (formData[field.key] || "")}
                   placeholder={field.placeholder}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Activity, useState } from "react";
 import PageHeader from "../../components/PageHeader.jsx";
 import SearchBar from "../../components/SearchBar.jsx";
 import DataTable from "../../components/Table.jsx";
@@ -7,6 +7,7 @@ import { statusOptions } from "../../lib/constants.js";
 import { useGetAllSaleTrends } from "../../hooks/useSaleTrend.js";
 import formatDate from "../../utils/formatDate.js";
 import { useNavigate } from "react-router-dom";
+import SaleTrendsManager from "./SaleTrendsManager.jsx";
 
 const SaleTrends = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -14,6 +15,7 @@ const SaleTrends = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [sort, setSort] = useState("createdAt:desc");
   const [activeStatus, setActiveStatus] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   const navigate = useNavigate();
 
@@ -25,6 +27,7 @@ const SaleTrends = () => {
   });
 
   console.log("saleTrendsData", saleTrendsData);
+
   // Dummy Data
   //   const dummyData = [
   //     {
@@ -126,9 +129,6 @@ const SaleTrends = () => {
   //     const matchesSearch = item.trend_name.toLowerCase().includes(searchTerm.toLowerCase());
   //     const matchesStatus = activeStatus === "" ? true : activeStatus === "active" ? item.is_active : !item.is_active;
 
-  //     return matchesSearch && matchesStatus;
-  //   });
-
   return (
     <div className="min-h-screen bg-gray-50 p-2">
       <div className="max-w-8xl">
@@ -138,7 +138,7 @@ const SaleTrends = () => {
             title="Sale Trends"
             subtitle="Manage sale trends and products"
             actionLabel="Add New Trend"
-            onAction={() => alert("Add New Trend Clicked (Dummy)")}
+            onAction={() => setShowModal(true)}
           />
 
           {/* Filters Row */}
@@ -168,6 +168,13 @@ const SaleTrends = () => {
             />
           </div>
         </div>
+
+        {/* Add Modal */}
+        <Activity mode={showModal ? "visible" : "hidden"}>
+          <div className="fixed inset-0 bg-white/20 backdrop-blur-lg flex items-center justify-center z-50">
+            <SaleTrendsManager onCancel={() => setShowModal(false)} />
+          </div>
+        </Activity>
       </div>
     </div>
   );
