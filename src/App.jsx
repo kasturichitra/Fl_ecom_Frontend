@@ -27,7 +27,7 @@ const ProductManager = lazy(() => import("./pages/ProductManager/ProductManager"
 
 const ProductList = lazy(() => import("./pages/ProductManager/ProductList"));
 const IndustryTypeList = lazy(() => import("./pages/industryType/IndustryTypeList"));
-const SaleTrends = lazy(() => import("./pages/SaleTrends/SaleTrends"));
+const SaleTrends = lazy(() => import("./pages/SaleTrends/SaleTrendsList"));
 const CategoryListManager = lazy(() => import("./pages/CategoryManager/CategoryListManager"));
 const BrandListManager = lazy(() => import("./pages/BrandManager/BrandListManager"));
 const OrderProductsDetailes = lazy(() => import("./pages/Orders/OrderProductsDetailes"));

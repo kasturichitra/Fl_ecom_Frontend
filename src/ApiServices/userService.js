@@ -2,7 +2,7 @@ import axiosInstance from "../axios/axiosInstance";
 const BASE_URL = "/user";
 
 export const storeFcmToken = (token, userId) => {
-  return axiosInstance.put(`/fcm-token/${userId}`, { fcm_token: token });
+  return axiosInstance.put(`/user/fcm-token/${userId}`, { fcm_token: token });
 };
 
 export const getAllUsers = (params = {}) => {
