@@ -1,15 +1,23 @@
 import { ArrowLeft, ArrowRight, Check, Search, ShoppingBag, Trash2, Loader2 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import PageHeader from "../../components/PageHeader";
 import { useGetAllProducts } from "../../hooks/useProduct";
+import { useGetAllBrands } from "../../hooks/useBrand";
+import { useGetAllCategories } from "../../hooks/useCategory";
+import { useGetSaleTrendByUniqueId, useUpdateSaleTrend } from "../../hooks/useSaleTrend";
 import useDebounce from "../../hooks/useDebounce";
 
 const SingleSaleTrendPage = () => {
+  // --- URL PARAMS ---
+  const { id: trendUniqueId } = useParams();
+  const navigate = useNavigate();
+
   // --- STATE ---
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  // Filters (mock for now for visual consistency, or can be wired up later)
+  // Filters
   const [brandFilter, setBrandFilter] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
 
@@ -20,7 +28,35 @@ const SingleSaleTrendPage = () => {
   const [selectedAvailable, setSelectedAvailable] = useState(new Set());
   const [selectedTrend, setSelectedTrend] = useState(new Set());
 
-  // --- QUERY ---
+  // Drag-drop state
+  const [draggedIndex, setDraggedIndex] = useState(null);
+
+  // --- QUERY: SALE TREND DATA ---
+  const { data: saleTrendData, isLoading: trendLoading } = useGetSaleTrendByUniqueId(trendUniqueId);
+
+  // Populate trendProducts when data loads
+  useEffect(() => {
+    if (saleTrendData?.data?.trend_products) {
+      setTrendProducts(saleTrendData.data.trend_products);
+    }
+  }, [saleTrendData]);
+
+  // --- QUERY: FILTERS ---
+  const { data: brandsData } = useGetAllBrands({
+    limit: 100, // Fetch reasonable amount for dropdown
+    is_active: true,
+    category_unique_id: categoryFilter,
+  });
+
+  const { data: categoriesData } = useGetAllCategories({
+    limit: 100,
+    is_active: true,
+  });
+
+  const brands = brandsData?.data || [];
+  const categories = categoriesData?.data || [];
+
+  // --- QUERY: PRODUCTS ---
   const {
     data: productsResponse,
     isLoading,
@@ -28,9 +64,9 @@ const SingleSaleTrendPage = () => {
   } = useGetAllProducts({
     searchTerm: debouncedSearchTerm,
     page: 1,
-    limit: 100, // Fetching a larger batch for better UX in this "picker" view
-    // category_unique_id: categoryFilter, // Can enable if we map IDs later
-    // sort: "",
+    limit: 100,
+    category_unique_id: categoryFilter,
+    brand_unique_id: brandFilter,
   });
 
   const availableProductsData = useMemo(() => {
@@ -43,6 +79,11 @@ const SingleSaleTrendPage = () => {
     const trendIds = new Set(trendProducts.map((p) => p.product_unique_id));
     return availableProductsData.filter((p) => !trendIds.has(p.product_unique_id));
   }, [availableProductsData, trendProducts]);
+
+  // Sorted trend products by priority
+  const sortedTrendProducts = useMemo(() => {
+    return [...trendProducts].sort((a, b) => (a.priority || 0) - (b.priority || 0));
+  }, [trendProducts]);
 
   // --- HANDLERS ---
 
@@ -67,7 +108,14 @@ const SingleSaleTrendPage = () => {
     // Find full objects for selected IDs
     const toMove = displayedAvailableProducts.filter((p) => selectedAvailable.has(p.product_unique_id));
 
-    setTrendProducts((prev) => [...prev, ...toMove]);
+    // Assign new priorities (append to end)
+    const maxPriority = trendProducts.length > 0 ? Math.max(...trendProducts.map((p) => p.priority || 0)) : 0;
+    const productsWithPriority = toMove.map((p, idx) => ({
+      ...p,
+      priority: maxPriority + idx + 1,
+    }));
+
+    setTrendProducts((prev) => [...prev, ...productsWithPriority]);
     setSelectedAvailable(new Set()); // Clear left selection
   };
 
@@ -92,12 +140,70 @@ const SingleSaleTrendPage = () => {
     }
   };
 
+  // --- DRAG & DROP HANDLERS ---
+  const handleDragStart = (e, index) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (e, dropIndex) => {
+    e.preventDefault();
+
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      return;
+    }
+
+    const updatedProducts = [...sortedTrendProducts];
+    const [draggedProduct] = updatedProducts.splice(draggedIndex, 1);
+    updatedProducts.splice(dropIndex, 0, draggedProduct);
+
+    // Reassign priorities based on new order
+    const reorderedProducts = updatedProducts.map((p, idx) => ({
+      ...p,
+      priority: idx + 1,
+    }));
+
+    setTrendProducts(reorderedProducts);
+    setDraggedIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+  };
+
   // --- HELPER: Image URL ---
   const getProductImage = (product) => {
     if (product.product_images && product.product_images.length > 0) {
       return `${import.meta.env.VITE_API_URL}/${product.product_images[0]}`;
     }
     return "https://placehold.co/100x100?text=No+Image";
+  };
+
+  // --- MUTATION: UPDATE SALE TREND ---
+  const { mutate: updateSaleTrend, isPending: isSaving } = useUpdateSaleTrend();
+
+  // --- SAVE HANDLERS ---
+  const handleSave = () => {
+    // Extract only product_unique_id for the API
+    const productIds = trendProducts.map((p, index) => ({
+      product_unique_id: p.product_unique_id,
+      priority: index + 1,
+    }));
+
+    updateSaleTrend({
+      id: trendUniqueId,
+      data: { trend_products: productIds },
+    });
+  };
+
+  const handleCancel = () => {
+    navigate("/saleTrends");
   };
 
   // --- RENDER ---
@@ -128,22 +234,29 @@ const SingleSaleTrendPage = () => {
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
-              {/* Note: Filters are UI-only placeholders for now as we need ID integration for real filtering */}
               <select
-                className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer max-w-[150px]"
                 value={brandFilter}
                 onChange={(e) => setBrandFilter(e.target.value)}
               >
                 <option value="">All Brands</option>
-                {/* Dynamically populate later */}
+                {brands.map((brand) => (
+                  <option key={brand.brand_unique_id} value={brand.brand_unique_id}>
+                    {brand.brand_name}
+                  </option>
+                ))}
               </select>
               <select
-                className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-700 outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer max-w-[150px]"
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
               >
                 <option value="">All Categories</option>
-                {/* Dynamically populate later */}
+                {categories.map((cat) => (
+                  <option key={cat.category_unique_id} value={cat.category_unique_id}>
+                    {cat.category_name}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -238,17 +351,35 @@ const SingleSaleTrendPage = () => {
               <Check className="w-5 h-5 mr-2 text-green-600" />
               Products in This Trend
             </h2>
-            <p className="text-sm text-gray-500 ml-7">{trendProducts.length} products selected</p>
+            <p className="text-sm text-gray-500 ml-7">{trendProducts.length} products selected • Drag to reorder</p>
           </div>
 
           {/* Selected List - Scrollable */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-white">
-            {trendProducts.map((product) => (
+            {sortedTrendProducts.map((product, index) => (
               <div
                 key={product.product_unique_id}
-                className={`group flex items-center p-3 rounded-xl border border-gray-100 transition-all hover:border-red-200 hover:shadow-sm
-                   ${selectedTrend.has(product.product_unique_id) ? "bg-red-50 border-red-200" : "bg-white"}`}
+                draggable
+                onDragStart={(e) => handleDragStart(e, index)}
+                onDragOver={handleDragOver}
+                onDrop={(e) => handleDrop(e, index)}
+                onDragEnd={handleDragEnd}
+                className={`group flex items-center p-3 rounded-xl border transition-all cursor-move
+                   ${
+                     selectedTrend.has(product.product_unique_id)
+                       ? "bg-red-50 border-red-200"
+                       : "bg-white border-gray-100"
+                   }
+                   ${draggedIndex === index ? "opacity-50" : ""}
+                   hover:border-indigo-300 hover:shadow-md`}
               >
+                {/* Priority Badge */}
+                <div className="mr-3 shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm">
+                    {product.priority || index + 1}
+                  </div>
+                </div>
+
                 <div onClick={() => toggleTrendSelect(product.product_unique_id)} className="cursor-pointer mr-4">
                   <div
                     className={`w-5 h-5 rounded border flex items-center justify-center transition-colors
@@ -313,12 +444,24 @@ const SingleSaleTrendPage = () => {
 
       {/* 3. Global Sticky Page Footer */}
       <div className="bg-white border-t border-gray-200 p-4 shrink-0 flex justify-between items-center z-20 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-        <button className="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors">
+        <button
+          onClick={handleCancel}
+          className="px-6 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors"
+        >
           Cancel
         </button>
-        <div className="text-sm text-gray-500">{/* Optional status text can go here */}</div>
-        <button className="px-8 py-2.5 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-700 text-white font-bold shadow-md hover:shadow-lg hover:from-indigo-700 hover:to-purple-800 transform hover:-translate-y-0.5 transition-all">
-          Save Changes
+        <div className="text-sm text-gray-500">{isSaving && <span className="text-indigo-600">Saving...</span>}</div>
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className={`px-8 py-2.5 rounded-lg bg-linear-to-r from-indigo-600 to-purple-700 text-white font-bold shadow-md transition-all
+            ${
+              isSaving
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:shadow-lg hover:from-indigo-700 hover:to-purple-800 transform hover:-translate-y-0.5"
+            }`}
+        >
+          {isSaving ? "Saving..." : "Save Changes"}
         </button>
       </div>
     </div>

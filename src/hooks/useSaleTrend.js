@@ -1,6 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createSaleTrend, deleteSaleTrend, getSaleTrends, updateSaleTrend } from "../ApiServices/saleTrendService";
 import toast from "react-hot-toast";
+import {
+  createSaleTrend,
+  deleteSaleTrend,
+  getSaleTrendByUniqueId,
+  getSaleTrends,
+  updateSaleTrend,
+} from "../ApiServices/saleTrendService";
 
 export const useGetAllSaleTrends = ({ searchTerm = "", page = 1, limit = 10, sort = "" }) => {
   const queryKey = ["saleTrends", searchTerm || "", page, limit, sort];
@@ -15,13 +21,25 @@ export const useGetAllSaleTrends = ({ searchTerm = "", page = 1, limit = 10, sor
   });
 };
 
+export const useGetSaleTrendByUniqueId = (uniqueId) => {
+  const queryKey = ["saleTrend", uniqueId];
+  return useQuery({
+    queryKey,
+    queryFn: () => getSaleTrendByUniqueId(uniqueId),
+    select: (res) => res?.data,
+    staleTime: 10 * 60 * 1000,
+    cacheTime: 30 * 60 * 1000,
+    refetchOnMount: false,
+  });
+};
+
 export const useCreateSaleTrend = (options = {}) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data) => createSaleTrend(data),
-    onSuccess: () => {
+    onSuccess: (id) => {
       toast.success("Sale Trend created successfully");
-      queryClient.invalidateQueries({ queryKey: ["saleTrends"] });
+      queryClient.invalidateQueries({ queryKey: ["saleTrends", id] });
       options?.onSuccess?.();
     },
     onError: () => {
@@ -60,4 +78,32 @@ export const useDeleteSaleTrend = () => {
       toast.error("Failed to delete Sale Trend");
     },
   });
-}
+};
+
+// export const useAddProductsToSaleTrend = () => {
+//   const queryClient = useQueryClient();
+//   return useMutation({
+//     mutationFn: ({ id, data }) => addProductsToSaleTrend(id, data),
+//     onSuccess: () => {
+//       toast.success("Products added to Sale Trend successfully");
+//       queryClient.invalidateQueries({ queryKey: ["saleTrends"] });
+//     },
+//     onError: () => {
+//       toast.error("Failed to add products to Sale Trend");
+//     },
+//   });
+// };
+
+// export const useRemoveProductsFromSaleTrend = () => {
+//   const queryClient = useQueryClient();
+//   return useMutation({
+//     mutationFn: ({ id, data }) => removeProductsFromSaleTrend(id, data),
+//     onSuccess: () => {
+//       toast.success("Products removed from Sale Trend successfully");
+//       queryClient.invalidateQueries({ queryKey: ["saleTrends"] });
+//     },
+//     onError: () => {
+//       toast.error("Failed to remove products from Sale Trend");
+//     },
+//   });
+// };

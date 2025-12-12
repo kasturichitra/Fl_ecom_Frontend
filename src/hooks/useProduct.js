@@ -16,12 +16,33 @@ export const useGetAllProducts = ({
   sort = "",
   industry_unique_id = "",
   category_unique_id = "",
+  brand_unique_id = "",
   gender = "",
 } = {}) => {
-  const queryKey = ["products", searchTerm, page, limit, sort, industry_unique_id, category_unique_id, gender];
+  const queryKey = [
+    "products",
+    searchTerm,
+    page,
+    limit,
+    sort,
+    industry_unique_id,
+    category_unique_id,
+    brand_unique_id,
+    gender,
+  ];
   return useQuery({
     queryKey,
-    queryFn: () => getAllProductsApi({ searchTerm, page, limit, sort, industry_unique_id, category_unique_id, gender }),
+    queryFn: () =>
+      getAllProductsApi({
+        searchTerm,
+        page,
+        limit,
+        sort,
+        industry_unique_id,
+        category_unique_id,
+        brand_unique_id,
+        gender,
+      }),
     select: (res) => res.data,
     staleTime: 60 * 1000,
     refetchOnMount: false,

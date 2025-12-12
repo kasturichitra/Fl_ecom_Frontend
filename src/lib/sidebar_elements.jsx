@@ -1,14 +1,15 @@
 import {
-  Home,
-  Building2,
-  Layers,
-  Tag,
-  Package,
-  FileText,
-  Users,
+  BadgeDollarSign,
   Briefcase,
+  Building2,
   ClipboardPlus,
+  FileText,
+  Home,
+  Layers,
+  Package,
   Palette,
+  Tag,
+  Users
 } from "lucide-react";
 
 /**
@@ -92,6 +93,6 @@ export const sidebarElements = [
     id: "sale-trends",
     path: "/saleTrends",
     label: "Sale Trends",
-    icon: ClipboardPlus, // Using a placeholder icon, you might want to import FaChartLine or similar if available within lucide-react or react-icons
+    icon: BadgeDollarSign, // Using a placeholder icon, you might want to import FaChartLine or similar if available within lucide-react or react-icons
   },
 ];
