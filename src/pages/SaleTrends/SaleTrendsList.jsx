@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Activity, useState } from "react";
 import PageHeader from "../../components/PageHeader.jsx";
 import SearchBar from "../../components/SearchBar.jsx";
 import DataTable from "../../components/Table.jsx";
@@ -6,6 +6,7 @@ import { DropdownFilter } from "../../components/DropdownFilter.jsx";
 import { statusOptions } from "../../lib/constants.js";
 import { useGetAllSaleTrends } from "../../hooks/useSaleTrend.js";
 import formatDate from "../../utils/formatDate.js";
+import SaleTrendsManager from "./SaleTrendsManager.jsx";
 
 const SaleTrends = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,6 +14,7 @@ const SaleTrends = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [sort, setSort] = useState("createdAt:desc");
   const [activeStatus, setActiveStatus] = useState("");
+  const [showModal, setShowModal] = useState(false);
 
   const { data: saleTrendsData } = useGetAllSaleTrends({
     searchTerm,
@@ -20,51 +22,52 @@ const SaleTrends = () => {
     limit: pageSize,
     sort,
   });
-   
+
   console.log("saleTrendsData", saleTrendsData);
+
   // Dummy Data
-//   const dummyData = [
-//     {
-//       id: 1,
-//       trend_name: "Summer Splash",
-//       trend_from: "2024-06-01",
-//       trend_to: "2024-08-31",
-//       trend_products: "Swimwear, Sunglasses, Beach Towels",
-//       is_active: true,
-//     },
-//     {
-//       id: 2,
-//       trend_name: "Winter Warmers",
-//       trend_from: "2024-11-01",
-//       trend_to: "2025-02-28",
-//       trend_products: "Jackets, Scarves, Gloves",
-//       is_active: true,
-//     },
-//     {
-//       id: 3,
-//       trend_name: "Back to School",
-//       trend_from: "2024-08-15",
-//       trend_to: "2024-09-15",
-//       trend_products: "Backpacks, Notebooks, Pens",
-//       is_active: false,
-//     },
-//     {
-//       id: 4,
-//       trend_name: "Spring Fling",
-//       trend_from: "2024-03-01",
-//       trend_to: "2024-05-31",
-//       trend_products: "Floral Dresses, Light Jackets",
-//       is_active: true,
-//     },
-//     {
-//       id: 5,
-//       trend_name: "Holiday Special",
-//       trend_from: "2024-12-01",
-//       trend_to: "2024-12-25",
-//       trend_products: "Gift Sets, Decorations",
-//       is_active: false,
-//     },
-//   ];
+  //   const dummyData = [
+  //     {
+  //       id: 1,
+  //       trend_name: "Summer Splash",
+  //       trend_from: "2024-06-01",
+  //       trend_to: "2024-08-31",
+  //       trend_products: "Swimwear, Sunglasses, Beach Towels",
+  //       is_active: true,
+  //     },
+  //     {
+  //       id: 2,
+  //       trend_name: "Winter Warmers",
+  //       trend_from: "2024-11-01",
+  //       trend_to: "2025-02-28",
+  //       trend_products: "Jackets, Scarves, Gloves",
+  //       is_active: true,
+  //     },
+  //     {
+  //       id: 3,
+  //       trend_name: "Back to School",
+  //       trend_from: "2024-08-15",
+  //       trend_to: "2024-09-15",
+  //       trend_products: "Backpacks, Notebooks, Pens",
+  //       is_active: false,
+  //     },
+  //     {
+  //       id: 4,
+  //       trend_name: "Spring Fling",
+  //       trend_from: "2024-03-01",
+  //       trend_to: "2024-05-31",
+  //       trend_products: "Floral Dresses, Light Jackets",
+  //       is_active: true,
+  //     },
+  //     {
+  //       id: 5,
+  //       trend_name: "Holiday Special",
+  //       trend_from: "2024-12-01",
+  //       trend_to: "2024-12-25",
+  //       trend_products: "Gift Sets, Decorations",
+  //       is_active: false,
+  //     },
+  //   ];
 
   const columns = [
     {
@@ -97,9 +100,8 @@ const SaleTrends = () => {
       flex: 1,
       renderCell: (params) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${
-            params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            }`}
         >
           {params.row.is_active ? "Active" : "Inactive"}
         </span>
@@ -108,18 +110,18 @@ const SaleTrends = () => {
   ];
 
   const tableData = saleTrendsData?.data?.map((item) => ({
-    ...item, 
+    ...item,
     trend_from: formatDate(item.trend_from),
     trend_to: formatDate(item.trend_to),
   }));
 
   // Filtering logic for dummy data
-//   const filteredData = dummyData.filter((item) => {
-//     const matchesSearch = item.trend_name.toLowerCase().includes(searchTerm.toLowerCase());
-//     const matchesStatus = activeStatus === "" ? true : activeStatus === "active" ? item.is_active : !item.is_active;
+  //   const filteredData = dummyData.filter((item) => {
+  //     const matchesSearch = item.trend_name.toLowerCase().includes(searchTerm.toLowerCase());
+  //     const matchesStatus = activeStatus === "" ? true : activeStatus === "active" ? item.is_active : !item.is_active;
 
-//     return matchesSearch && matchesStatus;
-//   });
+  //     return matchesSearch && matchesStatus;
+  //   });
 
   return (
     <div className="min-h-screen bg-gray-50 p-2">
@@ -130,7 +132,7 @@ const SaleTrends = () => {
             title="Sale Trends"
             subtitle="Manage sale trends and products"
             actionLabel="Add New Trend"
-            onAction={() => alert("Add New Trend Clicked (Dummy)")}
+            onAction={() => setShowModal(true)}
           />
 
           {/* Filters Row */}
@@ -148,7 +150,7 @@ const SaleTrends = () => {
               columns={columns}
               page={currentPage}
               pageSize={pageSize}
-            //   totalCount={filteredData.length}
+              //   totalCount={filteredData.length}
               setCurrentPage={setCurrentPage}
               setPageSize={setPageSize}
               sort={sort}
@@ -159,9 +161,17 @@ const SaleTrends = () => {
             />
           </div>
         </div>
+
+        {/* Add Modal */}
+        <Activity mode={showModal ? "visible" : "hidden"}>
+          <div className="fixed inset-0 bg-white/20 backdrop-blur-lg flex items-center justify-center z-50">
+            <SaleTrendsManager onCancel={() => setShowModal(false)} />
+          </div>
+        </Activity>
       </div>
     </div>
   );
 };
 
 export default SaleTrends;
+
