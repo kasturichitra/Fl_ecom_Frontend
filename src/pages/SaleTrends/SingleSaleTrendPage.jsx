@@ -210,7 +210,7 @@ const SingleSaleTrendPage = () => {
   return (
     <div className="flex flex-col h-screen bg-gray-50 overflow-hidden">
       {/* 1. Header */}
-      <PageHeader title="Edit Trend – Hot Deals" subtitle="Manage products included in this sale trend" />
+      <PageHeader title={`Edit Trend – ${saleTrendData?.data?.trend_name}`} subtitle="Manage products included in this sale trend" />
 
       {/* 2. Main Split Content */}
       <div className="flex-1 flex overflow-hidden">
