@@ -151,8 +151,12 @@ const IndustryTypeList = () => {
     },
   ];
 
+  // const visibleColumns = columns.filter((col) => {
+  //   const headerConfig = columns.find((h) => h.key === col.headerName);
+  //   return headerConfig ? headerConfig.value : true;
+  // });
   const visibleColumns = columns.filter((col) => {
-    const headerConfig = columns.find((h) => h.key === col.headerName);
+    const headerConfig = industryHeaders.find((h) => h.key === col.headerName);
     return headerConfig ? headerConfig.value : true;
   });
 

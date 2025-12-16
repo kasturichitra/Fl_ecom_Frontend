@@ -15,6 +15,7 @@ import Dashboard from "./pages/Dashboard";
 import SingleSaleTrendPage from "./pages/SaleTrends/SingleSaleTrendPage";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
+import VerifyOtp from "./pages/VerifyOtp";
 
 // Lazy-loaded pages
 const CategoryManager = lazy(() => import("./pages/CategoryManager/CategoryManager"));
@@ -78,6 +79,16 @@ const App = () => {
             </AuthLayout>
           }
         />
+
+        <Route
+          path="/verify-otp"
+          element={
+            <AuthLayout>
+              <VerifyOtp />
+            </AuthLayout>
+          }
+        />
+
         <Route
           path="/signup"
           element={
@@ -124,6 +135,8 @@ const App = () => {
                   <Route path="/users" element={<UsersList />} />
                   <Route path="/notificationList" element={<NotificationList />} />
 
+                  
+ 
                   <Route path="*" element={<PageNotFound />} />
                 </Routes>
               </Suspense>
