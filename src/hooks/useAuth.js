@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { register, verifyOtp, login, forgotPassword, verifyForgotOtp, resetPassword } from "../ApiServices/authService";
+import { register, verifyOtp, login, forgotPassword, verifyForgotOtp, resetPassword, resendOtp } from "../ApiServices/authService";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -146,3 +146,18 @@ export const useResetPassword = () => {
     },
   });
 }
+export const useResendOtp = () => {
+  return useMutation({
+    mutationFn: (data) => resendOtp(data),
+    onSuccess: (response) => {
+      toast.success("Otp sent successfully");
+      //   queryClient.invalidateQueries({ queryKey: ["users"] });
+      if (response) {
+        sessionStorage.setItem("otp_id", response?.data?.otp_id);
+      }
+    },
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || "Failed to send otp");
+    },
+  });
+};

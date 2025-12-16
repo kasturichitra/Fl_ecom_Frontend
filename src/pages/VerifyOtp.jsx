@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useVerifyOtp } from "../hooks/useAuth";
+import { useVerifyOtp, useResendOtp } from "../hooks/useAuth";
 
 const OTP_LENGTH = 6;
 const TIMER_SECONDS = 120; // 2 minutes
@@ -9,7 +9,8 @@ const VerifyOtp = () => {
   const [timeLeft, setTimeLeft] = useState(TIMER_SECONDS);
   const inputsRef = useRef([]);
 
-  const { mutateAsync: verifyOtp } = useVerifyOtp();
+  const { mutateAsync: verifyOtp, isPending: isVerifyPending } = useVerifyOtp();
+  const { mutateAsync: resendOtp, isPending: isResendPending } = useResendOtp();
 
   /* ⏱️ Countdown Timer */
   useEffect(() => {
@@ -62,6 +63,24 @@ const VerifyOtp = () => {
     await verifyOtp(formData);
   };
 
+  /* 🔁 Resend OTP */
+  const handleResendOtp = async () => {
+    const otpId = sessionStorage.getItem("otp_id");
+
+    const payload = {
+      otp_id: otpId,
+    };
+
+    await resendOtp(payload);
+
+    // Reset timer after resending
+    setTimeLeft(TIMER_SECONDS);
+    // Clear OTP inputs
+    setOtp(Array(OTP_LENGTH).fill(""));
+    // Focus first input
+    inputsRef.current[0]?.focus();
+  };
+
   /* ⏳ Format Timer */
   const formatTime = () => {
     const minutes = Math.floor(timeLeft / 60);
@@ -96,18 +115,22 @@ const VerifyOtp = () => {
           OTP expires in <span className="font-semibold text-gray-800">{formatTime()}</span>
         </p>
 
-        {/* 🔁 Resend OTP (Static) */}
-        <button disabled className="text-sm text-gray-400 cursor-not-allowed mb-6">
-          Resend OTP
+        {/* 🔁 Resend OTP */}
+        <button
+          onClick={handleResendOtp}
+          disabled={isResendPending}
+          className="text-sm text-white mb-6 cursor-pointer p-2 rounded-lg bg-blue-500 hover:bg-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isResendPending ? "Resending..." : "Resend OTP"}
         </button>
 
         {/* ✅ Verify Button */}
         <button
           onClick={handleVerify}
-          disabled={otp.includes("")}
+          disabled={otp.includes("") || isVerifyPending}
           className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Verify
+          {isVerifyPending ? "Verifying..." : "Verify"}
         </button>
       </div>
     </div>

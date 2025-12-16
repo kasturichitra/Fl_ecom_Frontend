@@ -3,7 +3,7 @@ import axiosInstance from "../axios/axiosInstance";
 const BASE_URL = "/auth";
 
 export const register = (formData) => {
-    return axiosInstance.post(`${BASE_URL}/register`, formData);
+  return axiosInstance.post(`${BASE_URL}/register`, formData);
 };
 
 export const login = (formData) => {
@@ -11,7 +11,7 @@ export const login = (formData) => {
 }
 
 export const verifyOtp = (formData) => {
-    return axiosInstance.post(`${BASE_URL}/verify-otp`, formData);
+  return axiosInstance.post(`${BASE_URL}/verify-otp`, formData);
 };
 
 // 'http://localhost:3000/auth/forgot-password' 
@@ -28,4 +28,7 @@ export const verifyForgotOtp = (formData) => {
 
 export const resetPassword = (formData) => {
   return axiosInstance.post(`${BASE_URL}/reset-password`, formData);
+};
+export const resendOtp = (data) => {
+  return axiosInstance.post(`${BASE_URL}/resend-otp`, data);
 };
