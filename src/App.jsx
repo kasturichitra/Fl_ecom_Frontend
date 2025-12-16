@@ -16,6 +16,9 @@ import SingleSaleTrendPage from "./pages/SaleTrends/SingleSaleTrendPage";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import VerifyOtp from "./pages/VerifyOtp";
+import ForgotPassword from "./pages/ForgotPassword";
+import ForgotOtp from "./pages/ForgotOtp";
+import ResetPassword from "./pages/ResetPassword";
 
 // Lazy-loaded pages
 const CategoryManager = lazy(() => import("./pages/CategoryManager/CategoryManager"));
@@ -85,6 +88,33 @@ const App = () => {
           element={
             <AuthLayout>
               <VerifyOtp />
+            </AuthLayout>
+          }
+        />
+
+        <Route
+          path="/forgot-password"
+          element={
+            <AuthLayout>
+              <ForgotPassword />
+            </AuthLayout>
+          }
+        />
+
+        <Route
+          path="/verify-forgot-otp"
+          element={
+            <AuthLayout>
+              <ForgotOtp />
+            </AuthLayout>
+          }
+        />
+
+        <Route
+          path="/reset-password"
+          element={
+            <AuthLayout>
+              <ResetPassword />
             </AuthLayout>
           }
         />
