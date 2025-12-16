@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { register, verifyOtp, login } from "../ApiServices/authService";
+import { register, verifyOtp, login, forgotPassword, verifyForgotOtp, resetPassword } from "../ApiServices/authService";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -23,7 +23,6 @@ export const useRegister = () => {
       if (data?.requireOtp) {
         navigate("/verify-otp");
       }
-      
     },
     onError: () => {
       toast.error("Failed to create user");
@@ -43,7 +42,7 @@ export const useLogin = () => {
 
       const data = response?.data;
 
-      console.log("data from useLogin",data);
+      console.log("data from useLogin", data);
 
       if (data) {
         sessionStorage.setItem("otp_id", data?.otp_id);
@@ -55,12 +54,12 @@ export const useLogin = () => {
         navigate("/verify-otp");
       }
 
-      if(data?.status === "success"){
+      if (data?.status === "success") {
         navigate("/");
       }
-    //   navigate("/");
+      //   navigate("/");
 
-    //   navigate("/verify-otp");
+      //   navigate("/verify-otp");
     },
     onError: () => {
       toast.error("Failed to create user");
@@ -88,3 +87,62 @@ export const useVerifyOtp = () => {
     },
   });
 };
+
+export const useForgotPassword = () => {
+  const navigate = useNavigate();
+  return useMutation({
+    mutationFn: (data) => forgotPassword(data),
+    onSuccess: (response) => {
+      // toast.success("User verified successfully");
+
+      console.log("response", response);
+      const data = response?.data;
+      // console.log("data from forgot password", data);
+      if (data) {
+        console.log("setnigs")
+        sessionStorage.setItem("otp_id", data?.otp_id);
+        sessionStorage.setItem("reason", data?.reason);
+        sessionStorage.setItem("requireOtp", data?.requireOtp);
+      }
+
+      if (data?.requireOtp) {
+        navigate("/verify-forgot-otp");
+      }
+    },
+    onError: () => {
+      toast.error("Failed to verify user");
+    },
+  });
+};
+
+
+export const useVerifyForgotOtp = () => {
+  const navigate = useNavigate();
+
+  return useMutation({
+    mutationFn: (data) => verifyForgotOtp(data),
+    onSuccess: (response) => {
+      toast.success("User verified successfully");
+      // navigate("/login");
+
+      navigate("/reset-password");
+    },
+    onError: () => {
+      toast.error("Failed to verify user");
+    },
+  });
+}
+
+export const useResetPassword = () => {
+  const navigate = useNavigate();
+  return useMutation({
+    mutationFn: (data) => resetPassword(data),
+    onSuccess: (response) => {
+      toast.success("Password reset successfully");
+      navigate("/login");
+    },
+    onError: () => {
+      toast.error("Failed to reset password");
+    },
+  });
+}
