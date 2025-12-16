@@ -22,33 +22,21 @@ const ResetPassword = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    try {
-      await resetPassword({
-        newPassword: form.newPassword,
-      });
-
-      navigate("/login");
-    } catch {
-      // handled in hook
-    }
+    await resetPassword({
+      newPassword: form.newPassword,
+    });
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">
-          Reset Password
-        </h2>
-        <p className="text-gray-600 mb-6">
-          Create a new password for your account
-        </p>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">Reset Password</h2>
+        <p className="text-gray-600 mb-6">Create a new password for your account</p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* New Password */}
           <div>
-            <label className="block text-sm font-medium mb-1">
-              New Password
-            </label>
+            <label className="block text-sm font-medium mb-1">New Password</label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -71,9 +59,7 @@ const ResetPassword = () => {
 
           {/* Confirm Password */}
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Confirm Password
-            </label>
+            <label className="block text-sm font-medium mb-1">Confirm Password</label>
             <input
               type="password"
               name="confirmPassword"

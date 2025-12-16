@@ -1,5 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { register, verifyOtp, login, forgotPassword, verifyForgotOtp, resetPassword, resendOtp } from "../ApiServices/authService";
+import {
+  register,
+  verifyOtp,
+  login,
+  forgotPassword,
+  verifyForgotOtp,
+  resetPassword,
+  resendOtp,
+} from "../ApiServices/authService";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -99,7 +107,7 @@ export const useForgotPassword = () => {
       const data = response?.data;
       // console.log("data from forgot password", data);
       if (data) {
-        console.log("setnigs")
+        console.log("setnigs");
         sessionStorage.setItem("otp_id", data?.otp_id);
         sessionStorage.setItem("reason", data?.reason);
         sessionStorage.setItem("requireOtp", data?.requireOtp);
@@ -114,7 +122,6 @@ export const useForgotPassword = () => {
     },
   });
 };
-
 
 export const useVerifyForgotOtp = () => {
   const navigate = useNavigate();
@@ -131,7 +138,7 @@ export const useVerifyForgotOtp = () => {
       toast.error("Failed to verify user");
     },
   });
-}
+};
 
 export const useResetPassword = () => {
   const navigate = useNavigate();
@@ -145,7 +152,8 @@ export const useResetPassword = () => {
       toast.error("Failed to reset password");
     },
   });
-}
+};
+
 export const useResendOtp = () => {
   return useMutation({
     mutationFn: (data) => resendOtp(data),
