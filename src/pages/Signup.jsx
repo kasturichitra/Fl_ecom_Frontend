@@ -19,8 +19,9 @@ const Signup = () => {
 
     await register(payload);
 
+
     // redirect after success
-    navigate("/login");
+    // navigate("/login");
   };
 
   return (
