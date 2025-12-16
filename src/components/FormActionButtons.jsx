@@ -19,7 +19,7 @@ const FormActionButtons = ({ onCancel, onSubmit, submitLabel = "Submit" }) => (
         <button
             onClick={onSubmit}
             type="submit"
-            className="px-15 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-800 transition shadow"
+            className="px-15 py-3 bg-linear-to-r from-blue-600 to-indigo-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-800 transition shadow"
         >
             {submitLabel}
         </button>

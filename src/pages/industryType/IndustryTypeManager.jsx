@@ -33,12 +33,12 @@ const IndustryTypeManager = ({ onCancel }) => {
       {/* ONLY ADDED THIS BUTTON — NO OTHER CHANGE */}
       <button
         onClick={onCancel}
-        className="absolute text-white right-3 top-1 text-gray-700 hover:text-red-600 text-3xl"
+        className="absolute text-white right-3 top-1  hover:text-red-600 text-3xl"
       >
         ×
       </button>
 
-      <div className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white px-8 py-10 text-center">
+      <div className="bg-linear-to-r from-indigo-600 to-purple-700 text-white px-8 py-10 text-center">
         <h2 className="text-4xl font-extrabold">Add New Industry Type</h2>
       </div>
 
