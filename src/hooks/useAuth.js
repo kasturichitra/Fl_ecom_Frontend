@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { register, verifyOtp, login, resendOtp} from "../ApiServices/authService";
+import { register, verifyOtp, login, resendOtp } from "../ApiServices/authService";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -23,7 +23,6 @@ export const useRegister = () => {
       if (data?.requireOtp) {
         navigate("/verify-otp");
       }
-      
     },
     onError: () => {
       toast.error("Failed to create user");
@@ -43,7 +42,7 @@ export const useLogin = () => {
 
       const data = response?.data;
 
-      console.log("data from useLogin",data);
+      console.log("data from useLogin", data);
 
       if (data) {
         sessionStorage.setItem("otp_id", data?.otp_id);
@@ -55,12 +54,12 @@ export const useLogin = () => {
         navigate("/verify-otp");
       }
 
-      if(data?.status === "success"){
+      if (data?.status === "success") {
         navigate("/");
       }
-    //   navigate("/");
+      //   navigate("/");
 
-    //   navigate("/verify-otp");
+      //   navigate("/verify-otp");
     },
     onError: () => {
       toast.error("Failed to create user");
@@ -95,9 +94,12 @@ export const useResendOtp = () => {
     onSuccess: (response) => {
       toast.success("Otp sent successfully");
       //   queryClient.invalidateQueries({ queryKey: ["users"] });
+      if (response) {
+        sessionStorage.setItem("otp_id", response?.data?.otp_id);
+      }
     },
-    onError: () => {
-      toast.error("Failed to send otp");
+    onError: (error) => {
+      toast.error(error?.response?.data?.message || "Failed to send otp");
     },
   });
 };
