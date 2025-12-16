@@ -97,7 +97,7 @@ const VerifyOtp = () => {
         </p>
 
         {/* 🔁 Resend OTP (Static) */}
-        <button disabled className="text-sm text-gray-400 cursor-not-allowed mb-6">
+        <button disabled className="text-sm text-white mb-6 cursor-pointer p-2 rounded-lg bg-blue-300 hover:bg-blue-400">
           Resend OTP
         </button>
 
