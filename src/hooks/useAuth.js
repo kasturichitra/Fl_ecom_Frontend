@@ -89,7 +89,7 @@ export const useLogout = () => {
       toast.error("Failed to logout user");
     },
   });
-}
+};
 
 export const useVerifyOtp = () => {
   const navigate = useNavigate();
@@ -186,12 +186,11 @@ export const useResendOtp = () => {
   });
 };
 
-
 export const useAuthGetMe = () => {
   const query = useQuery({
     queryKey: ["auth-get-me"],
     queryFn: () => authGetMe(),
-    select : (res) => res?.data,
+    select: (res) => res?.data,
     // onSuccess: (response) => {
     //   toast.success("User verified successfully");
     // },
@@ -200,10 +199,15 @@ export const useAuthGetMe = () => {
     // },
   });
 
-  return {
-    isAuthenticated : query?.data?.isAuthenticated,
-    isLoading : query?.isLoading,
-    isError : query?.isError,
-    data : query?.data?.user
+  if (query?.data?.user?.id) {
+    sessionStorage.setItem("user_id", query?.data?.user?.id);
+    sessionStorage.setItem("permissions", btoa(JSON.stringify(query?.data?.user?.permissions)));
   }
+
+  return {
+    isAuthenticated: query?.data?.isAuthenticated,
+    isLoading: query?.isLoading,
+    isError: query?.isError,
+    data: query?.data?.user,
+  };
 };

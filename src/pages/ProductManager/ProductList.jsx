@@ -1,4 +1,3 @@
-
 import { Activity, useCallback, useEffect, useRef, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
@@ -315,6 +314,7 @@ const ProductList = () => {
               title="Product Manager"
               subtitle="Manage all store products"
               actionLabel="Add New Product"
+              createPermission="product:create"
               onAction={() => setShowAddModal(true)}
             />
 

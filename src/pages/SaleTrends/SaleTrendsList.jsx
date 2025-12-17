@@ -86,11 +86,14 @@ const SaleTrends = () => {
     setEditingTrend(item);
   }, []);
 
-  const handleDelete = useCallback(async (item) => {
-    if (window.confirm(`Delete ${item.trend_name}?`)) {
-      await deleteSaleTrend(item.trend_unique_id);
-    }
-  }, [deleteSaleTrend]);
+  const handleDelete = useCallback(
+    async (item) => {
+      if (window.confirm(`Delete ${item.trend_name}?`)) {
+        await deleteSaleTrend(item.trend_unique_id);
+      }
+    },
+    [deleteSaleTrend]
+  );
 
   const handleUpdate = async (formData) => {
     if (!editingTrend) return;
@@ -131,8 +134,9 @@ const SaleTrends = () => {
       flex: 1,
       renderCell: (params) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-            }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${
+            params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+          }`}
         >
           {params.row.is_active ? "Active" : "Inactive"}
         </span>
@@ -195,6 +199,7 @@ const SaleTrends = () => {
             title="Sale Trends"
             subtitle="Manage sale trends and products"
             actionLabel="Add New Trend"
+            createPermission="saleTrend:create"
             onAction={() => setShowModal(true)}
           />
 

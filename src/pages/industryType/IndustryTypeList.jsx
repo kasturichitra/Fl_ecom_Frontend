@@ -169,6 +169,7 @@ const IndustryTypeList = () => {
             title="Industry Types"
             subtitle="Manage all industry classifications"
             actionLabel="Add New Industry"
+            createPermission="industry:create"
             onAction={() => setShowAddModal(true)}
           />
 

@@ -110,8 +110,9 @@ const BrandListManager = () => {
       valueGetter: (params) => (params.value ? "Active" : "Inactive"), // Convert boolean → string
       renderCell: (params) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-            }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${
+            params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+          }`}
         >
           {params.row?.is_active ? "Active" : "Inactive"}
         </span>
@@ -191,6 +192,7 @@ const BrandListManager = () => {
             title="Brand Manager"
             subtitle="Manage all brands"
             actionLabel="Add New Brand"
+            createPermission="brand:create"
             onAction={() => setShowAddModal(true)}
           />
 
