@@ -84,14 +84,14 @@ const Login = () => {
               <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg">
                 <img
                   src="/navLogo.png"
-                  alt="Harvest Hub Logo"
+                  alt="FlowPipe Ecom Logo"
                   className="w-14 h-14 object-contain"
                   onError={(e) => {
                     e.target.style.display = "none";
                   }}
                 />
               </div>
-              <h1 className="text-4xl font-bold text-white">Harvest Hub</h1>
+              <h1 className="text-4xl font-bold text-white">FlowPipe Ecom</h1>
             </div>
             <div className="text-center text-white space-y-4">
               <h2 className="text-3xl font-semibold">Welcome Back</h2>
