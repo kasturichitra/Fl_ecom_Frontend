@@ -32,3 +32,7 @@ export const resetPassword = (formData) => {
 export const resendOtp = (data) => {
   return axiosInstance.post(`${BASE_URL}/resend-otp`, data);
 };
+
+export const authGetMe = () => {
+  return axiosInstance.get(`${BASE_URL}/me`);
+};
