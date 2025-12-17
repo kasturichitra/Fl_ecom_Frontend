@@ -50,17 +50,23 @@ const ForgotOtp = () => {
     // 🔐 API call will go here
 
     const otpId = sessionStorage.getItem("otp_id");
-    const reason = sessionStorage.getItem("reason");
+    // const reason = sessionStorage.getItem("reason");
 
-    const formData = new FormData();
-    formData.append("otp_id", otpId);
-    formData.append("reason", reason);
-    formData.append("otp", enteredOtp);
-    // formData
-    // "device_name": "Mobile"
-    formData.append("device_name", "Mobile");
+    // const formData = new FormData();
+    // formData.append("otp_id", otpId);
+    // // formData.append("reason", reason);
+    // formData.append("otp", enteredOtp);
+    // // formData
+    // // "device_name": "Mobile"
+    // formData.append("device_name", "Mobile");
 
-    await verifyForgotOtp(formData);
+    const payload = {
+      otp_id: otpId,
+      otp: enteredOtp,
+      device_name: "Mobile",
+    }
+
+    await verifyForgotOtp(payload);
   };
 
   /* ⏳ Format Timer */

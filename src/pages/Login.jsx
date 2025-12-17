@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useLogin } from "../hooks/useAuth";
 import { DEVICE_ID } from "../lib/constants";
+import { useDeviceDetect } from "../hooks/useDeviceDetect";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +11,9 @@ const Login = () => {
     rememberMe: false,
   });
 
+  const deviceInfo = useDeviceDetect();
+  console.log("deviceInfo", deviceInfo);
+  
   const { mutateAsync: login } = useLogin();
 
   const [errors, setErrors] = useState({
