@@ -16,6 +16,8 @@ import { useCategoryTableHeadersStore } from "../../stores/CategoryTableHeaderSt
 import CategoryEditModal from "./CategoryEditModal";
 import CategoryManager from "./CategoryManager";
 import useDebounce from "../../hooks/useDebounce.js";
+import useCheckPermission from "../../hooks/useCheckPermission.js";
+import VerifyPermission from "../../middleware/verifyPermission.js";
 
 const CategoryListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,6 +32,9 @@ const CategoryListManager = () => {
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const canUpdate = useCheckPermission("category:update");
+  const canDelete = useCheckPermission("category:delete");
 
   const { categoryHeaders, updateCategoryTableHeaders } = useCategoryTableHeadersStore();
 
@@ -126,7 +131,10 @@ const CategoryListManager = () => {
         </span>
       ),
     },
-    {
+  ];
+
+  if (canUpdate || canDelete) {
+    columns.push({
       field: "actions",
       headerName: "ACTIONS",
       width: 120,
@@ -135,24 +143,28 @@ const CategoryListManager = () => {
       disableColumnMenu: true,
       renderCell: (params) => (
         <div className="flex gap-3 items-center">
-          <button
-            onClick={() => handleEdit(params.row)}
-            className="text-indigo-600 hover:text-indigo-800 transition"
-            title="Edit"
-          >
-            <FaEdit size={18} />
-          </button>
-          <button
-            onClick={() => handleDelete(params.row)}
-            className="text-indigo-600 hover:text-indigo-800 transition"
-            title="Delete"
-          >
-            <MdDelete size={18} />
-          </button>
+          <VerifyPermission permission="category:update">
+            <button
+              onClick={() => handleEdit(params.row)}
+              className="text-indigo-600 hover:text-indigo-800 transition"
+              title="Edit"
+            >
+              <FaEdit size={18} />
+            </button>
+          </VerifyPermission>
+          <VerifyPermission permission="category:delete">
+            <button
+              onClick={() => handleDelete(params.row)}
+              className="text-indigo-600 hover:text-indigo-800 transition"
+              title="Delete"
+            >
+              <MdDelete size={18} />
+            </button>
+          </VerifyPermission>
         </div>
       ),
-    },
-  ];
+    });
+  }
 
   const visibleColumns = columns.filter((col) => {
     if (col.field === "actions") return true;

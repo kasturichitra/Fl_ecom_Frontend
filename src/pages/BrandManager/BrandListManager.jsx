@@ -15,14 +15,19 @@ import { useGetAllCategories } from "../../hooks/useCategory";
 import { useBrandTableHeadersStore } from "../../stores/BrandTableHeaderStore";
 import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector";
 import useDebounce from "../../hooks/useDebounce.js";
+import VerifyPermission from "../../middleware/verifyPermission.js";
+import useCheckPermission from "../../hooks/useCheckPermission.js";
 
 const BrandListManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [pageSize, setPageSize] = useState(10);
+  const [currentPage, setCurrentPage] = useState(0);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
 
-  const [pageSize, setPageSize] = useState(10);
-  const [currentPage, setCurrentPage] = useState(0); // 0-based page
+  const canUpdate = useCheckPermission("brand:update");
+  const canDelete = useCheckPermission("brand:delete");
+  // 0-based page
 
   // const { mutateAsync: deleteBrandMutation } = useDeleteBrand();
 
@@ -134,28 +139,32 @@ const BrandListManager = () => {
         );
       },
     },
-    {
+  ];
+
+  if (canUpdate || canDelete) {
+    columns.push({
       field: "actions",
       headerName: "ACTIONS",
-      sortable: false,
-      filterable: false,
-      width: 150,
+      flex: 1,
       headerClassName: "custom-header",
-      cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 flex gap-1",
-      hideable: false,
+      sortable: false,
       disableColumnMenu: true,
       renderCell: (params) => (
         <div className="flex gap-2 items-center">
-          <button onClick={() => handleEdit(params.row)} className="cursor-pointer">
-            <FaEdit size={18} className="text-[#4f46e5]" />
-          </button>
-          {/* <button onClick={() => handleDelete(params.row)}>
-            <MdDelete size={18} className="text-[#4f46e5]" />
-          </button> */}
+          <VerifyPermission permission="brand:update">
+            <button onClick={() => handleEdit(params.row)} className="cursor-pointer">
+              <FaEdit size={18} className="text-[#4f46e5]" />
+            </button>
+          </VerifyPermission>
+          <VerifyPermission permission="brand:delete">
+            <button onClick={() => handleDelete(params.row)} className="cursor-pointer">
+              <MdDelete size={18} className="text-[#4f46e5]" />
+            </button>
+          </VerifyPermission>
         </div>
       ),
-    },
-  ];
+    });
+  }
 
   const handleEdit = (brand) => {
     setEditingBrand(brand);
