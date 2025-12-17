@@ -6,10 +6,11 @@ import {
   FileText,
   Home,
   Layers,
+  LogOut,
   Package,
   Palette,
   Tag,
-  Users
+  Users,
 } from "lucide-react";
 
 /**
