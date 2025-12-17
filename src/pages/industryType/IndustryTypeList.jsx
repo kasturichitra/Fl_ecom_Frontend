@@ -62,11 +62,11 @@ const IndustryTypeList = () => {
     is_active: statusFun(),
   });
 
-  const { mutateAsync: updateIndustry } = useUpdateIndustry({
+  const { mutateAsync: updateIndustry, isPending: isUpdatingIndustry } = useUpdateIndustry({
     onSettled: () => setEditingIndustry(false),
   });
 
-  const { mutateAsync: deleteIndustry } = useDeleteIndustry();
+  const { mutateAsync: deleteIndustry, isPending: isDeletingIndustry } = useDeleteIndustry();
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingIndustry, setEditingIndustry] = useState(null);
@@ -152,7 +152,8 @@ const IndustryTypeList = () => {
           <VerifyPermission permission="industry:delete">
             <button
               onClick={() => handleDelete(params.row)}
-              className="text-indigo-600 hover:text-indigo-800 transition"
+              disabled={isDeletingIndustry}
+              className="text-indigo-600 hover:text-indigo-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
               title="Delete"
             >
               <MdDelete size={18} />
@@ -241,6 +242,7 @@ const IndustryTypeList = () => {
           formData={editingIndustry}
           onSubmit={handleUpdate}
           closeModal={() => setEditingIndustry(null)}
+          isSubmitting={isUpdatingIndustry}
         />
       )}
       {/* <Activity mode={editingIndustry ? "visible" : "hidden"}>

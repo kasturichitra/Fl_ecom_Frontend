@@ -4,7 +4,7 @@ import { useCreateIndustry } from "../../hooks/useIndustry";
 import { objectToFormData } from "../../utils/ObjectToFormData";
 
 const IndustryTypeManager = ({ onCancel }) => {
-  const { mutateAsync: createIndustry } = useCreateIndustry({
+  const { mutateAsync: createIndustry, isPending: isCreatingIndustry } = useCreateIndustry({
     onSuccess: () => {
       onCancel();
     },
@@ -29,12 +29,8 @@ const IndustryTypeManager = ({ onCancel }) => {
 
   return (
     <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200 relative">
-
       {/* ONLY ADDED THIS BUTTON — NO OTHER CHANGE */}
-      <button
-        onClick={onCancel}
-        className="absolute text-white right-3 top-1  hover:text-red-600 text-3xl"
-      >
+      <button onClick={onCancel} className="absolute text-white right-3 top-1  hover:text-red-600 text-3xl">
         ×
       </button>
 
@@ -46,9 +42,11 @@ const IndustryTypeManager = ({ onCancel }) => {
         <IndustryTypeForm
           fields={fields}
           onSubmit={handleAddIndustryType}
+          isSubmitting={isCreatingIndustry}
           additionalContent={
             <FormActionButtons
               submitLabel="Create Industry Type"
+              isSubmitting={isCreatingIndustry}
               onCancel={handleCancel}
             />
           }

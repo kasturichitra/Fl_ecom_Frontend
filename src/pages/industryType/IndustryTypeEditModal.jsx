@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import EditModalLayout from "../../components/EditModalLayout";
 import DynamicForm from "../../components/DynamicForm";
 
-const IndustryTypeEditModal = ({ formData: initialData, closeModal, onSubmit }) => {
+const IndustryTypeEditModal = ({ formData: initialData, closeModal, onSubmit, isSubmitting }) => {
   const [formData, setLocalFormData] = useState({
     ...initialData,
   });
@@ -69,7 +69,7 @@ const IndustryTypeEditModal = ({ formData: initialData, closeModal, onSubmit }) 
       closeModal={closeModal}
       onSubmit={handleSubmit}
       submitLabel="Update Industry Type"
-      isLoading={false}
+      isLoading={isSubmitting}
     >
       <DynamicForm
         // onCancel={onCancel}

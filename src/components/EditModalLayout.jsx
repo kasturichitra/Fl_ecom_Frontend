@@ -40,7 +40,7 @@ bg-white/20 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg
             <button
               type="submit"
               disabled={isLoading}
-              className={`flex-1 py-4 rounded-xl font-bold text-white text-lg transition ${
+              className={`flex-1 py-4 rounded-xl font-bold text-white text-lg transition disabled:opacity-50 disabled:cursor-not-allowed ${
                 isLoading
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-xl transform hover:scale-105"
