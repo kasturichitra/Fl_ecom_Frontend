@@ -112,16 +112,12 @@ export const useVerifyOtp = () => {
   });
 };
 
-export const useForgotPassword = () => {
+export const useForgotPassword = (options = {}) => {
   const navigate = useNavigate();
   return useMutation({
     mutationFn: (data) => forgotPassword(data),
     onSuccess: (response) => {
-      // toast.success("User verified successfully");
-
-      console.log("response", response);
       const data = response?.data;
-      // console.log("data from forgot password", data);
       if (data) {
         console.log("setnigs");
         sessionStorage.setItem("otp_id", data?.otp_id);
@@ -129,12 +125,15 @@ export const useForgotPassword = () => {
         sessionStorage.setItem("requireOtp", data?.requireOtp);
       }
 
+      options?.onSuccess?.(response);
+
       if (data?.requireOtp) {
         navigate("/verify-forgot-otp");
       }
     },
-    onError: () => {
+    onError: (error) => {
       toast.error("Failed to verify user");
+      options?.onError?.(error);
     },
   });
 };

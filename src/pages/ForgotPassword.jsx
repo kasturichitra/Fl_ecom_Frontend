@@ -1,16 +1,19 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useForgotPassword } from "../hooks/useAuth";
-// import { useForgotPassword } from "../hooks/useAuth";
 
 const ForgotPassword = () => {
   const [identifier, setIdentifier] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  //   const { mutateAsync: forgotPassword } = useForgotPassword();
-
-  const { mutateAsync: forgotPassword } = useForgotPassword();
+  const { mutateAsync: forgotPassword, isPending: isForgotPasswordPending } = useForgotPassword({
+    onError: (err) => {
+      setError(err.response?.data?.message || "Failed to send OTP");
+    },
+    onSuccess: () => {
+      setSuccess("OTP sent successfully. Please check your messages.");
+    },
+  });
 
   // Regex
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -33,23 +36,9 @@ const ForgotPassword = () => {
   const handleSendOtp = async () => {
     if (!identifier || error) return;
 
-    setLoading(true);
-    setError("");
-    setSuccess("");
+    const payload = emailPattern.test(identifier) ? { email: identifier } : { phone_number: identifier };
 
-    try {
-      const payload = emailPattern.test(identifier) ? { email: identifier } : { phone_number: identifier };
-
-      console.log("payload", payload);
-
-      await forgotPassword(payload);
-
-      setSuccess("OTP sent successfully. Please check your messages.");
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to send OTP");
-    } finally {
-      setLoading(false);
-    }
+    await forgotPassword(payload);
   };
 
   return (
@@ -77,10 +66,10 @@ const ForgotPassword = () => {
         {/* Button */}
         <button
           onClick={handleSendOtp}
-          disabled={loading || !!error || !identifier}
+          disabled={isForgotPasswordPending || !!error || !identifier}
           className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition"
         >
-          {loading ? "Sending OTP..." : "Send OTP"}
+          {isForgotPasswordPending ? "Sending OTP..." : "Send OTP"}
         </button>
       </div>
     </div>

@@ -9,8 +9,7 @@ const ForgotOtp = () => {
   const [timeLeft, setTimeLeft] = useState(TIMER_SECONDS);
   const inputsRef = useRef([]);
 
-  const { mutateAsync: verifyForgotOtp } = useVerifyForgotOtp();
-
+  const { mutateAsync: verifyForgotOtp, isPending: isVerifyForgotOtpPending } = useVerifyForgotOtp();
 
   /* ⏱️ Countdown Timer */
   useEffect(() => {
@@ -64,7 +63,7 @@ const ForgotOtp = () => {
       otp_id: otpId,
       otp: enteredOtp,
       device_name: "Mobile",
-    }
+    };
 
     await verifyForgotOtp(payload);
   };
@@ -111,10 +110,10 @@ const ForgotOtp = () => {
         {/* ✅ Verify Button */}
         <button
           onClick={handleVerify}
-          disabled={otp.includes("")}
+          disabled={otp.includes("") || isVerifyForgotOtpPending}
           className="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Verify
+          {isVerifyForgotOtpPending ? "Verifying..." : "Verify OTP"}
         </button>
       </div>
     </div>
