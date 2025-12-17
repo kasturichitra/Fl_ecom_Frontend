@@ -36,7 +36,6 @@ const BrandListManager = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { brandHeaders, updateBrandTableHeaders } = useBrandTableHeadersStore();
-  // console.log("activeStatus", activeStatus);
 
   const handleClickOutside = useCallback((event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -81,7 +80,6 @@ const BrandListManager = () => {
     category_unique_id: caterogyId,
   });
 
-  // console.log("brandsData", brandsData?.data);
   const data = brandsData?.data || [];
 
   const columns = [

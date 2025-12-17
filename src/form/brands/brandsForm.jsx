@@ -39,18 +39,14 @@ const BrandForm = ({ fields, categories, onSubmit, onCancel, defaultValues, isSu
       />
 
       <div className="flex justify-end space-x-2 mt-4">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="px-4 py-2 rounded-md border bg-gray-200 text-gray-700"
-        >
+        <button type="button" onClick={onCancel} className="px-4 py-2 rounded-md border bg-gray-200 text-gray-700">
           Cancel
         </button>
         <button
           type="button"
           onClick={handleSubmit(onSubmit)}
           disabled={isSubmitting}
-          className="px-4 py-2 rounded-md bg-blue-600 text-white"
+          className="px-4 py-2 rounded-md bg-blue-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? "Submitting..." : "Submit"}
         </button>
