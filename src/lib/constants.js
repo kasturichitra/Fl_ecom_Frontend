@@ -56,5 +56,3 @@ export const MONTHS = [
   "November",
   "December",
 ];
-
-export const DEVICE_ID = "abcde";

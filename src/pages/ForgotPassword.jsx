@@ -40,9 +40,6 @@ const ForgotPassword = () => {
     try {
       const payload = emailPattern.test(identifier) ? { email: identifier } : { phone_number: identifier };
 
-      // console.log("payload", payload.add("device_id", "abcd"));
-      payload.device_id = "abcd";
-
       console.log("payload", payload);
 
       await forgotPassword(payload);

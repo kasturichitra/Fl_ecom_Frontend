@@ -8,6 +8,7 @@ import {
   resetPassword,
   resendOtp,
   authGetMe,
+  logout,
 } from "../ApiServices/authService";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -75,6 +76,20 @@ export const useLogin = () => {
     },
   });
 };
+
+export const useLogout = () => {
+  const navigate = useNavigate();
+  return useMutation({
+    mutationFn: () => logout(),
+    onSuccess: () => {
+      toast.success("User logged out successfully");
+      navigate("/login");
+    },
+    onError: () => {
+      toast.error("Failed to logout user");
+    },
+  });
+}
 
 export const useVerifyOtp = () => {
   const navigate = useNavigate();

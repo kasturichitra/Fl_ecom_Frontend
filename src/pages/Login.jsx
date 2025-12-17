@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useLogin } from "../hooks/useAuth";
-import { DEVICE_ID } from "../lib/constants";
 import { useDeviceDetect } from "../hooks/useDeviceDetect";
 
 const Login = () => {
@@ -57,7 +56,6 @@ const Login = () => {
       // Build payload
       const payload = {
         password: formData.password,
-        device_id: DEVICE_ID,
         device_name: "Web Browser",
       };
 
