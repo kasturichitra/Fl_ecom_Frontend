@@ -19,6 +19,7 @@ import VerifyOtp from "./pages/VerifyOtp";
 import ForgotPassword from "./pages/ForgotPassword";
 import ForgotOtp from "./pages/ForgotOtp";
 import ResetPassword from "./pages/ResetPassword";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // Lazy-loaded pages
 const CategoryManager = lazy(() => import("./pages/CategoryManager/CategoryManager"));
@@ -129,50 +130,52 @@ const App = () => {
         />
 
         {/* Main Routes - With Sidebar/Navbar */}
-        <Route
-          path="/*"
-          element={
-            <MainLayout>
-              <Suspense
-                fallback={
-                  <div className="flex items-center justify-center h-screen">
-                    <div className="text-3xl font-bold text-indigo-600 animate-pulse">Loading...</div>
-                  </div>
-                }
-              >
-                <Routes>
-                  <Route path="/" element={<Dashboard />} />
+        <Route element={<ProtectedRoute />}>
+          <Route
+            path="/*"
+            element={
+              <MainLayout>
+                <Suspense
+                  fallback={
+                    <div className="flex items-center justify-center h-screen">
+                      <div className="text-3xl font-bold text-indigo-600 animate-pulse">Loading...</div>
+                    </div>
+                  }
+                >
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
 
-                  {/* List Pages */}
-                  <Route path="/industryTypeList" element={<IndustryTypeList />} />
-                  <Route path="/saleTrends" element={<SaleTrends />} />
-                  <Route path="/saleTrends/:id" element={<SingleSaleTrendPage />} />
-                  <Route path="/CategoryList" element={<CategoryListManager />} />
-                  <Route path="/brands" element={<BrandListManager />} />
-                  <Route path="/productList" element={<ProductList />} />
-                  <Route path="/order" element={<OrderListManager />} />
+                    {/* List Pages */}
+                    <Route path="/industryTypeList" element={<IndustryTypeList />} />
+                    <Route path="/saleTrends" element={<SaleTrends />} />
+                    <Route path="/saleTrends/:id" element={<SingleSaleTrendPage />} />
+                    <Route path="/CategoryList" element={<CategoryListManager />} />
+                    <Route path="/brands" element={<BrandListManager />} />
+                    <Route path="/productList" element={<ProductList />} />
+                    <Route path="/order" element={<OrderListManager />} />
 
-                  {/* Add / Create Pages */}
-                  <Route path="/add-industry-type" element={<IndustryTypeManager />} />
-                  <Route path="/add-category" element={<CategoryManager />} />
-                  <Route path="/add-brand" element={<BrandManager />} />
-                  <Route path="/add-product" element={<ProductManager />} />
-                  <Route path="/order-products-detailes/:id" element={<OrderProductsDetailes />} />
+                    {/* Add / Create Pages */}
+                    <Route path="/add-industry-type" element={<IndustryTypeManager />} />
+                    <Route path="/add-category" element={<CategoryManager />} />
+                    <Route path="/add-brand" element={<BrandManager />} />
+                    <Route path="/add-product" element={<ProductManager />} />
+                    <Route path="/order-products-detailes/:id" element={<OrderProductsDetailes />} />
 
-                  <Route path="/createOrder" element={<CreateOrder />} />
-                  <Route path="/employee" element={<EmployeeList />} />
-                  <Route path="/theme" element={<ThemeManager />} />
-                  <Route path="/users" element={<UsersList />} />
-                  <Route path="/notificationList" element={<NotificationList />} />
+                    <Route path="/createOrder" element={<CreateOrder />} />
+                    <Route path="/employee" element={<EmployeeList />} />
+                    <Route path="/theme" element={<ThemeManager />} />
+                    <Route path="/users" element={<UsersList />} />
+                    <Route path="/notificationList" element={<NotificationList />} />
 
-                  
- 
-                  <Route path="*" element={<PageNotFound />} />
-                </Routes>
-              </Suspense>
-            </MainLayout>
-          }
-        />
+
+
+                    <Route path="*" element={<PageNotFound />} />
+                  </Routes>
+                </Suspense>
+              </MainLayout>
+            }
+          />
+        </Route>
       </Routes>
     </Router>
   );

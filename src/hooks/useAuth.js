@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   register,
   verifyOtp,
@@ -7,6 +7,7 @@ import {
   verifyForgotOtp,
   resetPassword,
   resendOtp,
+  authGetMe,
 } from "../ApiServices/authService";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -168,4 +169,26 @@ export const useResendOtp = () => {
       toast.error(error?.response?.data?.message || "Failed to send otp");
     },
   });
+};
+
+
+export const useAuthGetMe = () => {
+  const query = useQuery({
+    queryKey: ["auth-get-me"],
+    queryFn: () => authGetMe(),
+    select : (res) => res?.data,
+    // onSuccess: (response) => {
+    //   toast.success("User verified successfully");
+    // },
+    // onError: () => {
+    //   toast.error("Failed to verify user");
+    // },
+  });
+
+  return {
+    isAuthenticated : query?.data?.isAuthenticated,
+    isLoading : query?.isLoading,
+    isError : query?.isError,
+    data : query?.data?.user
+  }
 };
