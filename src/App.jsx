@@ -20,6 +20,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ForgotOtp from "./pages/ForgotOtp";
 import ResetPassword from "./pages/ResetPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ContactInfoManager from "./pages/ContactInfo/ContactInfoManager";
 
 // Lazy-loaded pages
 const CategoryManager = lazy(() => import("./pages/CategoryManager/CategoryManager"));
@@ -167,6 +168,7 @@ const App = () => {
                     <Route path="/users" element={<UsersList />} />
                     <Route path="/notificationList" element={<NotificationList />} />
 
+                    <Route path="/contactInfo" element={<ContactInfoManager />} />
 
 
                     <Route path="*" element={<PageNotFound />} />

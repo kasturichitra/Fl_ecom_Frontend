@@ -10,6 +10,8 @@ const ThemeManager = () => {
   const [savedTheme, setSavedTheme] = useState(null);
   const { data: currentConfig } = useGetCurrentConfig();
 
+  // console.log("currentConfig", currentConfig);
+
   // Form state for theme configuration
   const [theme, setTheme] = useState({
     mode: "light",
@@ -171,7 +173,7 @@ const ThemeManager = () => {
 
             {/* Saved Theme Display */}
             {savedTheme && (
-              <div className="mt-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200">
+              <div className="mt-6 bg-linear-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200">
                 <div className="flex items-center gap-3 mb-4">
                   <FaCheckCircle className="text-green-600 text-2xl" />
                   <div>
