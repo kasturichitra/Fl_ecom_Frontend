@@ -75,7 +75,7 @@ const EmployeeManager = ({ onCancel }) => {
             <FormActionButtons
               onCancel={onCancel}
               submitLabel={isSubmitting ? "Creating..." : "Create Employee"}
-              disabled={isSubmitting}
+              isSubmitting={isSubmitting}
             />
           }
         />

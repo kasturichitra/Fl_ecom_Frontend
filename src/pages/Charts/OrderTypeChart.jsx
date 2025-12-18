@@ -3,8 +3,8 @@ import CommonPieChart from "./CommonPieChart";
 import { useGetOrdersByType } from "../../hooks/useDashboard";
 import { toIndianCurrency } from "../../utils/toIndianCurrency";
 
-const OrderTypeChart = () => {
-  const { data: ordersByTypeData, isLoading, isError } = useGetOrdersByType();
+const OrderTypeChart = ({ from, to }) => {
+  const { data: ordersByTypeData, isLoading, isError } = useGetOrdersByType({ from, to });
 
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Error loading order types</p>;
@@ -26,15 +26,7 @@ const OrderTypeChart = () => {
 
   const colors = ["#60a5fa", "#fb923c", "#10b981", "#f59e0b", "#ec4899"]; // Add more if needed
 
-  return (
-    <CommonPieChart
-      title="Orders by Type"
-      labels={labels}
-      counts={counts}
-      stats={stats}
-      colors={colors}
-    />
-  );
+  return <CommonPieChart title="Orders by Type" labels={labels} counts={counts} stats={stats} colors={colors} />;
 };
 
 export default OrderTypeChart;

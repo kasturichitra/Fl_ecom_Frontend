@@ -125,11 +125,11 @@ const ProductList = () => {
   const totalCount = productsResponse?.totalCount ?? (Array.isArray(rows) ? rows.length : 0);
 
   const { mutate: deleteProduct } = useDeleteProduct();
-  const { mutateAsync: downloadExcel } = useDownloadProductExcel({
+  const { mutateAsync: downloadExcel, isPending: isDownloadingExcel } = useDownloadProductExcel({
     onSuccess: () => setIsOpen(false),
   });
 
-  const { mutateAsync: createBulkProducts } = useCreateBulkProducts({
+  const { mutateAsync: createBulkProducts, isPending: isCreatingBulkProducts } = useCreateBulkProducts({
     onSuccess: (response) => {
       setBulkResultData(response?.data?.data);
       setShowBulkResultModal(true);
@@ -358,13 +358,15 @@ const ProductList = () => {
                   Download Excel
                 </button>
 
-                <button
-                  onClick={() => setIsUploadOpen(true)}
-                  className="bg-white text-indigo-600 font-bold px-5 py-3 rounded-lg shadow hover:bg-indigo-50 flex items-center gap-2 cursor-pointer"
-                >
-                  <FaFileUpload />
-                  Upload Excel
-                </button>
+                <VerifyPermission permission="product:create">
+                  <button
+                    onClick={() => setIsUploadOpen(true)}
+                    className="bg-white text-indigo-600 font-bold px-5 py-3 rounded-lg shadow hover:bg-indigo-50 flex items-center gap-2 cursor-pointer"
+                  >
+                    <FaFileUpload />
+                    Upload Excel
+                  </button>
+                </VerifyPermission>
               </div>
             </div>
 
@@ -430,6 +432,7 @@ const ProductList = () => {
         setSearchTerm={setExcelSearchTerm}
         showDropdown={showExcelDropdown}
         setShowDropdown={setShowExcelDropdown}
+        isSubmitting={isDownloadingExcel}
         handleSelect={handleExcelCategorySelect}
       />
 
@@ -453,6 +456,7 @@ const ProductList = () => {
         setShowDropdown={setShowUploadDropdown}
         handleSelect={handleUploadCategorySelect}
         onFileChange={handleExcelUpload}
+        isSubmitting={isCreatingBulkProducts}
       />
 
       <Activity mode={showBulkResultModal ? "visible" : "hidden"}>

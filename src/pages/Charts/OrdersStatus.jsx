@@ -1,19 +1,18 @@
 import React from "react";
 import CommonPieChart from "./CommonPieChart";
-import { useGetOrdersStatus } from "../../hooks/useDashboard";
+import { useGetOrdersByStatus } from "../../hooks/useDashboard";
 
-const OrdersStatusChart = () => {
-  const { data: orderStatusData, isLoading, isError } = useGetOrdersStatus();
+const OrdersStatusChart = ({ from, to }) => {
+  const { data: orderStatusData, isLoading, isError } = useGetOrdersByStatus({ from, to });
   // console.log(orderStatusData,"orderStatusData");
-  
 
   if (isLoading) return <p>Loading...</p>;
   if (isError || !orderStatusData) return <p>Error loading order status</p>;
 
   // Convert object → arrays
-  const labels = Object.keys(orderStatusData);                 // ["pending", "processing", ...]
-  const counts = Object.values(orderStatusData).map(i => i.count);
-  const values = Object.values(orderStatusData).map(i => i.value);
+  const labels = Object.keys(orderStatusData); // ["pending", "processing", ...]
+  const counts = Object.values(orderStatusData).map((i) => i.count);
+  const values = Object.values(orderStatusData).map((i) => i.value);
 
   // console.log("labels", labels);
   // console.log("counts", counts);
@@ -31,13 +30,7 @@ const OrdersStatusChart = () => {
   const colors = ["#a78bfa", "#60a5fa", "#93c5fd", "#6ee7b7", "#f87171", "#fb923c"];
 
   return (
-    <CommonPieChart
-      title="Orders Status Overview"
-      labels={labels}
-      counts={counts}
-      stats={stats}
-      colors={colors}
-    />
+    <CommonPieChart title="Orders Status Overview" labels={labels} counts={counts} stats={stats} colors={colors} />
   );
 };
 
