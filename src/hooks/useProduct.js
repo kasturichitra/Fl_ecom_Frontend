@@ -5,6 +5,7 @@ import {
   deleteProductApi,
   downloadProductsExcelApi,
   getAllProductsApi,
+  getProductQrPdf,
   updateProductApi,
 } from "../ApiServices/productService";
 import toast from "react-hot-toast";
@@ -127,6 +128,32 @@ export const useCreateBulkProducts = (options = {}) => {
     },
     onError: () => {
       toast.error("Failed to create bulk products");
+    },
+  });
+};
+
+export const useGetProductQrPdf = (options = {}) => {
+  return useMutation({
+    mutationFn: ({ product_unique_id, quantity }) => getProductQrPdf(product_unique_id, { quantity }),
+    onSuccess: (response) => {
+      const blob = new Blob([response.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const printWindow = window.open(url);
+
+      if (printWindow) {
+        // Optional: you can attempt printWindow.print() here if desired
+      }
+
+      toast.success("Product QR PDF generated successfully");
+      options?.onSuccess?.();
+    },
+    onError: (error) => {
+      console.error("Failed to generate QR PDF", error);
+      toast.error("Failed to download product QR PDF");
+      options?.onError?.(error);
+    },
+    onSettled: () => {
+      options?.onSettled?.();
     },
   });
 };

@@ -40,7 +40,7 @@ const PageLayoutWithTable = ({
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
           {/* Header */}
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white px-8 py-7 flex justify-between items-center">
+          <div className="bg-linear-to-r from-indigo-600 to-purple-700 text-white px-8 py-7 flex justify-between items-center">
             <div>
               <h1 className="text-4xl font-extrabold">{title}</h1>
               {subtitle && <p className="text-indigo-100 text-lg mt-1">{subtitle}</p>}

@@ -44,3 +44,9 @@ export const createBulkProductsApi = (data) => {
     },
   });
 };
+
+export const getProductQrPdf = (product_unique_id, data) => {
+  return axiosInstance.put(`${BASE_URL}/qr-pdf/${product_unique_id}`, data, {
+    responseType: "blob",
+  });
+};
