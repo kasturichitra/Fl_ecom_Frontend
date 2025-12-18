@@ -11,6 +11,8 @@ import formatDate from "../../utils/formatDate.js";
 import { useNavigate } from "react-router-dom";
 import SaleTrendsManager from "./SaleTrendsManager.jsx";
 import SaleTrendEditModal from "./SaleTrendEditModal.jsx";
+import useCheckPermission from "../../hooks/useCheckPermission.js";
+import VerifyPermission from "../../middleware/verifyPermission.js";
 
 const SaleTrends = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,6 +22,9 @@ const SaleTrends = () => {
   const [activeStatus, setActiveStatus] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingTrend, setEditingTrend] = useState(null);
+
+  const canUpdate = useCheckPermission("saletrend:update");
+  const canDelete = useCheckPermission("saletrend:delete");
 
   const navigate = useNavigate();
 
@@ -86,11 +91,14 @@ const SaleTrends = () => {
     setEditingTrend(item);
   }, []);
 
-  const handleDelete = useCallback(async (item) => {
-    if (window.confirm(`Delete ${item.trend_name}?`)) {
-      await deleteSaleTrend(item.trend_unique_id);
-    }
-  }, [deleteSaleTrend]);
+  const handleDelete = useCallback(
+    async (item) => {
+      if (window.confirm(`Delete ${item.trend_name}?`)) {
+        await deleteSaleTrend(item.trend_unique_id);
+      }
+    },
+    [deleteSaleTrend]
+  );
 
   const handleUpdate = async (formData) => {
     if (!editingTrend) return;
@@ -131,14 +139,18 @@ const SaleTrends = () => {
       flex: 1,
       renderCell: (params) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-            }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${
+            params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+          }`}
         >
           {params.row.is_active ? "Active" : "Inactive"}
         </span>
       ),
     },
-    {
+  ];
+
+  if (canUpdate || canDelete) {
+    columns.push({
       field: "actions",
       headerName: "ACTIONS",
       width: 120,
@@ -147,30 +159,34 @@ const SaleTrends = () => {
       disableColumnMenu: true,
       renderCell: (params) => (
         <div className="flex gap-3 items-center">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleEdit(params.row);
-            }}
-            className="text-indigo-600 hover:text-indigo-800 transition"
-            title="Edit"
-          >
-            <FaEdit size={18} />
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDelete(params.row);
-            }}
-            className="text-indigo-600 hover:text-indigo-800 transition"
-            title="Delete"
-          >
-            <MdDelete size={18} />
-          </button>
+          <VerifyPermission permission="saletrend:update">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleEdit(params.row);
+              }}
+              className="text-indigo-600 hover:text-indigo-800 transition"
+              title="Edit"
+            >
+              <FaEdit size={18} />
+            </button>
+          </VerifyPermission>
+          <VerifyPermission permission="saletrend:delete">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete(params.row);
+              }}
+              className="text-indigo-600 hover:text-indigo-800 transition"
+              title="Delete"
+            >
+              <MdDelete size={18} />
+            </button>
+          </VerifyPermission>
         </div>
       ),
-    },
-  ];
+    });
+  }
 
   const tableData = saleTrendsData?.data?.map((item) => ({
     ...item,
@@ -195,6 +211,7 @@ const SaleTrends = () => {
             title="Sale Trends"
             subtitle="Manage sale trends and products"
             actionLabel="Add New Trend"
+            createPermission="saletrend:create"
             onAction={() => setShowModal(true)}
           />
 

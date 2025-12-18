@@ -18,7 +18,7 @@ const CategoryManager = ({ onCancel }) => {
 
   const [showAttributes, setShowAttributes] = useState(false);
 
-  const { mutateAsync: createCategory } = useCreateCategory({
+  const { mutateAsync: createCategory, isPending: isCreatingCategory } = useCreateCategory({
     onSuccess: () => {
       setAttributes([{ name: "", code: "", description: "", units: "", is_active: true }]);
       setShowAttributes(false);
@@ -132,6 +132,7 @@ const CategoryManager = ({ onCancel }) => {
           <CategoryForm
             fields={categoryFields}
             onSubmit={handleSubmit}
+            isSubmitting={isCreatingCategory}
             onCancel={onCancel}
             additionalContent={
               <>
@@ -241,7 +242,11 @@ const CategoryManager = ({ onCancel }) => {
                 </div>
 
                 {/* Form Action Buttons */}
-                <FormActionButtons submitLabel="Create Category" onCancel={onCancel} />
+                <FormActionButtons
+                  submitLabel="Create Category"
+                  onCancel={onCancel}
+                  isSubmitting={isCreatingCategory}
+                />
               </>
             }
           />

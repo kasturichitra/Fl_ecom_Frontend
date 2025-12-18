@@ -6,30 +6,19 @@ import { useUpdateBrand } from "../../hooks/useBrand";
 import { useGetAllCategories } from "../../hooks/useCategory";
 
 const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }) => {
-  // const { token, tenantId } = useSelector((state) => state.auth || {});
-  console.log(brand, "brand....?");
-  const {
-    mutateAsync: updateBrand,
-    isPending: isUpdating,
-    onSuccess: success,
-  } = useUpdateBrand({
+  const { mutateAsync: updateBrand, isPending: isUpdatingBrand } = useUpdateBrand({
     onSettled: () => {
-      setIsLoading(false);
       setEditingBrand(null);
     },
   });
 
-  // console.log(brand, "brand");
   const { data: categoriesData, isLoaing, isError } = useGetAllCategories({});
-  // console.log("categories", brand.categories);
 
   const getSelectedCategoryObjects = (brandCategories = [], categoriesData = []) => {
     if (!Array?.isArray(brandCategories) || !Array?.isArray(categoriesData)) return [];
 
     return categoriesData?.filter((cat) => brandCategories?.includes(cat?._id));
   };
-
-  console.log("selected categories", getSelectedCategoryObjects(brand?.categories, categoriesData));
 
   const [form, setForm] = useState({
     categories: brand?.categories || [],
@@ -42,7 +31,6 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
 
   const [imagePreview, setImagePreview] = useState(brand?.brand_image || "");
   const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
 
   const validate = () => {
     const e = {};
@@ -69,8 +57,6 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
     e.preventDefault();
     if (!validate()) return;
 
-    setIsLoading(true);
-
     const fd = new FormData();
 
     form.categories.forEach((id) => fd?.append("categories[]", id));
@@ -89,22 +75,10 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
       fd.append("brand_image", "");
     }
 
-    try {
-      console.log("before update");
-
-      await updateBrand({
-        id: brand?._id,
-        data: fd,
-      });
-
-      setEditingBrand(null);
-
-      console.log("after update");
-    } catch (err) {
-      // alert("Update failed: " + (err.message || "Please try again"));
-    } finally {
-      setIsLoading(false);
-    }
+    await updateBrand({
+      id: brand?._id,
+      data: fd,
+    });
   };
 
   const fields = [
@@ -147,7 +121,7 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
       closeModal={onClose}
       onSubmit={handleSubmit}
       submitLabel="Update Brand"
-      isLoading={isLoading}
+      isLoading={isUpdatingBrand}
     >
       {/* Category Selector (Not in DynamicForm) */}
       <div className="mb-6">

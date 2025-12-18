@@ -12,8 +12,8 @@ const Login = () => {
 
   const deviceInfo = useDeviceDetect();
   console.log("deviceInfo", deviceInfo);
-  
-  const { mutateAsync: login } = useLogin();
+
+  const { mutateAsync: login, isPending: isLoginPending } = useLogin();
 
   const [errors, setErrors] = useState({
     identifier: "",
@@ -52,26 +52,20 @@ const Login = () => {
     }
     if (errors.identifier) return;
 
-    try {
-      // Build payload
-      const payload = {
-        password: formData.password,
-        device_name: "Web Browser",
-      };
+    // Build payload
+    const payload = {
+      password: formData.password,
+      device_name: "Web Browser",
+    };
 
-      // Send as phone_number if it's a 10-digit number, else as email
-      if (mobilePattern.test(formData.identifier)) {
-        payload.phone_number = formData.identifier;
-      } else {
-        payload.email = formData.identifier;
-      }
-
-      console.log("Login success:", payload);
-      const response = await login(payload);
-      console.log(response);
-    } catch (error) {
-      console.error("Login failed:", error.response?.data || error.message);
+    // Send as phone_number if it's a 10-digit number, else as email
+    if (mobilePattern.test(formData.identifier)) {
+      payload.phone_number = formData.identifier;
+    } else {
+      payload.email = formData.identifier;
     }
+
+    await login(payload);
   };
 
   return (
@@ -84,14 +78,14 @@ const Login = () => {
               <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg">
                 <img
                   src="/navLogo.png"
-                  alt="Harvest Hub Logo"
+                  alt="FlowPipe Ecom Logo"
                   className="w-14 h-14 object-contain"
                   onError={(e) => {
                     e.target.style.display = "none";
                   }}
                 />
               </div>
-              <h1 className="text-4xl font-bold text-white">Harvest Hub</h1>
+              <h1 className="text-4xl font-bold text-white">FlowPipe Ecom</h1>
             </div>
             <div className="text-center text-white space-y-4">
               <h2 className="text-3xl font-semibold">Welcome Back</h2>
@@ -233,7 +227,7 @@ const Login = () => {
 
                 {/* Remember Me & Forgot Password */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center">
+                  {/* <div className="flex items-center">
                     <input
                       type="checkbox"
                       id="rememberMe"
@@ -245,7 +239,7 @@ const Login = () => {
                     <label htmlFor="rememberMe" className="ml-2 block text-sm text-gray-700 cursor-pointer">
                       Remember me
                     </label>
-                  </div>
+                  </div> */}
                   <Link
                     to="/forgot-password"
                     className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
@@ -257,9 +251,10 @@ const Login = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full bg-linear-to-r from-blue-500 to-blue-600 text-white py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl"
+                  disabled={isLoginPending}
+                  className="w-full bg-linear-to-r from-blue-500 to-blue-600 text-white py-3 rounded-lg font-semibold hover:from-blue-600 hover:to-blue-700 transform hover:scale-[1.02] transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Sign In
+                  {isLoginPending ? "Signing in..." : "Sign In"}
                 </button>
 
                 {/* Other content remains unchanged */}

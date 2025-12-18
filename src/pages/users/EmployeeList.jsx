@@ -123,6 +123,7 @@ const EmployeeList = () => {
               title="Employee Manager"
               subtitle="Manage all registered Employees"
               actionLabel="Create Employee"
+              createPermission="user:create"
               onAction={() => setShowAddModal(true)}
             />
 
@@ -162,7 +163,7 @@ const EmployeeList = () => {
                   setCurrentPage={setCurrentPage}
                   setPageSize={setPageSize}
                   sort="" // Client-side sorting not implemented yet, or can be added if needed
-                  setSort={() => { }}
+                  setSort={() => {}}
                 />
               )}
             </div>

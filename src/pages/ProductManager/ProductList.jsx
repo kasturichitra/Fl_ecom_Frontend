@@ -1,4 +1,3 @@
-
 import { Activity, useCallback, useEffect, useRef, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
@@ -29,6 +28,8 @@ import { toIndianCurrency } from "../../utils/toIndianCurrency.js";
 import ProductEditModal from "./ProductEditModal";
 import ProductManager from "./ProductManager";
 import useDebounce from "../../hooks/useDebounce.js";
+import useCheckPermission from "../../hooks/useCheckPermission.js";
+import VerifyPermission from "../../middleware/verifyPermission.js";
 
 const ProductList = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -47,6 +48,9 @@ const ProductList = () => {
   const [selectedGender, setSelectedGender] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const canUpdate = useCheckPermission("product:update");
+  const canDelete = useCheckPermission("product:delete");
   const { productHeaders, updateProductTableHeaders } = useProductTableHeadersStore();
 
   // Bulk product result modal state
@@ -281,7 +285,10 @@ const ProductList = () => {
       headerClassName: "custom-header",
       cellClassName: "px-6 py-4 text-left text-sm text-gray-800",
     },
-    {
+  ];
+
+  if (canUpdate || canDelete) {
+    columns.push({
       field: "actions",
       headerName: "ACTIONS",
       sortable: false,
@@ -290,16 +297,20 @@ const ProductList = () => {
       cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 flex gap-1",
       renderCell: (params) => (
         <div className="flex gap-2 items-center">
-          <button onClick={() => handleEdit(params.row)} className="cursor-pointer">
-            <FaEdit size={18} className="text-[#4f46e5]" />
-          </button>
-          <button onClick={() => handleDelete(params.row)}>
-            <MdDelete size={18} className="text-[#4f46e5]" />
-          </button>
+          <VerifyPermission permission="product:update">
+            <button onClick={() => handleEdit(params.row)} className="cursor-pointer">
+              <FaEdit size={18} className="text-[#4f46e5]" />
+            </button>
+          </VerifyPermission>
+          <VerifyPermission permission="product:delete">
+            <button onClick={() => handleDelete(params.row)}>
+              <MdDelete size={18} className="text-[#4f46e5]" />
+            </button>
+          </VerifyPermission>
         </div>
       ),
-    },
-  ];
+    });
+  }
 
   const visibleColumns = columns.filter((col) => {
     const headerConfig = productHeaders.find((h) => h.key === col.headerName);
@@ -315,6 +326,7 @@ const ProductList = () => {
               title="Product Manager"
               subtitle="Manage all store products"
               actionLabel="Add New Product"
+              createPermission="product:create"
               onAction={() => setShowAddModal(true)}
             />
 

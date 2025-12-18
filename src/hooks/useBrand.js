@@ -3,13 +3,20 @@ import { createBrandApi, deleteBrandApi, getAllBrandApi, updateBrandApi } from "
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-export const useGetAllBrands = ({ searchTerm = "", page = 1, limit = 10, sort = "", is_active = "", category_unique_id = "" }) => {
+export const useGetAllBrands = ({
+  searchTerm = "",
+  page = 1,
+  limit = 10,
+  sort = "",
+  is_active = "",
+  category_unique_id = "",
+}) => {
   const queryKey = ["brands", searchTerm || "", page, limit, sort, is_active, category_unique_id];
 
   return useQuery({
     queryKey,
     queryFn: () => getAllBrandApi({ searchTerm, page, limit, sort, is_active, category_unique_id }),
-    select: (res) => res?.data, 
+    select: (res) => res?.data,
     staleTime: 10 * 60 * 1000,
     cacheTime: 30 * 60 * 1000,
     refetchOnMount: false,
@@ -41,6 +48,9 @@ export const useUpdateBrand = (options = {}) => {
     onSuccess: () => {
       toast.success("Brand updated successfully");
       queryClient.invalidateQueries({ queryKey: ["brands"] });
+    },
+    onSettled: () => {
+      options?.onSettled?.();
     },
     onError: () => {
       toast.error("Failed to update brand");

@@ -89,7 +89,7 @@ export const useLogout = () => {
       toast.error("Failed to logout user");
     },
   });
-}
+};
 
 export const useVerifyOtp = () => {
   const navigate = useNavigate();
@@ -112,16 +112,12 @@ export const useVerifyOtp = () => {
   });
 };
 
-export const useForgotPassword = () => {
+export const useForgotPassword = (options = {}) => {
   const navigate = useNavigate();
   return useMutation({
     mutationFn: (data) => forgotPassword(data),
     onSuccess: (response) => {
-      // toast.success("User verified successfully");
-
-      console.log("response", response);
       const data = response?.data;
-      // console.log("data from forgot password", data);
       if (data) {
         console.log("setnigs");
         sessionStorage.setItem("otp_id", data?.otp_id);
@@ -129,12 +125,15 @@ export const useForgotPassword = () => {
         sessionStorage.setItem("requireOtp", data?.requireOtp);
       }
 
+      options?.onSuccess?.(response);
+
       if (data?.requireOtp) {
         navigate("/verify-forgot-otp");
       }
     },
-    onError: () => {
+    onError: (error) => {
       toast.error("Failed to verify user");
+      options?.onError?.(error);
     },
   });
 };
@@ -186,12 +185,11 @@ export const useResendOtp = () => {
   });
 };
 
-
 export const useAuthGetMe = () => {
   const query = useQuery({
     queryKey: ["auth-get-me"],
     queryFn: () => authGetMe(),
-    select : (res) => res?.data,
+    select: (res) => res?.data,
     // onSuccess: (response) => {
     //   toast.success("User verified successfully");
     // },
@@ -200,10 +198,15 @@ export const useAuthGetMe = () => {
     // },
   });
 
-  return {
-    isAuthenticated : query?.data?.isAuthenticated,
-    isLoading : query?.isLoading,
-    isError : query?.isError,
-    data : query?.data?.user
+  if (query?.data?.user?.id) {
+    sessionStorage.setItem("user_id", query?.data?.user?.id);
+    sessionStorage.setItem("permissions", btoa(JSON.stringify(query?.data?.user?.permissions)));
   }
+
+  return {
+    isAuthenticated: query?.data?.isAuthenticated,
+    isLoading: query?.isLoading,
+    isError: query?.isError,
+    data: query?.data?.user,
+  };
 };

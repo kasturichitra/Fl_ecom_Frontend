@@ -144,6 +144,7 @@ const ThemeManager = () => {
             title="Theme Manager"
             subtitle="Customize your application's theme settings"
             actionLabel="Save Theme"
+            createPermission="config:update"
             onAction={handleSaveTheme}
           />
 

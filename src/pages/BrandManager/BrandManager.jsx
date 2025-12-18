@@ -18,11 +18,14 @@ const objectToFormData = (obj) => {
 };
 
 const BrandManager = ({ setShowAddModal, onCancel }) => {
-  const { mutateAsync: createBrand } = useCreateBrand();
-  const { data: categoriesData } = useGetAllCategories();
-
   const [imagePreview, setImagePreview] = useState([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { mutateAsync: createBrand, isPending: isCreatingBrand } = useCreateBrand({
+    onSuccess: () => {
+      setShowAddModal(false);
+      setImagePreview([]);
+    },
+  });
+  const { data: categoriesData } = useGetAllCategories();
 
   const formFields = [
     { key: "brand_name", label: "Brand Name", type: "text", placeholder: "Nike, Samsung..." },
@@ -33,22 +36,12 @@ const BrandManager = ({ setShowAddModal, onCancel }) => {
   ];
 
   const handleCreateBrand = async (data) => {
-    setIsSubmitting(true);
-
     const { categories, brand_image, ...rest } = data;
     const formData = objectToFormData(rest);
     formData.append("brand_image", brand_image);
     formData.append("categories", `[${categories.map((id) => `"${id}"`).join(", ")}]`);
 
-    try {
-      await createBrand(formData);
-      setShowAddModal(false);
-      setImagePreview([]);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsSubmitting(false);
-    }
+    await createBrand(formData);
   };
 
   const defaultValues = brandFormDefaults();
@@ -63,7 +56,7 @@ const BrandManager = ({ setShowAddModal, onCancel }) => {
         onSubmit={handleCreateBrand}
         onCancel={onCancel}
         defaultValues={defaultValues}
-        isSubmitting={isSubmitting}
+        isSubmitting={isCreatingBrand}
       />
 
       {imagePreview.length > 0 && (

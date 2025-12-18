@@ -12,12 +12,12 @@ const EditModalLayout = ({
   width = "max-w-3xl",
 }) => {
   return (
-    <div className="fixed inset-0 glass-container:
+    <div
+      className="fixed inset-0 glass-container:
 bg-white/20 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg
- bg-opacity-60 flex items-center justify-center z-50 p-4">
-      <div
-        className={`bg-white rounded-2xl shadow-2xl w-full ${width} max-h-[90vh] overflow-y-auto`}
-      >
+ bg-opacity-60 flex items-center justify-center z-50 p-4"
+    >
+      <div className={`bg-white rounded-2xl shadow-2xl w-full ${width} max-h-[90vh] overflow-y-auto`}>
         {/* Header */}
         <div className="relative sticky top-0 bg-white border-b border-gray-200 px-8 py-6 flex justify-center items-center">
           <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
@@ -40,10 +40,11 @@ bg-white/20 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg
             <button
               type="submit"
               disabled={isLoading}
-              className={`flex-1 py-4 rounded-xl font-bold text-white text-lg transition ${isLoading
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-xl transform hover:scale-105"
-                }`}
+              className={`flex-1 py-4 rounded-xl font-bold text-white text-lg transition disabled:opacity-50 disabled:cursor-not-allowed ${
+                isLoading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-xl transform hover:scale-105"
+              }`}
             >
               {isLoading ? "Saving..." : submitLabel}
             </button>
@@ -52,7 +53,7 @@ bg-white/20 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg
               type="button"
               onClick={closeModal}
               disabled={isLoading}
-              className="flex-1 py-4 rounded-xl font-bold bg-gray-200 text-gray-800 hover:bg-gray-300 transition"
+              className="flex-1 py-4 rounded-xl font-bold bg-gray-200 text-gray-800 hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {cancelLabel}
             </button>

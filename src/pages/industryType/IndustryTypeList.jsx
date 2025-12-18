@@ -12,7 +12,9 @@ import { useIndustryTableHeadersStore } from "../../stores/IndustryTableHeadersS
 import IndustryTypeEditModal from "./IndustryTypeEditModal";
 import IndustryTypeManager from "./IndustryTypeManager";
 import useDebounce from "../../hooks/useDebounce.js";
+import useCheckPermission from "../../hooks/useCheckPermission.js";
 import { industryTypeColumns } from "../../lib/columns.jsx";
+import VerifyPermission from "../../middleware/verifyPermission.js";
 
 const IndustryTypeList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,6 +27,9 @@ const IndustryTypeList = () => {
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  const canUpdate = useCheckPermission("industry:update");
+  const canDelete = useCheckPermission("industry:delete");
 
   const handleClickOutside = useCallback((event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -57,11 +62,11 @@ const IndustryTypeList = () => {
     is_active: statusFun(),
   });
 
-  const { mutateAsync: updateIndustry } = useUpdateIndustry({
+  const { mutateAsync: updateIndustry, isPending: isUpdatingIndustry } = useUpdateIndustry({
     onSettled: () => setEditingIndustry(false),
   });
 
-  const { mutateAsync: deleteIndustry } = useDeleteIndustry();
+  const { mutateAsync: deleteIndustry, isPending: isDeletingIndustry } = useDeleteIndustry();
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingIndustry, setEditingIndustry] = useState(null);
@@ -123,7 +128,10 @@ const IndustryTypeList = () => {
         </span>
       ),
     },
-    {
+  ];
+
+  if (canUpdate || canDelete) {
+    columns.push({
       field: "actions",
       headerName: "ACTIONS",
       width: 120,
@@ -132,24 +140,29 @@ const IndustryTypeList = () => {
       disableColumnMenu: true,
       renderCell: (params) => (
         <div className="flex gap-3 items-center">
-          <button
-            onClick={() => handleEdit(params.row)}
-            className="text-indigo-600 hover:text-indigo-800 transition"
-            title="Edit"
-          >
-            <FaEdit size={18} />
-          </button>
-          <button
-            onClick={() => handleDelete(params.row)}
-            className="text-indigo-600 hover:text-indigo-800 transition"
-            title="Delete"
-          >
-            <MdDelete size={18} />
-          </button>
+          <VerifyPermission permission="industry:update">
+            <button
+              onClick={() => handleEdit(params.row)}
+              className="text-indigo-600 hover:text-indigo-800 transition"
+              title="Edit"
+            >
+              <FaEdit size={18} />
+            </button>
+          </VerifyPermission>
+          <VerifyPermission permission="industry:delete">
+            <button
+              onClick={() => handleDelete(params.row)}
+              disabled={isDeletingIndustry}
+              className="text-indigo-600 hover:text-indigo-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Delete"
+            >
+              <MdDelete size={18} />
+            </button>
+          </VerifyPermission>
         </div>
       ),
-    },
-  ];
+    });
+  }
 
   // const visibleColumns = columns.filter((col) => {
   //   const headerConfig = columns.find((h) => h.key === col.headerName);
@@ -169,6 +182,7 @@ const IndustryTypeList = () => {
             title="Industry Types"
             subtitle="Manage all industry classifications"
             actionLabel="Add New Industry"
+            createPermission="industry:create"
             onAction={() => setShowAddModal(true)}
           />
 
@@ -228,6 +242,7 @@ const IndustryTypeList = () => {
           formData={editingIndustry}
           onSubmit={handleUpdate}
           closeModal={() => setEditingIndustry(null)}
+          isSubmitting={isUpdatingIndustry}
         />
       )}
       {/* <Activity mode={editingIndustry ? "visible" : "hidden"}>
