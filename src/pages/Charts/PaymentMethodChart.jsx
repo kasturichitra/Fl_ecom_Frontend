@@ -3,12 +3,8 @@ import CommonPieChart from "./CommonPieChart";
 import { useGetOrdersByPaymentMethod } from "../../hooks/useDashboard";
 import { toIndianCurrency } from "../../utils/toIndianCurrency";
 
-const PaymentMethodChart = () => {
-  const {
-    data: ordersByPaymentMethodData,
-    isLoading,
-    isError,
-  } = useGetOrdersByPaymentMethod();
+const PaymentMethodChart = ({ from, to }) => {
+  const { data: ordersByPaymentMethodData, isLoading, isError } = useGetOrdersByPaymentMethod({ from, to });
 
   if (isLoading) return <p>Loading...</p>;
   if (isError) return <p>Error loading payments</p>;
@@ -36,13 +32,7 @@ const PaymentMethodChart = () => {
   const colors = ["#4F46E5", "#06B6D4", "#10B981", "#F59E0B", "#EC4899", "#8B5CF6"];
 
   return (
-    <CommonPieChart
-      title="Orders by Payment Method"
-      labels={labels}
-      counts={counts}
-      stats={stats}
-      colors={colors}
-    />
+    <CommonPieChart title="Orders by Payment Method" labels={labels} counts={counts} stats={stats} colors={colors} />
   );
 };
 
