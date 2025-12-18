@@ -358,13 +358,15 @@ const ProductList = () => {
                   Download Excel
                 </button>
 
-                <button
-                  onClick={() => setIsUploadOpen(true)}
-                  className="bg-white text-indigo-600 font-bold px-5 py-3 rounded-lg shadow hover:bg-indigo-50 flex items-center gap-2 cursor-pointer"
-                >
-                  <FaFileUpload />
-                  Upload Excel
-                </button>
+                <VerifyPermission permission="product:create">
+                  <button
+                    onClick={() => setIsUploadOpen(true)}
+                    className="bg-white text-indigo-600 font-bold px-5 py-3 rounded-lg shadow hover:bg-indigo-50 flex items-center gap-2 cursor-pointer"
+                  >
+                    <FaFileUpload />
+                    Upload Excel
+                  </button>
+                </VerifyPermission>
               </div>
             </div>
 
