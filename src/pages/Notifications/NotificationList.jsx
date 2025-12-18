@@ -39,6 +39,7 @@ const NotificationList = () => {
     sort,
     fromDate,
     toDate,
+    role : "admin"
   });
 
   const notifications = data?.data || [];
