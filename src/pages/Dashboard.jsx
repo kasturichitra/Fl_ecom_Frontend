@@ -2,9 +2,12 @@ import { useState } from "react";
 import InventoryTabComponent from "./Charts/Tabs/InventoryTabComponent";
 import OverallTabComponent from "./Charts/Tabs/OverallTabComponent";
 import PerformanceTabComponent from "./Charts/Tabs/PerformanceTabComponent";
+import QRScanner from "../components/QrScanner";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("overall");
+
+  const [scannedText, setScannedText] = useState("");
 
   return (
     <div className="flex flex-col gap-6">
@@ -22,6 +25,15 @@ const Dashboard = () => {
           </button>
         ))}
       </div>
+
+      {/* <div className="">
+        <p>Scan QR, click on below button</p>
+        <QRScanner onScan={(text) => {
+          console.log("Scanned text:", text);
+          setScannedText(text);
+        }}/>
+        <p className="text-lg font-bold">Scanned text: {scannedText}</p>
+      </div> */}
 
       {/* --- TAB CONTENT --- */}
 
