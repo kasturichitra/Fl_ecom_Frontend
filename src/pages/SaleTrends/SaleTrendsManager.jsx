@@ -3,7 +3,7 @@ import SaleTrendForm from "../../form/saleTrends/saleTrendForm";
 import { useCreateSaleTrend } from "../../hooks/useSaleTrend";
 
 const SaleTrendsManager = ({ onCancel }) => {
-  const { mutateAsync: createSaleTrend } = useCreateSaleTrend({
+  const { mutateAsync: createSaleTrend, isPending: isCreatingSaleTrend } = useCreateSaleTrend({
     onSuccess: () => {
       onCancel();
     },
@@ -38,7 +38,13 @@ const SaleTrendsManager = ({ onCancel }) => {
         <SaleTrendForm
           fields={fields}
           onSubmit={handleAddSaleTrend}
-          additionalContent={<FormActionButtons submitLabel="Create Sale Trend" onCancel={handleCancel} />}
+          additionalContent={
+            <FormActionButtons
+              submitLabel="Create Sale Trend"
+              isSubmitting={isCreatingSaleTrend}
+              onCancel={handleCancel}
+            />
+          }
         />
       </div>
     </div>

@@ -35,11 +35,11 @@ const SaleTrends = () => {
     sort,
   });
 
-  const { mutateAsync: updateSaleTrend } = useUpdateSaleTrend({
+  const { mutateAsync: updateSaleTrend, isPending: isUpdatingSaleTrend } = useUpdateSaleTrend({
     onSettled: () => setEditingTrend(null),
   });
 
-  const { mutateAsync: deleteSaleTrend } = useDeleteSaleTrend();
+  const { mutateAsync: deleteSaleTrend, isPending: isDeletingSaleTrend } = useDeleteSaleTrend();
 
   console.log("saleTrendsData", saleTrendsData);
 
@@ -165,7 +165,8 @@ const SaleTrends = () => {
                 e.stopPropagation();
                 handleEdit(params.row);
               }}
-              className="text-indigo-600 hover:text-indigo-800 transition"
+              disabled={isUpdatingSaleTrend}
+              className="text-indigo-600 hover:text-indigo-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
               title="Edit"
             >
               <FaEdit size={18} />
@@ -177,7 +178,8 @@ const SaleTrends = () => {
                 e.stopPropagation();
                 handleDelete(params.row);
               }}
-              className="text-indigo-600 hover:text-indigo-800 transition"
+              disabled={isDeletingSaleTrend}
+              className="text-indigo-600 hover:text-indigo-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
               title="Delete"
             >
               <MdDelete size={18} />
@@ -256,6 +258,7 @@ const SaleTrends = () => {
             formData={editingTrend}
             onSubmit={handleUpdate}
             closeModal={() => setEditingTrend(null)}
+            isSubmitting={isUpdatingSaleTrend}
           />
         )}
       </div>

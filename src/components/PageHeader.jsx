@@ -1,7 +1,7 @@
-import React, { Activity } from "react";
+import { Activity } from "react";
 import VerifyPermission from "../middleware/verifyPermission";
 
-const PageHeader = ({ title, subtitle, actionLabel, onAction, createPermission }) => {
+const PageHeader = ({ title, subtitle, actionLabel, onAction, createPermission, isSubmitting }) => {
   return (
     <div className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white px-8 py-7 flex justify-between items-center">
       {/* LEFT SIDE */}
@@ -15,8 +15,8 @@ const PageHeader = ({ title, subtitle, actionLabel, onAction, createPermission }
         <VerifyPermission permission={createPermission}>
           <button
             onClick={onAction}
-            className="bg-white text-indigo-600 cursor-pointer font-bold px-6 py-3 
-                 rounded-lg shadow-lg hover:bg-indigo-50 transition transform hover:scale-105"
+            disabled={isSubmitting}
+            className="bg-white text-indigo-600 cursor-pointer font-bold px-6 py-3 rounded-lg shadow-lg hover:bg-indigo-50 transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {actionLabel}
           </button>

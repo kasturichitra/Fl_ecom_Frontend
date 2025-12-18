@@ -28,7 +28,7 @@ const ThemeManager = () => {
     },
   });
 
-  const { mutateAsync: updateConfig } = useUpdateConfig({
+  const { mutateAsync: updateConfig, isPending: isUpdatingConfig } = useUpdateConfig({
     onSuccess: () => {
       setSavedTheme({
         ...theme,
@@ -126,9 +126,6 @@ const ThemeManager = () => {
       },
     };
 
-    console.log("Theme data before going to API", themeData);
-    // return;
-
     // Update config via API
     await updateConfig({
       id: currentConfig._id,
@@ -146,6 +143,7 @@ const ThemeManager = () => {
             actionLabel="Save Theme"
             createPermission="config:update"
             onAction={handleSaveTheme}
+            isSubmitting={isUpdatingConfig}
           />
 
           <div className="p-8">

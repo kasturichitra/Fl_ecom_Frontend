@@ -125,11 +125,11 @@ const ProductList = () => {
   const totalCount = productsResponse?.totalCount ?? (Array.isArray(rows) ? rows.length : 0);
 
   const { mutate: deleteProduct } = useDeleteProduct();
-  const { mutateAsync: downloadExcel } = useDownloadProductExcel({
+  const { mutateAsync: downloadExcel, isPending: isDownloadingExcel } = useDownloadProductExcel({
     onSuccess: () => setIsOpen(false),
   });
 
-  const { mutateAsync: createBulkProducts } = useCreateBulkProducts({
+  const { mutateAsync: createBulkProducts, isPending: isCreatingBulkProducts } = useCreateBulkProducts({
     onSuccess: (response) => {
       setBulkResultData(response?.data?.data);
       setShowBulkResultModal(true);
@@ -430,6 +430,7 @@ const ProductList = () => {
         setSearchTerm={setExcelSearchTerm}
         showDropdown={showExcelDropdown}
         setShowDropdown={setShowExcelDropdown}
+        isSubmitting={isDownloadingExcel}
         handleSelect={handleExcelCategorySelect}
       />
 
@@ -453,6 +454,7 @@ const ProductList = () => {
         setShowDropdown={setShowUploadDropdown}
         handleSelect={handleUploadCategorySelect}
         onFileChange={handleExcelUpload}
+        isSubmitting={isCreatingBulkProducts}
       />
 
       <Activity mode={showBulkResultModal ? "visible" : "hidden"}>

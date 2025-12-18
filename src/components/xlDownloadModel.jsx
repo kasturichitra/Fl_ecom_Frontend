@@ -9,7 +9,8 @@ export default function DownloadXLExcel({
   setSearchTerm,
   showDropdown,
   setShowDropdown,
-  handleSelect, 
+  handleSelect,
+  isSubmitting,
 }) {
   return (
     <>
@@ -44,7 +45,8 @@ export default function DownloadXLExcel({
 
             <button
               onClick={() => setIsOpen(false)}
-              className="mt-6 w-full py-2 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition"
+              disabled={isSubmitting}
+              className="mt-6 w-full py-2 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Close
             </button>
