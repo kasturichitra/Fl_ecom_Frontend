@@ -14,10 +14,10 @@ const IndustryTypeEditModal = ({ formData: initialData, closeModal, onSubmit, is
     e.preventDefault();
     const submitData = new FormData();
 
-    submitData.append("industry_name", formData.industry_name || "");
-    submitData.append("industry_unique_id", formData.industry_unique_id || "");
-    submitData.append("description", formData.description || "");
-    submitData.append("is_active", formData.is_active ?? true);
+    submitData.append("industry_name", formData?.industry_name || "");
+    submitData.append("industry_unique_id", formData?.industry_unique_id || "");
+    submitData.append("description", formData?.description || "");
+    submitData.append("is_active", formData?.is_active ?? true);
 
     // Only append NEW image
     if (imageFile) {

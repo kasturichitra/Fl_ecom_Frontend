@@ -4,7 +4,7 @@ const BASE_URL = "/industryType";
 
 // GET ALL
 export const getAllIndustryApi = (params = {}) => {
-  const queryString = new URLSearchParams(params).toString();
+  const queryString = new URLSearchParams(params)?.toString();
   return axiosInstance.get(`${BASE_URL}/search${queryString ? `?${queryString}` : ""}`);
 };
 

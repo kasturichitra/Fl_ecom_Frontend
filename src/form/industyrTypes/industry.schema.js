@@ -20,7 +20,7 @@ export const industryTypeSchema = yup.object().shape({
         .test("fileType", "Only image files are allowed", (value) => {
             if (!value) return true; // optional
             if (typeof value === "string") return true; // existing URL
-            return value instanceof File && value.type.startsWith("image/");
+            return value instanceof File && value?.type?.startsWith("image/");
         }),
 
     description: yup
