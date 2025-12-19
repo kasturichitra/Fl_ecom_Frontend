@@ -56,3 +56,9 @@ export const MONTHS = [
   "November",
   "December",
 ];
+
+export const COUPON_STATUS_OPTIONS = [
+  { label: "All", value: "" },
+  { label: "Active", value: "Active" },
+  { label: "Inactive", value: "Inactive" },
+];
