@@ -6,12 +6,12 @@ import { brandFormDefaults } from "../../form/brands/brands.defaults.js";
 
 const objectToFormData = (obj) => {
   const formData = new FormData();
-  Object.entries(obj).forEach(([key, value]) => {
+  Object?.entries(obj)?.forEach(([key, value]) => {
     if (value === undefined || value === null) return;
-    if (Array.isArray(value)) {
-      value.forEach((item) => formData.append(`${key}[]`, item));
+    if (Array?.isArray(value)) {
+      value?.forEach((item) => formData?.append(`${key}[]`, item));
     } else {
-      formData.append(key, value);
+      formData?.append(key, value);
     }
   });
   return formData;
@@ -39,7 +39,7 @@ const BrandManager = ({ setShowAddModal, onCancel }) => {
     const { categories, brand_image, ...rest } = data;
     const formData = objectToFormData(rest);
     formData.append("brand_image", brand_image);
-    formData.append("categories", `[${categories.map((id) => `"${id}"`).join(", ")}]`);
+    formData.append("categories", `[${categories?.map((id) => `"${id}"`).join(", ")}]`);
 
     await createBrand(formData);
   };

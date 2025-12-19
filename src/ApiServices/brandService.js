@@ -4,7 +4,7 @@ import axiosInstance from "../axios/axiosInstance";
 const BASE_URL = "/brands";
 
 export const getAllBrandApi = (params = {}) => {
-  const queryString = new URLSearchParams(params).toString();
+  const queryString = new URLSearchParams(params)?.toString();
   return axiosInstance.get(`${BASE_URL}${queryString ? `?${queryString}` : ""} `);
 };
 
