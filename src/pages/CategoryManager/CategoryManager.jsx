@@ -39,29 +39,29 @@ const CategoryManager = ({ onCancel }) => {
   };
 
   const deleteAttribute = (index) => {
-    setAttributes((prev) => prev.filter((_, i) => i !== index));
+    setAttributes((prev) => prev?.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (formData) => {
     const data = new FormData();
-    data.append("industry_unique_id", formData.industry_unique_id);
-    data.append("category_unique_id", formData.category_unique_id);
-    data.append("category_name", formData.category_name);
-    console.log("Form image", formData.image);
-    if (formData.image) data.append("image", formData.image);
-    data.append("is_active", formData.is_active);
+    data.append("industry_unique_id", formData?.industry_unique_id);
+    data.append("category_unique_id", formData?.category_unique_id);
+    data.append("category_name", formData?.category_name);
+    console.log("Form image", formData?.image);
+    if (formData?.image) data.append("image", formData?.image);
+    data.append("is_active", formData?.is_active);
     data.append("created_by", "Admin");
     data.append("updated_by", "Admin");
 
-    if (showAttributes && attributes.some((a) => a.name.trim())) {
+    if (showAttributes && attributes?.some((a) => a?.name.trim())) {
       attributes.forEach((attr, i) => {
-        if (!attr.name.trim()) return;
-        data.append(`attributes[${i}][name]`, attr.name);
-        data.append(`attributes[${i}][code]`, attr.code);
-        data.append(`attributes[${i}][slug]`, attr.name.toLowerCase().replace(/\s+/g, "-"));
-        data.append(`attributes[${i}][description]`, attr.description);
-        data.append(`attributes[${i}][units]`, attr.units || "N/A");
-        data.append(`attributes[${i}][is_active]`, attr.is_active);
+        if (!attr?.name.trim()) return;
+        data.append(`attributes[${i}][name]`, attr?.name);
+        data.append(`attributes[${i}][code]`, attr?.code);
+        data.append(`attributes[${i}][slug]`, attr?.name.toLowerCase().replace(/\s+/g, "-"));
+        data.append(`attributes[${i}][description]`, attr?.description);
+        data.append(`attributes[${i}][units]`, attr?.units || "N/A");
+        data.append(`attributes[${i}][is_active]`, attr?.is_active);
         data.append(`attributes[${i}][created_by]`, "Admin");
         data.append(`attributes[${i}][updated_by]`, "Admin");
       });
@@ -71,8 +71,8 @@ const CategoryManager = ({ onCancel }) => {
   };
 
   const formattedIndustryTypes = industryTypes?.data?.map((i) => ({
-    label: `${i.industry_name} #${i.industry_unique_id}`,
-    value: i.industry_unique_id,
+    label: `${i?.industry_name} #${i?.industry_unique_id}`,
+    value: i?.industry_unique_id,
   }));
 
   const categoryFields = [
@@ -178,28 +178,28 @@ const CategoryManager = ({ onCancel }) => {
                               <input
                                 type="text"
                                 placeholder="Attribute Name (e.g. Screen Size)"
-                                value={attr.name}
+                                value={attr?.name}
                                 onChange={(e) => handleAttributeChange(index, "name", e.target.value)}
                                 className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                               />
                               <input
                                 type="text"
                                 placeholder="Code (e.g. SCRN)"
-                                value={attr.code}
+                                value={attr?.code}
                                 onChange={(e) => handleAttributeChange(index, "code", e.target.value)}
                                 className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                               />
                               <input
                                 type="text"
                                 placeholder="Description (optional)"
-                                value={attr.description}
+                                value={attr?.description}
                                 onChange={(e) => handleAttributeChange(index, "description", e.target.value)}
                                 className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                               />
                               <input
                                 type="text"
                                 placeholder="Units (e.g. inches, GB)"
-                                value={attr.units}
+                                value={attr?.units}
                                 onChange={(e) => handleAttributeChange(index, "units", e.target.value)}
                                 className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                               />
@@ -209,7 +209,7 @@ const CategoryManager = ({ onCancel }) => {
                               <label className="flex items-center gap-2 cursor-pointer">
                                 <input
                                   type="checkbox"
-                                  checked={attr.is_active}
+                                  checked={attr?.is_active}
                                   onChange={(e) => handleAttributeChange(index, "is_active", e.target.checked)}
                                   className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
                                 />

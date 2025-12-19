@@ -44,7 +44,7 @@ export const useGetAllProducts = ({
         brand_unique_id,
         gender,
       }),
-    select: (res) => res.data,
+    select: (res) => res?.data,
     staleTime: 60 * 1000,
     refetchOnMount: false,
   });

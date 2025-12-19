@@ -42,7 +42,7 @@ export const useUpdateBrand = (options = {}) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }) => {
-      console.log("Updating brand with:", id, data);
+      // console.log("Updating brand with:", id, data);
       return updateBrandApi(id, data);
     },
     onSuccess: () => {

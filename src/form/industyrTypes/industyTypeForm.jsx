@@ -24,7 +24,7 @@ const IndustryTypeForm = (
 
   const setFormData = (updater) => {
     const newData = typeof updater === "function" ? updater(formData) : updater;
-    Object.keys(newData).forEach((key) => {
+    Object?.keys(newData)?.forEach((key) => {
       setValue(key, newData[key], { shouldValidate: true });
     });
   };

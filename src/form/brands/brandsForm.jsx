@@ -24,7 +24,7 @@ const BrandForm = ({ fields, categories, onSubmit, onCancel, defaultValues, isSu
     <>
       <CategorySelector
         categories={categories}
-        selected={formData.categories}
+        selected={formData?.categories}
         setSelected={(values) => setValue("categories", values, { shouldValidate: true })}
         errors={{ categories: errors.categories?.message }}
       />
@@ -32,7 +32,7 @@ const BrandForm = ({ fields, categories, onSubmit, onCancel, defaultValues, isSu
       <DynamicForm
         fields={fields}
         formData={formData}
-        setFormData={(data) => Object.keys(data).forEach((key) => setValue(key, data[key], { shouldValidate: true }))}
+        setFormData={(data) => Object?.keys(data)?.forEach((key) => setValue(key, data[key], { shouldValidate: true }))}
         register={register}
         control={control}
         errors={errors}

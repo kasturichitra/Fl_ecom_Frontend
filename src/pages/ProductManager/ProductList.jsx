@@ -103,8 +103,8 @@ const ProductList = () => {
   const { data: industries } = useGetAllIndustries();
 
   let formattedIndustries = industries?.data?.map((ind) => ({
-    value: ind.industry_unique_id,
-    label: ind.industry_name,
+    value: ind?.industry_unique_id,
+    label: ind?.industry_name,
   }));
 
   // Add "All Industries" option to the start of array using array.unshitf method
@@ -118,8 +118,8 @@ const ProductList = () => {
   });
 
   let formattedFilterCategories = filterCategories?.data?.map((cat) => ({
-    value: cat.category_unique_id,
-    label: cat.category_name,
+    value: cat?.category_unique_id,
+    label: cat?.category_name,
   }));
 
   // Add "All Categories" option to the start of array using array.unshift method
@@ -129,7 +129,7 @@ const ProductList = () => {
   });
 
   const rows = productsResponse?.data || productsResponse || [];
-  const totalCount = productsResponse?.totalCount ?? (Array.isArray(rows) ? rows.length : 0);
+  const totalCount = productsResponse?.totalCount ?? (Array?.isArray(rows) ? rows?.length : 0);
 
   const { mutate: deleteProduct } = useDeleteProduct();
   const { mutateAsync: downloadExcel, isPending: isDownloadingExcel } = useDownloadProductExcel({
@@ -159,8 +159,8 @@ const ProductList = () => {
   });
 
   const formattedCategories = categories?.data?.map((cat) => ({
-    value: cat.category_unique_id,
-    label: cat.category_name,
+    value: cat?.category_unique_id,
+    label: cat?.category_name,
   }));
 
   useEffect(() => {
@@ -168,7 +168,7 @@ const ProductList = () => {
   }, [searchTerm]);
 
   const handleExcelCategorySelect = async (item) => {
-    const uniqueId = item.value;
+    const uniqueId = item?.value;
     const response = await downloadExcel({ uniqueId });
 
     const blob = new Blob([response.data], {
@@ -214,7 +214,7 @@ const ProductList = () => {
   const handleUpdate = async (formData) => {
     if (!editingProduct) return;
     await updateProduct({
-      uniqueId: editingProduct.product_unique_id,
+      uniqueId: editingProduct?.product_unique_id,
       payload: formData,
     });
   };
@@ -239,7 +239,7 @@ const ProductList = () => {
   const handleQrSubmit = (quantity) => {
     if (!selectedQrProduct || !quantity) return;
     getQrPdf({
-      product_unique_id: selectedQrProduct.product_unique_id,
+      product_unique_id: selectedQrProduct?.product_unique_id,
       quantity: parseInt(quantity),
     });
   };
@@ -257,7 +257,7 @@ const ProductList = () => {
       headerClassName: "custom-header",
       cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 capitalize",
       renderCell: (params) => (
-        <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">{params.value}</span>
+        <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">{params?.value}</span>
       ),
     },
     {
@@ -287,7 +287,7 @@ const ProductList = () => {
       flex: 1,
       headerClassName: "custom-header",
       cellClassName: "px-6 py-4 text-left text-sm text-gray-800",
-      renderCell: (params) => <span>{toIndianCurrency(params.value)}</span>,
+      renderCell: (params) => <span>{toIndianCurrency(params?.value)}</span>,
     },
     {
       field: "stock_quantity",
@@ -325,7 +325,7 @@ const ProductList = () => {
       cellClassName: "px-6 py-4 text-left text-sm text-gray-800",
       renderCell: (params) => (
         <button
-          onClick={() => handleQrClick(params.row)}
+          onClick={() => handleQrClick(params?.row)}
           className="text-gray-600 hover:text-indigo-600 transition-colors p-2 rounded-full hover:bg-gray-100"
           title="Generate QR"
         >
@@ -346,12 +346,12 @@ const ProductList = () => {
       renderCell: (params) => (
         <div className="flex gap-2 items-center">
           <VerifyPermission permission="product:update">
-            <button onClick={() => handleEdit(params.row)} className="cursor-pointer">
+            <button onClick={() => handleEdit(params?.row)} className="cursor-pointer">
               <FaEdit size={18} className="text-[#4f46e5]" />
             </button>
           </VerifyPermission>
           <VerifyPermission permission="product:delete">
-            <button onClick={() => handleDelete(params.row)}>
+            <button onClick={() => handleDelete(params?.row)}>
               <MdDelete size={18} className="text-[#4f46e5]" />
             </button>
           </VerifyPermission>
@@ -360,9 +360,9 @@ const ProductList = () => {
     });
   }
 
-  const visibleColumns = columns.filter((col) => {
-    const headerConfig = productHeaders.find((h) => h.key === col.headerName);
-    return headerConfig ? headerConfig.value : true;
+  const visibleColumns = columns?.filter((col) => {
+    const headerConfig = productHeaders?.find((h) => h?.key === col?.headerName);
+    return headerConfig ? headerConfig?.value : true;
   });
 
   return (
@@ -421,7 +421,7 @@ const ProductList = () => {
             <div className="p-6 bg-white">
               <DataTable
                 rows={rows}
-                getRowId={(row) => row.product_unique_id}
+                getRowId={(row) => row?.product_unique_id}
                 columns={visibleColumns}
                 page={currentPage}
                 pageSize={pageSize}
@@ -431,7 +431,7 @@ const ProductList = () => {
                 sort={sort}
                 setSort={(newSort) => {
                   const sortItem = newSort[0];
-                  setSort(sortItem ? `${sortItem.field}:${sortItem.sort}` : "");
+                  setSort(sortItem ? `${sortItem?.field}:${sortItem?.sort}` : "");
                 }}
               />
             </div>
