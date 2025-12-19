@@ -14,7 +14,7 @@ export const useGetAllOrders = ({
   return useQuery({
     queryKey,
     queryFn: () => getAllOrdersApi({ searchTerm, page, limit, order_status, order_type, payment_method }),
-    select: (res) => res.data.data,
+    select: (res) => res?.data?.data,
     staleTime: 10 * 60 * 1000,
     cacheTime: 30 * 60 * 1000,
     refetchOnMount: false,
@@ -26,7 +26,7 @@ export const useGetOrderProductsById = (orderId) => {
   return useQuery({
     queryKey,
     queryFn: () => getOrderProductsByIdApi(orderId),
-    select: (res) => res.data.data,
+    select: (res) => res?.data?.data,
     enabled: !!orderId,
     staleTime: 5 * 60 * 1000,
     cacheTime: 20 * 60 * 1000,
