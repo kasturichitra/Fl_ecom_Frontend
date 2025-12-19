@@ -51,7 +51,7 @@ const OrderListManager = () => {
   });
 
   const handleRowClick = (params) => {
-    const orderId = params.row.order_id;
+    const orderId = params?.row?.order_id;
     navigate(`/order-products-detailes/${orderId}`);
   };
 
@@ -144,13 +144,13 @@ const OrderListManager = () => {
       flex: 1,
       headerClassName: "custom-header",
       cellClassName: "px-6 py-4 text-left text-sm tracking-wider text-gray-700",
-      renderCell: (params) => <span>{toIndianCurrency(params.value)}</span>,
+      renderCell: (params) => <span>{toIndianCurrency(params?.value)}</span>,
     },
   ];
 
-  const visibleColumns = columns.filter((col) => {
-    const headerConfig = orderHeaders.find((h) => h.key === col.headerName);
-    return headerConfig ? headerConfig.value : true;
+  const visibleColumns = columns?.filter((col) => {
+    const headerConfig = orderHeaders?.find((h) => h?.key === col?.headerName);
+    return headerConfig ? headerConfig?.value : true;
   });
 
   return (

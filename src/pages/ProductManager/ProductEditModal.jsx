@@ -42,20 +42,20 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
   // Map product.product_attributes to the AttributeRepeater 'predefined' format
   const productDbAttributes = useMemo(
     () =>
-      (product?.product_attributes || []).map((attr) => ({
-        attribute_code: attr.attribute_code || attr.code || "",
+      (product?.product_attributes || [])?.map((attr) => ({
+        attribute_code: attr?.attribute_code || attr?.code || "",
         value: attr.value ?? "",
-        placeholderValue: attr.placeholderValue || `Enter ${attr.attribute_code || attr.code || "value"}`,
-        type: attr.type || "text",
+        placeholderValue: attr?.placeholderValue || `Enter ${attr?.attribute_code || attr?.code || "value"}`,
+        type: attr?.type || "text",
       })),
     [product?.product_attributes]
   );
 
   // Initialize attributesRef.current and sync to form whenever productDbAttributes change
   useEffect(() => {
-    attributesRef.current = productDbAttributes.map((a) => ({
-      attribute_code: a.attribute_code,
-      value: a.value ?? "",
+    attributesRef.current = productDbAttributes?.map((a) => ({
+      attribute_code: a?.attribute_code,
+      value: a?.value ?? "",
     }));
     setForm((prev) => ({ ...prev, product_attributes: attributesRef.current }));
   }, [productDbAttributes]);
@@ -64,30 +64,30 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
     if (!product) return;
     // Only set once to prevent extra rerenders
     setForm({
-      category_unique_id: product.category_unique_id ?? "",
-      brand_unique_id: product.brand_unique_id ?? "",
-      product_unique_id: product.product_unique_id ?? "",
-      product_name: product.product_name ?? "",
-      product_description: product.product_description ?? "",
-      product_color: product.product_color ?? "",
-      product_size: product.product_size ?? "",
+      category_unique_id: product?.category_unique_id ?? "",
+      brand_unique_id: product?.brand_unique_id ?? "",
+      product_unique_id: product?.product_unique_id ?? "",
+      product_name: product?.product_name ?? "",
+      product_description: product?.product_description ?? "",
+      product_color: product?.product_color ?? "",
+      product_size: product?.product_size ?? "",
       product_image: null,
-      currentImage: product.product_images?.[0] ? `${import.meta.env.VITE_API_URL}/${product.product_images[0]}` : null,
-      price: product.price ?? "",
-      discount_percentage: product.discount_percentage ?? "",
-      cgst: product.cgst ?? "",
-      sgst: product.sgst ?? "",
-      igst: product.igst ?? "",
-      stock_quantity: product.stock_quantity ?? "",
-      min_order_limit: product.min_order_limit ?? "",
-      gender: product.gender ?? "",
-      product_attributes: attributesRef.current,
+      currentImage: product?.product_images?.[0] ? `${import.meta.env.VITE_API_URL}/${product.product_images[0]}` : null,
+      price: product?.price ?? "",
+      discount_percentage: product?.discount_percentage ?? "",
+      cgst: product?.cgst ?? "",
+      sgst: product?.sgst ?? "",
+      igst: product?.igst ?? "",
+      stock_quantity: product?.stock_quantity ?? "",
+      min_order_limit: product?.min_order_limit ?? "",
+      gender: product?.gender ?? "",
+      product_attributes: attributesRef?.current,
     });
   }, [product]);
 
   // format dropdowns
-  const formattedCategories = categories?.data?.map((c) => ({ value: c.category_unique_id, label: c.category_name }));
-  const formattedBrands = brands?.data?.map((b) => ({ value: b.brand_unique_id, label: b.brand_name }));
+  const formattedCategories = categories?.data?.map((c) => ({ value: c?.category_unique_id, label: c?.category_name }));
+  const formattedBrands = brands?.data?.map((b) => ({ value: b?.brand_unique_id, label: b?.brand_name }));
 
   const { mutateAsync: updateProduct, isPending: isUpdating } = useUpdateProduct();
 
@@ -97,19 +97,19 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
     const { product_image, product_attributes, ...rest } = form;
 
     // Use attributesRef for the latest repeater values
-    const currentAttributes = attributesRef.current || [];
+    const currentAttributes = attributesRef?.current || [];
     const validAttributes = currentAttributes
-      .filter((attr) => attr.attribute_code && attr.value !== undefined && String(attr.value).trim() !== "")
+      .filter((attr) => attr?.attribute_code && attr?.value !== undefined && String(attr?.value).trim() !== "")
       .map((attr) => ({
-        attribute_code: attr.attribute_code,
-        value: attr.value,
+        attribute_code: attr?.attribute_code,
+        value: attr?.value,
       }));
 
     const formData = objectToFormData(rest);
-    if (product_image) formData.append("product_image", product_image);
-    if (validAttributes.length) formData.append("product_attributes", JSON.stringify(validAttributes));
+    if (product_image) formData?.append("product_image", product_image);
+    if (validAttributes.length) formData?.append("product_attributes", JSON.stringify(validAttributes));
 
-    await updateProduct({ uniqueId: product.product_unique_id, payload: formData });
+    await updateProduct({ uniqueId: product?.product_unique_id, payload: formData });
 
     // if (onSuccess) onSuccess();
     closeModal();
@@ -145,13 +145,13 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
         setBrandSearchTerm("");
         setShowDropdown(false);
       },
-      onSelect: (value) => setForm((prev) => ({ ...prev, brand_unique_id: value.value })),
+      onSelect: (value) => setForm((prev) => ({ ...prev, brand_unique_id: value?.value })),
       placeholder: "e.g., apple1",
     },
     // use the shared static fields, with a small override for edit mode
-    ...PRODUCT_STATIC_FIELDS.map((field) => {
+    ...PRODUCT_STATIC_FIELDS?.map((field) => {
       // enable field but disable user editing
-      if (field.key === "product_unique_id") {
+      if (field?.key === "product_unique_id") {
         return { ...field, disabled: true, required: false };
       }
 
@@ -169,9 +169,9 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
     // Update ref
     attributesRef.current = items;
     // Keep form.product_attributes in sync for compatibility
-    const mapped = items.map((it) => ({
-      attribute_code: it.attribute_code,
-      value: it.value,
+    const mapped = items?.map((it) => ({
+      attribute_code: it?.attribute_code,
+      value: it?.value,
     }));
     setForm((prev) => ({ ...prev, product_attributes: mapped }));
   };

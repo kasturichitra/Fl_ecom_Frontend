@@ -37,7 +37,7 @@ const SingleSaleTrendPage = () => {
   // Populate trendProducts when data loads
   useEffect(() => {
     if (saleTrendData?.data?.trend_products) {
-      setTrendProducts(saleTrendData.data.trend_products);
+      setTrendProducts(saleTrendData?.data?.trend_products);
     }
   }, [saleTrendData]);
 
@@ -76,13 +76,13 @@ const SingleSaleTrendPage = () => {
   // Derived: Available products excluding those already in Trend
   const displayedAvailableProducts = useMemo(() => {
     // Exclude products that are already in the right panel
-    const trendIds = new Set(trendProducts.map((p) => p.product_unique_id));
-    return availableProductsData.filter((p) => !trendIds.has(p.product_unique_id));
+    const trendIds = new Set(trendProducts?.map((p) => p?.product_unique_id));
+    return availableProductsData?.filter((p) => !trendIds?.has(p?.product_unique_id));
   }, [availableProductsData, trendProducts]);
 
   // Sorted trend products by priority
   const sortedTrendProducts = useMemo(() => {
-    return [...trendProducts].sort((a, b) => (a.priority || 0) - (b.priority || 0));
+    return [...trendProducts].sort((a, b) => (a?.priority || 0) - (b?.priority || 0));
   }, [trendProducts]);
 
   // --- HANDLERS ---
@@ -90,27 +90,27 @@ const SingleSaleTrendPage = () => {
   // Toggle selection in Left Panel
   const toggleAvailableSelect = (id) => {
     const newSet = new Set(selectedAvailable);
-    if (newSet.has(id)) newSet.delete(id);
-    else newSet.add(id);
+    if (newSet?.has(id)) newSet?.delete(id);
+    else newSet?.add(id);
     setSelectedAvailable(newSet);
   };
 
   // Toggle selection in Right Panel
   const toggleTrendSelect = (id) => {
     const newSet = new Set(selectedTrend);
-    if (newSet.has(id)) newSet.delete(id);
-    else newSet.add(id);
+    if (newSet?.has(id)) newSet?.delete(id);
+    else newSet?.add(id);
     setSelectedTrend(newSet);
   };
 
   // Move Selected -> Right
   const moveRight = () => {
     // Find full objects for selected IDs
-    const toMove = displayedAvailableProducts.filter((p) => selectedAvailable.has(p.product_unique_id));
+    const toMove = displayedAvailableProducts?.filter((p) => selectedAvailable?.has(p?.product_unique_id));
 
     // Assign new priorities (append to end)
-    const maxPriority = trendProducts.length > 0 ? Math.max(...trendProducts.map((p) => p.priority || 0)) : 0;
-    const productsWithPriority = toMove.map((p, idx) => ({
+    const maxPriority = trendProducts.length > 0 ? Math.max(...trendProducts?.map((p) => p?.priority || 0)) : 0;
+    const productsWithPriority = toMove?.map((p, idx) => ({
       ...p,
       priority: maxPriority + idx + 1,
     }));
@@ -122,7 +122,7 @@ const SingleSaleTrendPage = () => {
   // Move Selected <- Left
   const moveLeft = () => {
     // We just remove them from trendProducts. They will automatically reappear in available list (filtered view).
-    const remaining = trendProducts.filter((p) => !selectedTrend.has(p.product_unique_id));
+    const remaining = trendProducts?.filter((p) => !selectedTrend?.has(p?.product_unique_id));
 
     setTrendProducts(remaining);
     setSelectedTrend(new Set()); // Clear right selection
@@ -130,12 +130,12 @@ const SingleSaleTrendPage = () => {
 
   // Remove single item from Right Panel (Trash icon)
   const removeSingleFromTrend = (product) => {
-    setTrendProducts((prev) => prev.filter((p) => p.product_unique_id !== product.product_unique_id));
+    setTrendProducts((prev) => prev?.filter((p) => p?.product_unique_id !== product?.product_unique_id));
 
     // Also remove from selection if it was selected
-    if (selectedTrend.has(product.product_unique_id)) {
+    if (selectedTrend.has(product?.product_unique_id)) {
       const newSet = new Set(selectedTrend);
-      newSet.delete(product.product_unique_id);
+      newSet?.delete(product?.product_unique_id);
       setSelectedTrend(newSet);
     }
   };
@@ -160,11 +160,11 @@ const SingleSaleTrendPage = () => {
     }
 
     const updatedProducts = [...sortedTrendProducts];
-    const [draggedProduct] = updatedProducts.splice(draggedIndex, 1);
-    updatedProducts.splice(dropIndex, 0, draggedProduct);
+    const [draggedProduct] = updatedProducts?.splice(draggedIndex, 1);
+    updatedProducts?.splice(dropIndex, 0, draggedProduct);
 
     // Reassign priorities based on new order
-    const reorderedProducts = updatedProducts.map((p, idx) => ({
+    const reorderedProducts = updatedProducts?.map((p, idx) => ({
       ...p,
       priority: idx + 1,
     }));
@@ -179,8 +179,8 @@ const SingleSaleTrendPage = () => {
 
   // --- HELPER: Image URL ---
   const getProductImage = (product) => {
-    if (product.product_images && product.product_images.length > 0) {
-      return `${import.meta.env.VITE_API_URL}/${product.product_images[0]}`;
+    if (product?.product_images && product?.product_images?.length > 0) {
+      return `${import.meta.env.VITE_API_URL}/${product?.product_images[0]}`;
     }
     return "https://placehold.co/100x100?text=No+Image";
   };
@@ -191,8 +191,8 @@ const SingleSaleTrendPage = () => {
   // --- SAVE HANDLERS ---
   const handleSave = () => {
     // Extract only product_unique_id for the API
-    const productIds = trendProducts.map((p, index) => ({
-      product_unique_id: p.product_unique_id,
+    const productIds = trendProducts?.map((p, index) => ({
+      product_unique_id: p?.product_unique_id,
       priority: index + 1,
     }));
 
@@ -240,9 +240,9 @@ const SingleSaleTrendPage = () => {
                 onChange={(e) => setBrandFilter(e.target.value)}
               >
                 <option value="">All Brands</option>
-                {brands.map((brand) => (
-                  <option key={brand.brand_unique_id} value={brand.brand_unique_id}>
-                    {brand.brand_name}
+                {brands?.map((brand) => (
+                  <option key={brand?.brand_unique_id} value={brand?.brand_unique_id}>
+                    {brand?.brand_name}
                   </option>
                 ))}
               </select>
@@ -253,8 +253,8 @@ const SingleSaleTrendPage = () => {
               >
                 <option value="">All Categories</option>
                 {categories.map((cat) => (
-                  <option key={cat.category_unique_id} value={cat.category_unique_id}>
-                    {cat.category_name}
+                  <option key={cat?.category_unique_id} value={cat?.category_unique_id}>
+                    {cat?.category_name}
                   </option>
                 ))}
               </select>
@@ -278,13 +278,13 @@ const SingleSaleTrendPage = () => {
             {/* List */}
             {!isLoading &&
               !isError &&
-              displayedAvailableProducts.map((product) => (
+              displayedAvailableProducts?.map((product) => (
                 <div
-                  key={product.product_unique_id}
-                  onClick={() => toggleAvailableSelect(product.product_unique_id)}
+                  key={product?.product_unique_id}
+                  onClick={() => toggleAvailableSelect(product?.product_unique_id)}
                   className={`group flex items-center p-3 rounded-xl border transition-all cursor-pointer hover:shadow-md
                   ${
-                    selectedAvailable.has(product.product_unique_id)
+                    selectedAvailable?.has(product?.product_unique_id)
                       ? "bg-indigo-50 border-indigo-200 ring-1 ring-indigo-200"
                       : "bg-white border-gray-200 hover:border-indigo-200"
                   }`}
@@ -293,33 +293,33 @@ const SingleSaleTrendPage = () => {
                     <div
                       className={`w-5 h-5 rounded border flex items-center justify-center transition-colors
                     ${
-                      selectedAvailable.has(product.product_unique_id)
+                      selectedAvailable?.has(product?.product_unique_id)
                         ? "bg-indigo-600 border-indigo-600"
                         : "border-gray-300 group-hover:border-indigo-400"
                     }`}
                     >
-                      {selectedAvailable.has(product.product_unique_id) && <Check className="w-3 h-3 text-white" />}
+                      {selectedAvailable?.has(product?.product_unique_id) && <Check className="w-3 h-3 text-white" />}
                     </div>
                   </div>
                   <img
                     src={getProductImage(product)}
-                    alt={product.product_name}
+                    alt={product?.product_name}
                     className="w-12 h-12 rounded-lg object-cover border border-gray-100"
                   />
                   <div className="ml-4 flex-1">
-                    <h3 className="font-semibold text-gray-800 text-sm">{product.product_name}</h3>
+                    <h3 className="font-semibold text-gray-800 text-sm">{product?.product_name}</h3>
                     <div className="flex items-center text-xs text-gray-500 mt-1 space-x-2">
                       <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-600">
-                        {product.brand_name || "Brand"}
+                        {product?.brand_name || "Brand"}
                       </span>
                       <span>•</span>
-                      <span className="font-medium text-gray-900">${product.final_price}</span>
+                      <span className="font-medium text-gray-900">${product?.final_price}</span>
                     </div>
                   </div>
                 </div>
               ))}
 
-            {!isLoading && !isError && displayedAvailableProducts.length === 0 && (
+            {!isLoading && !isError && displayedAvailableProducts?.length === 0 && (
               <div className="text-center py-10 text-gray-400">
                 {searchTerm ? "No products match your search" : "No available products found"}
               </div>
@@ -330,15 +330,15 @@ const SingleSaleTrendPage = () => {
           <div className="p-4 bg-white border-t border-gray-200 sticky bottom-0 z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
             <button
               onClick={moveRight}
-              disabled={selectedAvailable.size === 0}
+              disabled={selectedAvailable?.size === 0}
               className={`w-full py-3 rounded-xl font-bold flex items-center justify-center transition-all
                 ${
-                  selectedAvailable.size > 0
+                  selectedAvailable?.size > 0
                     ? "bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 hover:scale-[1.02]"
                     : "bg-gray-100 text-gray-400 cursor-not-allowed"
                 }`}
             >
-              Add Selected ({selectedAvailable.size})
+              Add Selected ({selectedAvailable?.size})
               <ArrowRight className="ml-2 w-5 h-5" />
             </button>
           </div>
@@ -351,14 +351,14 @@ const SingleSaleTrendPage = () => {
               <Check className="w-5 h-5 mr-2 text-green-600" />
               Products in This Trend
             </h2>
-            <p className="text-sm text-gray-500 ml-7">{trendProducts.length} products selected • Drag to reorder</p>
+            <p className="text-sm text-gray-500 ml-7">{trendProducts?.length} products selected • Drag to reorder</p>
           </div>
 
           {/* Selected List - Scrollable */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-white">
-            {sortedTrendProducts.map((product, index) => (
+            {sortedTrendProducts?.map((product, index) => (
               <div
-                key={product.product_unique_id}
+                key={product?.product_unique_id}
                 draggable
                 onDragStart={(e) => handleDragStart(e, index)}
                 onDragOver={handleDragOver}
@@ -366,7 +366,7 @@ const SingleSaleTrendPage = () => {
                 onDragEnd={handleDragEnd}
                 className={`group flex items-center p-3 rounded-xl border transition-all cursor-move
                    ${
-                     selectedTrend.has(product.product_unique_id)
+                     selectedTrend?.has(product?.product_unique_id)
                        ? "bg-red-50 border-red-200"
                        : "bg-white border-gray-100"
                    }
@@ -376,32 +376,32 @@ const SingleSaleTrendPage = () => {
                 {/* Priority Badge */}
                 <div className="mr-3 shrink-0">
                   <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 font-bold flex items-center justify-center text-sm">
-                    {product.priority || index + 1}
+                    {product?.priority || index + 1}
                   </div>
                 </div>
 
-                <div onClick={() => toggleTrendSelect(product.product_unique_id)} className="cursor-pointer mr-4">
+                <div onClick={() => toggleTrendSelect(product?.product_unique_id)} className="cursor-pointer mr-4">
                   <div
                     className={`w-5 h-5 rounded border flex items-center justify-center transition-colors
-                    ${selectedTrend.has(product.product_unique_id) ? "bg-red-500 border-red-500" : "border-gray-200"}`}
+                    ${selectedTrend?.has(product?.product_unique_id) ? "bg-red-500 border-red-500" : "border-gray-200"}`}
                   >
-                    {selectedTrend.has(product.product_unique_id) && <Check className="w-3 h-3 text-white" />}
+                    {selectedTrend?.has(product?.product_unique_id) && <Check className="w-3 h-3 text-white" />}
                   </div>
                 </div>
 
                 <img
                   src={getProductImage(product)}
-                  alt={product.product_name}
+                  alt={product?.product_name}
                   className="w-12 h-12 rounded-lg object-cover border border-gray-100 opacity-90"
                 />
 
                 <div className="ml-4 flex-1">
-                  <h3 className="font-semibold text-gray-800 text-sm">{product.product_name}</h3>
+                  <h3 className="font-semibold text-gray-800 text-sm">{product?.product_name}</h3>
                   <div className="flex items-center text-xs text-gray-500 mt-1 space-x-2">
                     <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-600">
-                      {product.brand_name || "Brand"}
+                      {product?.brand_name || "Brand"}
                     </span>
-                    <span className="font-medium text-gray-900">${product.final_price}</span>
+                    <span className="font-medium text-gray-900">${product?.final_price}</span>
                   </div>
                 </div>
 
@@ -414,7 +414,7 @@ const SingleSaleTrendPage = () => {
                 </button>
               </div>
             ))}
-            {trendProducts.length === 0 && (
+            {trendProducts?.length === 0 && (
               <div className="flex flex-col items-center justify-center h-full text-gray-400 py-20">
                 <ShoppingBag className="w-12 h-12 mb-3 text-gray-200" />
                 <p>No products added yet</p>
@@ -427,16 +427,16 @@ const SingleSaleTrendPage = () => {
           <div className="p-4 bg-white border-t border-gray-100 sticky bottom-0 z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
             <button
               onClick={moveLeft}
-              disabled={selectedTrend.size === 0}
+              disabled={selectedTrend?.size === 0}
               className={`w-full py-3 rounded-xl font-bold flex items-center justify-center transition-all border
                 ${
-                  selectedTrend.size > 0
+                  selectedTrend?.size > 0
                     ? "border-red-200 text-red-600 bg-red-50 hover:bg-red-100"
                     : "border-gray-100 text-gray-300 bg-gray-50 cursor-not-allowed"
                 }`}
             >
               <ArrowLeft className="mr-2 w-5 h-5" />
-              Remove Selected ({selectedTrend.size})
+              Remove Selected ({selectedTrend?.size})
             </button>
           </div>
         </div>

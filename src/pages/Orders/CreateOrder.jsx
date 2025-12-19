@@ -43,14 +43,14 @@ const CreateOrder = () => {
 
   const products = productsResponse?.data || [];
 
-  const formattedProducts = products.map((product) => ({
-    value: product.product_unique_id,
-    label: product.product_name,
+  const formattedProducts = products?.map((product) => ({
+    value: product?.product_unique_id,
+    label: product?.product_name,
     data: product,
   }));
 
   const handleSelectProduct = (item) => {
-    const exists = selectedProducts.some((p) => p.product_unique_id === item.value);
+    const exists = selectedProducts?.some((p) => p?.product_unique_id === item?.value);
     if (exists) return;
 
     setSelectedProducts((prev) => [
@@ -58,8 +58,8 @@ const CreateOrder = () => {
       {
         ...item.data,
         quantity: 1,
-        base_price: Number(item.data.base_price),
-        final_price: Number(item.data.final_price),
+        base_price: Number(item?.data?.base_price),
+        final_price: Number(item?.data?.final_price),
       },
     ]);
 
@@ -68,39 +68,39 @@ const CreateOrder = () => {
   };
 
   const handleRemoveProduct = (productId) => {
-    setSelectedProducts((prev) => prev.filter((p) => p.product_unique_id !== productId));
+    setSelectedProducts((prev) => prev?.filter((p) => p?.product_unique_id !== productId));
   };
 
   const handleQuantityChange = (productId, value) => {
     const qty = parseInt(value) || 1;
     setSelectedProducts((prev) =>
-      prev.map((p) => (p.product_unique_id === productId ? { ...p, quantity: Math.max(1, qty) } : p))
+      prev?.map((p) => (p?.product_unique_id === productId ? { ...p, quantity: Math.max(1, qty) } : p))
     );
   };
 
   const handleSubmitOrder = async () => {
     const orderData = {
-      customer_name: customerForm.customerName.trim(),
-      mobile_number: customerForm.mobileNumber.trim(),
+      customer_name: customerForm?.customerName.trim(),
+      mobile_number: customerForm?.mobileNumber.trim(),
       order_type: "Offline",
       payment_method: "UPI",
       payment_status: "Paid",
-      order_products: selectedProducts.map((p) => ({
-        product_name: p.product_name,
-        product_unique_id: p.product_unique_id,
-        quantity: p.quantity,
-        unit_base_price: p.base_price,
-        unit_final_price: p.final_price,
+      order_products: selectedProducts?.map((p) => ({
+        product_name: p?.product_name,
+        product_unique_id: p?.product_unique_id,
+        quantity: p?.quantity,
+        unit_base_price: p?.base_price,
+        unit_final_price: p?.final_price,
       })),
     };
 
     await createOrder(orderData);
   };
 
-  const totalAmount = selectedProducts.reduce((sum, p) => sum + p.final_price * p.quantity, 0);
+  const totalAmount = selectedProducts?.reduce((sum, p) => sum + p?.final_price * p?.quantity, 0);
 
   const isFormValid =
-    customerForm.customerName.trim() && customerForm.mobileNumber.trim() && selectedProducts.length > 0;
+    customerForm?.customerName.trim() && customerForm?.mobileNumber.trim() && selectedProducts?.length > 0;
 
   return (
     <div className="min-h-screen bg-gray-50 p-2">
@@ -134,11 +134,11 @@ const CreateOrder = () => {
                 results={showDropdown ? formattedProducts : []}
                 onChange={(val) => {
                   setSearchTerm(val);
-                  setShowDropdown(val.length > 0);
+                  setShowDropdown(val?.length > 0);
                 }}
                 onSearch={(val) => {
                   setSearchTerm(val);
-                  setShowDropdown(val.length > 0);
+                  setShowDropdown(val?.length > 0);
                 }}
                 onSelect={handleSelectProduct}
                 clearResults={() => {
@@ -166,7 +166,7 @@ const CreateOrder = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {selectedProducts.length === 0 ? (
+                    {selectedProducts?.length === 0 ? (
                       <tr>
                         <td colSpan="5" className="px-6 py-16 text-center">
                           <div className="flex flex-col items-center text-gray-400">
@@ -184,30 +184,30 @@ const CreateOrder = () => {
                         </td>
                       </tr>
                     ) : (
-                      selectedProducts.map((product) => {
-                        const itemTotal = product.final_price * product.quantity;
+                      selectedProducts?.map((product) => {
+                        const itemTotal = product?.final_price * product?.quantity;
                         return (
-                          <tr key={product.product_unique_id} className="hover:bg-gray-50">
+                          <tr key={product?.product_unique_id} className="hover:bg-gray-50">
                             <td className="px-6 py-4">
-                              <div className="text-sm font-medium text-gray-900">{product.product_name}</div>
+                              <div className="text-sm font-medium text-gray-900">{product?.product_name}</div>
                               {/* <div className="text-xs text-gray-500">
                                 ID: {product.product_unique_id}
                               </div> */}
                             </td>
-                            <td className="px-6 py-4 text-center font-semibold">₹{product.final_price.toFixed(2)}</td>
+                            <td className="px-6 py-4 text-center font-semibold">₹{product?.final_price.toFixed(2)}</td>
                             <td className="px-6 py-4 text-center">
                               <input
                                 type="number"
                                 min="1"
-                                value={product.quantity}
-                                onChange={(e) => handleQuantityChange(product.product_unique_id, e.target.value)}
+                                value={product?.quantity}
+                                onChange={(e) => handleQuantityChange(product?.product_unique_id, e.target.value)}
                                 className="w-20 px-3 py-1 border border-gray-300 rounded text-center focus:outline-none focus:ring-2 focus:ring-indigo-500"
                               />
                             </td>
-                            <td className="px-6 py-4 text-center font-bold text-indigo-700">₹{itemTotal.toFixed(2)}</td>
+                            <td className="px-6 py-4 text-center font-bold text-indigo-700">₹{itemTotal?.toFixed(2)}</td>
                             <td className="px-6 py-4 text-center">
                               <button
-                                onClick={() => handleRemoveProduct(product.product_unique_id)}
+                                onClick={() => handleRemoveProduct(product?.product_unique_id)}
                                 className="text-red-600 hover:text-red-800"
                               >
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -230,7 +230,7 @@ const CreateOrder = () => {
                       <td colSpan="3" className="px-6 py-4 text-right">
                         Grand Total:
                       </td>
-                      <td className="px-6 py-4 text-center text-indigo-700">₹{totalAmount.toFixed(2)}</td>
+                      <td className="px-6 py-4 text-center text-indigo-700">₹{totalAmount?.toFixed(2)}</td>
                       <td></td>
                     </tr>
                   </tfoot>

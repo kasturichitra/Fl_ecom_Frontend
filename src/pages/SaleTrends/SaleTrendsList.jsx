@@ -93,8 +93,8 @@ const SaleTrends = () => {
 
   const handleDelete = useCallback(
     async (item) => {
-      if (window.confirm(`Delete ${item.trend_name}?`)) {
-        await deleteSaleTrend(item.trend_unique_id);
+      if (window.confirm(`Delete ${item?.trend_name}?`)) {
+        await deleteSaleTrend(item?.trend_unique_id);
       }
     },
     [deleteSaleTrend]
@@ -103,7 +103,7 @@ const SaleTrends = () => {
   const handleUpdate = async (formData) => {
     if (!editingTrend) return;
     await updateSaleTrend({
-      id: editingTrend.trend_unique_id,
+      id: editingTrend?.trend_unique_id,
       data: formData,
     });
   };
@@ -113,19 +113,19 @@ const SaleTrends = () => {
       field: "trend_name",
       headerName: "TREND NAME",
       flex: 1,
-      renderCell: (params) => <span className="font-semibold text-gray-800">{params.value}</span>,
+      renderCell: (params) => <span className="font-semibold text-gray-800">{params?.value}</span>,
     },
     {
       field: "trend_from",
       headerName: "FROM",
       flex: 1,
-      renderCell: (params) => <span className="text-gray-600">{formatDate(params.value)}</span>,
+      renderCell: (params) => <span className="text-gray-600">{formatDate(params?.value)}</span>,
     },
     {
       field: "trend_to",
       headerName: "TO",
       flex: 1,
-      renderCell: (params) => <span className="text-gray-600">{formatDate(params.value)}</span>,
+      renderCell: (params) => <span className="text-gray-600">{formatDate(params?.value)}</span>,
     },
     // {
     //   field: "trend_products",
@@ -140,10 +140,10 @@ const SaleTrends = () => {
       renderCell: (params) => (
         <span
           className={`px-3 py-1 rounded-full text-xs font-bold ${
-            params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            params?.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
           }`}
         >
-          {params.row.is_active ? "Active" : "Inactive"}
+          {params?.row?.is_active ? "Active" : "Inactive"}
         </span>
       ),
     },
@@ -163,7 +163,7 @@ const SaleTrends = () => {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                handleEdit(params.row);
+                handleEdit(params?.row);
               }}
               disabled={isUpdatingSaleTrend}
               className="text-indigo-600 hover:text-indigo-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
@@ -176,7 +176,7 @@ const SaleTrends = () => {
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                handleDelete(params.row);
+                handleDelete(params?.row);
               }}
               disabled={isDeletingSaleTrend}
               className="text-indigo-600 hover:text-indigo-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
@@ -195,7 +195,7 @@ const SaleTrends = () => {
   }));
 
   const handleRowClick = (params) => {
-    const trend_unique_id = params.row.trend_unique_id;
+    const trend_unique_id = params?.row?.trend_unique_id;
     navigate(`/saleTrends/${trend_unique_id}`);
   };
 
