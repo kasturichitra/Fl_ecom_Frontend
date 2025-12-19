@@ -150,12 +150,12 @@ const BrandListManager = () => {
       renderCell: (params) => (
         <div className="flex gap-2 items-center">
           <VerifyPermission permission="brand:update">
-            <button onClick={() => handleEdit(params.row)} className="cursor-pointer">
+            <button onClick={() => handleEdit(params?.row)} className="cursor-pointer">
               <FaEdit size={18} className="text-[#4f46e5]" />
             </button>
           </VerifyPermission>
           <VerifyPermission permission="brand:delete">
-            <button onClick={() => handleDelete(params.row)} className="cursor-pointer">
+            <button onClick={() => handleDelete(params?.row)} className="cursor-pointer">
               <MdDelete size={18} className="text-[#4f46e5]" />
             </button>
           </VerifyPermission>
@@ -185,8 +185,8 @@ const BrandListManager = () => {
     // refreshBrands();
   };
 
-  const visibleColumns = columns.filter((col) => {
-    const headerConfig = brandHeaders.find((h) => h.key === col.headerName);
+  const visibleColumns = columns?.filter((col) => {
+    const headerConfig = brandHeaders?.find((h) => h?.key === col?.headerName);
     return headerConfig ? headerConfig.value : true;
   });
 

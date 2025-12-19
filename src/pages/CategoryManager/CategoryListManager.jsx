@@ -64,8 +64,8 @@ const CategoryListManager = () => {
   const formattedIndustries = [
     { label: "All Industries", value: "" },
     ...(industriesData?.data?.map((ind) => ({
-      label: ind.industry_name,
-      value: ind.industry_unique_id,
+      label: ind?.industry_name,
+      value: ind?.industry_unique_id,
     })) || []),
   ];
 
@@ -106,7 +106,7 @@ const CategoryListManager = () => {
       flex: 1,
       renderCell: (params) => (
         <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-          {params.value || "N/A"}
+          {params?.value || "N/A"}
         </span>
       ),
     },
@@ -114,27 +114,27 @@ const CategoryListManager = () => {
       field: "category_name",
       headerName: "CATEGORY NAME",
       flex: 1,
-      renderCell: (params) => <span className="font-semibold text-gray-800">{params.value || "Unnamed"}</span>,
+      renderCell: (params) => <span className="font-semibold text-gray-800">{params?.value || "Unnamed"}</span>,
     },
     {
       field: "is_active",
       headerName: "STATUS",
       flex: 1,
-      valueGetter: (params) => (params.value ? "Active" : "Inactive"),
+      valueGetter: (params) => (params?.value ? "Active" : "Inactive"),
       renderCell: (params) => (
         <span
           className={`px-3 py-1.5 rounded-full text-xs font-bold ${
-            params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            params?.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
           }`}
         >
-          {params.row.is_active ? "Active" : "Inactive"}
+          {params?.row?.is_active ? "Active" : "Inactive"}
         </span>
       ),
     },
   ];
 
   if (canUpdate || canDelete) {
-    columns.push({
+    columns?.push({
       field: "actions",
       headerName: "ACTIONS",
       width: 120,
@@ -145,7 +145,7 @@ const CategoryListManager = () => {
         <div className="flex gap-3 items-center">
           <VerifyPermission permission="category:update">
             <button
-              onClick={() => handleEdit(params.row)}
+              onClick={() => handleEdit(params?.row)}
               className="text-indigo-600 hover:text-indigo-800 transition"
               title="Edit"
             >
@@ -154,7 +154,7 @@ const CategoryListManager = () => {
           </VerifyPermission>
           <VerifyPermission permission="category:delete">
             <button
-              onClick={() => handleDelete(params.row)}
+              onClick={() => handleDelete(params?.row)}
               className="text-indigo-600 hover:text-indigo-800 transition"
               title="Delete"
             >
@@ -166,9 +166,9 @@ const CategoryListManager = () => {
     });
   }
 
-  const visibleColumns = columns.filter((col) => {
+  const visibleColumns = columns?.filter((col) => {
     if (col.field === "actions") return true;
-    const config = categoryHeaders.find((h) => h.key === col.headerName);
+    const config = categoryHeaders?.find((h) => h?.key === col?.headerName);
     return config ? config.value : true;
   });
 
@@ -241,7 +241,7 @@ const CategoryListManager = () => {
               ) : (
                 <DataTable
                   rows={categories?.data || []}
-                  getRowId={(row) => row.category_unique_id}
+                  getRowId={(row) => row?.category_unique_id}
                   columns={visibleColumns}
                   page={currentPage}
                   pageSize={pageSize}
@@ -251,7 +251,7 @@ const CategoryListManager = () => {
                   sort={sort}
                   setSort={(newSort) => {
                     const item = newSort[0];
-                    setSort(item ? `${item.field}:${item.sort}` : "");
+                    setSort(item ? `${item?.field}:${item?.sort}` : "");
                   }}
                   loading={loading}
                   // Beautiful empty state — table stays visible!

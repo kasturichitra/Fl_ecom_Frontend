@@ -7,7 +7,7 @@ export const useGetAllCategories = ({ search = "", page = 1, limit = 10, sort = 
   return useQuery({
     queryKey,
     queryFn: () => getAllCategoryApi({ search, page, limit, sort, is_active, industry_unique_id }),
-    select: (res) => res.data,
+    select: (res) => res?.data,
     staleTime: 5 * 60 * 1000,
     cacheTime: 20 * 60 * 1000, 
     refetchOnMount: false, 
@@ -19,7 +19,7 @@ export const useGetCategoryByUniqueId = (uniqueId) => {
   return useQuery({
     queryKey,
     queryFn: () => getCategoryByUniqueIdApi(uniqueId),
-    select: (res) => res.data.data,
+    select: (res) => res?.data?.data,
     enabled: !!uniqueId,
     staleTime: 5 * 60 * 1000,
     cacheTime: 20 * 60 * 1000, 
