@@ -8,6 +8,7 @@ const SearchDropdown = ({
   onSearch,
   onSelect,
   clearResults,
+  customInputClass,
 }) => {
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const inputRef = useRef(null);
@@ -64,7 +65,7 @@ const SearchDropdown = ({
           if (onSearch) onSearch(val);
         }}
         onKeyDown={handleKeyDown}
-        className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className={customInputClass || "w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"}
       />
 
       {/* Results Dropdown */}
@@ -76,11 +77,10 @@ const SearchDropdown = ({
               ref={(el) => (resultsRef.current[index] = el)}
               onClick={() => handleItemClick(item)}
               onMouseEnter={() => setHighlightedIndex(index)}
-              className={`p-3 cursor-pointer transition ${
-                highlightedIndex === index
+              className={`p-3 cursor-pointer transition ${highlightedIndex === index
                   ? "bg-indigo-100 text-indigo-800 font-medium"
                   : "hover:bg-gray-100"
-              }`}
+                }`}
             >
               {item.label}
             </div>
