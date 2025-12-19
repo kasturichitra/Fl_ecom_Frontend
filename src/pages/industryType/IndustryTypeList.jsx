@@ -83,7 +83,7 @@ const IndustryTypeList = () => {
   const handleUpdate = async (formData) => {
     if (!editingIndustry) return;
     await updateIndustry({
-      id: editingIndustry.industry_unique_id,
+      id: editingIndustry?.industry_unique_id,
       data: formData,
     });
   };
@@ -93,8 +93,8 @@ const IndustryTypeList = () => {
   }, []);
 
   const handleDelete = useCallback(async (item) => {
-    if (window.confirm(`Delete ${item.industry_name}?`)) {
-      await deleteIndustry(item.industry_unique_id);
+    if (window.confirm(`Delete ${item?.industry_name}?`)) {
+      await deleteIndustry(item?.industry_unique_id);
     }
   }, []);
 
@@ -117,14 +117,14 @@ const IndustryTypeList = () => {
       field: "is_active",
       headerName: "STATUS",
       flex: 1,
-      valueGetter: (params) => (params.value ? "Active" : "Inactive"),
+      valueGetter: (params) => (params?.row?.is_active ? "Active" : "Inactive"),
       renderCell: (params) => (
         <span
           className={`px-3 py-1 rounded-full text-xs font-bold ${
-            params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            params?.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
           }`}
         >
-          {params.row.is_active ? "Active" : "Inactive"}
+          {params?.row?.is_active ? "Active" : "Inactive"}
         </span>
       ),
     },
@@ -142,7 +142,7 @@ const IndustryTypeList = () => {
         <div className="flex gap-3 items-center">
           <VerifyPermission permission="industry:update">
             <button
-              onClick={() => handleEdit(params.row)}
+              onClick={() => handleEdit(params?.row)}
               className="text-indigo-600 hover:text-indigo-800 transition"
               title="Edit"
             >
@@ -151,7 +151,7 @@ const IndustryTypeList = () => {
           </VerifyPermission>
           <VerifyPermission permission="industry:delete">
             <button
-              onClick={() => handleDelete(params.row)}
+              onClick={() => handleDelete(params?.row)}
               disabled={isDeletingIndustry}
               className="text-indigo-600 hover:text-indigo-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
               title="Delete"
@@ -168,9 +168,9 @@ const IndustryTypeList = () => {
   //   const headerConfig = columns.find((h) => h.key === col.headerName);
   //   return headerConfig ? headerConfig.value : true;
   // });
-  const visibleColumns = columns.filter((col) => {
-    const headerConfig = industryHeaders.find((h) => h.key === col.headerName);
-    return headerConfig ? headerConfig.value : true;
+  const visibleColumns = columns?.filter((col) => {
+    const headerConfig = industryHeaders?.find((h) => h?.key === col?.headerName);
+    return headerConfig ? headerConfig?.value : true;
   });
 
   return (
@@ -210,7 +210,7 @@ const IndustryTypeList = () => {
             ) : (
               <DataTable
                 rows={industryTypes?.data || []}
-                getRowId={(row) => row.industry_unique_id}
+                getRowId={(row) => row?.industry_unique_id}
                 columns={visibleColumns}
                 page={currentPage}
                 pageSize={pageSize}
@@ -220,7 +220,7 @@ const IndustryTypeList = () => {
                 sort={sort}
                 setSort={(newSort) => {
                   const sortItem = newSort[0];
-                  setSort(sortItem ? `${sortItem.field}:${sortItem.sort}` : "");
+                  setSort(sortItem ? `${sortItem?.field}:${sortItem?.sort}` : "");
                 }}
               />
             )}
