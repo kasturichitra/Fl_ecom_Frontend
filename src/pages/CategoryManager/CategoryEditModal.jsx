@@ -29,23 +29,23 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
   useEffect(() => {
     if (category) {
       setFormData({
-        category_name: category.category_name,
-        category_unique_id: category.category_unique_id,
-        industry_unique_id: category.industry_unique_id,
-        is_active: category.is_active,
+        category_name: category?.category_name,
+        category_unique_id: category?.category_unique_id,
+        industry_unique_id: category?.industry_unique_id,
+        is_active: category?.is_active,
         image: null,
-        currentImage: category.image ? `${import.meta.env.VITE_API_URL}/${category.image}` : null,
+        currentImage: category?.image ? `${import.meta.env.VITE_API_URL}/${category.image}` : null,
       });
 
       setAttributes(
-        (category.attributes || []).map((a) => ({
-          name: a.name,
-          code: a.code,
-          slug: a.slug,
-          description: a.description,
-          units: a.units,
-          is_active: a.is_active,
-          _id: a._id,
+        (category?.attributes || [])?.map((a) => ({
+          name: a?.name,
+          code: a?.code,
+          slug: a?.slug,
+          description: a?.description,
+          units: a?.units,
+          is_active: a?.is_active,
+          _id: a?._id,
         }))
       );
     }
@@ -72,7 +72,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
       updated[index][key] = value;
 
       if (key === "name") {
-        updated[index].slug = value.toLowerCase().trim().replace(/\s+/g, "-");
+        updated[index].slug = value?.toLowerCase().trim().replace(/\s+/g, "-");
       }
 
       return updated;
@@ -95,7 +95,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
   };
 
   const deleteAttribute = (index) => {
-    setAttributes((prev) => prev.filter((_, i) => i !== index));
+    setAttributes((prev) => prev?.filter((_, i) => i !== index));
   };
 
   // ------------------------------
@@ -106,27 +106,27 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
     e.preventDefault();
 
     const fd = new FormData();
-    fd.append("category_name", formData.category_name);
-    fd.append("category_unique_id", formData.category_unique_id);
-    fd.append("industry_unique_id", formData.industry_unique_id);
-    fd.append("is_active", formData.is_active);
+    fd.append("category_name", formData?.category_name);
+    fd.append("category_unique_id", formData?.category_unique_id);
+    fd.append("industry_unique_id", formData?.industry_unique_id);
+    fd.append("is_active", formData?.is_active);
 
     // Image logic
-    if (formData.image && formData.image !== "REMOVE") {
-      fd.append("image", formData.image);
+    if (formData?.image && formData?.image !== "REMOVE") {
+      fd.append("image", formData?.image);
     }
-    if (formData.image === "REMOVE") {
+    if (formData?.image === "REMOVE") {
       fd.append("remove_image", "true");
     }
 
     // Attributes
     attributes.forEach((attr, i) => {
-      Object.entries(attr).forEach(([key, value]) => {
-        if (value !== null) fd.append(`attributes[${i}][${key}]`, value);
+      Object?.entries(attr)?.forEach(([key, value]) => {
+        if (value !== null) fd?.append(`attributes[${i}][${key}]`, value);
       });
     });
 
-    await updateCategory({ uniqueId: category.category_unique_id, payload: fd });
+    await updateCategory({ uniqueId: category?.category_unique_id, payload: fd });
     onClose()
   };
 
@@ -136,8 +136,8 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
 
   // Format accordingly how the dynamic form is expecting
   const formattedIndustryTypes = industryTypes?.data?.map((i) => ({
-    label: `${i.industry_name} #${i.industry_unique_id}`,
-    value: i.industry_unique_id,
+    label: `${i?.industry_name} #${i?.industry_unique_id}`,
+    value: i?.industry_unique_id,
   }));
 
   const dynamicFields = [
@@ -214,7 +214,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
         </div>
 
         <div className="space-y-6">
-          {attributes.map((attr, idx) => (
+          {attributes?.map((attr, idx) => (
             <div key={idx} className="border p-6 rounded-xl bg-gray-50 shadow-sm">
               <div className="flex justify-between mb-4">
                 <h4 className="font-semibold text-indigo-700">Attribute #{idx + 1}</h4>
@@ -230,28 +230,28 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
               <div className="grid grid-cols-2 gap-4">
                 <input
                   placeholder="Name:- ex. RAM (GB), Battery, Storage (GB), etc."
-                  value={attr.name}
+                  value={attr?.name}
                   onChange={(e) => handleAttributeChange(idx, "name", e.target.value)}
                   className="border p-3 rounded-lg"
                 />
 
                 <input
                   placeholder="Code:- ex. ram_gb, battery, storage_gb, etc."
-                  value={attr.code}
+                  value={attr?.code}
                   onChange={(e) => handleAttributeChange(idx, "code", e.target.value)}
                   className="border p-3 rounded-lg"
                 />
 
                 <input
                   placeholder="Units:- ex. gb, mAH, gb, etc."
-                  value={attr.units}
+                  value={attr?.units}
                   onChange={(e) => handleAttributeChange(idx, "units", e.target.value)}
                   className="border p-3 rounded-lg"
                 />
 
                 <input
                   placeholder="Description"
-                  value={attr.description}
+                  value={attr?.description}
                   onChange={(e) => handleAttributeChange(idx, "description", e.target.value)}
                   className="border p-3 rounded-lg"
                 />
@@ -260,7 +260,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
               <label className="flex items-center gap-3 mt-4">
                 <input
                   type="checkbox"
-                  checked={attr.is_active}
+                  checked={attr?.is_active}
                   onChange={(e) => handleAttributeChange(idx, "is_active", e.target.checked)}
                   className="w-5 h-5"
                 />

@@ -39,7 +39,7 @@ export const useCreateSaleTrend = (options = {}) => {
     mutationFn: (data) => createSaleTrend(data),
     onSuccess: (id) => {
       toast.success("Sale Trend created successfully");
-      queryClient.invalidateQueries({ queryKey: ["saleTrends", id] });
+      queryClient.invalidateQueries({ queryKey: ["saleTrends"] });
       options?.onSuccess?.();
     },
     onError: () => {

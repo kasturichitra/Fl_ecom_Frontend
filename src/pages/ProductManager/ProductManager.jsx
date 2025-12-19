@@ -32,29 +32,29 @@ const ProductManager = ({ onCancel }) => {
   const selectedCategoryAttributes = selectedCategoryItem?.attributes || [];
 
   // Prepare DB attributes (stateless list used by AttributeRepeater)
-  const dbAttributes = selectedCategoryAttributes.map((attr) => ({
-    attribute_code: attr.code,
+  const dbAttributes = selectedCategoryAttributes?.map((attr) => ({
+    attribute_code: attr?.code,
     value: "",
-    placeholderValue: `Enter ${attr.name}`,
+    placeholderValue: `Enter ${attr?.name}`,
     type: "text",
   }));
 
   // Initialize attributesRef with the pre-defined DB attributes
   useEffect(() => {
-    attributesRef.current = dbAttributes.map((a) => ({
-      attribute_code: a.attribute_code,
-      value: a.value || "",
+    attributesRef.current = dbAttributes?.map((a) => ({
+      attribute_code: a?.attribute_code,
+      value: a?.value || "",
     }));
   }, [dbAttributes]);
 
   const formattedCategories = categories?.data?.map((cat) => ({
-    value: cat.category_unique_id,
-    label: cat.category_name,
+    value: cat?.category_unique_id,
+    label: cat?.category_name,
   }));
 
   const formattedBrands = brands?.data?.map((brand) => ({
-    value: brand.brand_unique_id,
-    label: brand.brand_name,
+    value: brand?.brand_unique_id,
+    label: brand?.brand_name,
   }));
 
   const { mutateAsync: createProduct, isPending: isSubmitting } = useCreateProduct({
@@ -81,7 +81,7 @@ const ProductManager = ({ onCancel }) => {
         setShowCategoryDropdown(false);
       },
       onSelect: (value) => {
-        setSelectedCategory(value.value);
+        setSelectedCategory(value?.value);
       },
       placeholder: "e.g., HF1",
     },
@@ -105,7 +105,7 @@ const ProductManager = ({ onCancel }) => {
       },
       placeholder: "e.g., apple1",
     },
-     ...PRODUCT_STATIC_FIELDS.filter(field => !field.isEditOnly),
+     ...PRODUCT_STATIC_FIELDS?.filter(field => !field?.isEditOnly),
   ];
 
   // CALLBACK: Update attributes ref
@@ -121,10 +121,10 @@ const ProductManager = ({ onCancel }) => {
 
     // Filter out empty attributes and format them according to schema
     const validAttributes = currentAttributes
-      .filter((attr) => attr.attribute_code && attr.value)
+      .filter((attr) => attr?.attribute_code && attr?.value)
       .map((attr) => ({
-        attribute_code: attr.attribute_code,
-        value: attr.value,
+        attribute_code: attr?.attribute_code,
+        value: attr?.value,
       }));
 
     const { product_image, product_attributes, ...rest } = formData;

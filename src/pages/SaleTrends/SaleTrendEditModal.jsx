@@ -7,13 +7,13 @@ const SaleTrendEditModal = ({ formData: initialData, closeModal, onSubmit, isSub
   const formatDateForInput = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-    return date.toISOString().split("T")[0];
+    return date?.toISOString().split("T")[0];
   };
 
   const [formData, setLocalFormData] = useState({
     ...initialData,
-    trend_from: formatDateForInput(initialData.trend_from),
-    trend_to: formatDateForInput(initialData.trend_to),
+    trend_from: formatDateForInput(initialData?.trend_from),
+    trend_to: formatDateForInput(initialData?.trend_to),
   });
 
   // Submit handler
@@ -21,9 +21,9 @@ const SaleTrendEditModal = ({ formData: initialData, closeModal, onSubmit, isSub
     e.preventDefault();
 
     const submitData = {
-      trend_name: formData.trend_name || "",
-      trend_from: formData.trend_from || "",
-      trend_to: formData.trend_to || "",
+      trend_name: formData?.trend_name || "",
+      trend_from: formData?.trend_from || "",
+      trend_to: formData?.trend_to || "",
     };
 
     await onSubmit(submitData);

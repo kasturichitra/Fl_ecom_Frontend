@@ -19,9 +19,10 @@ export const useGetAllUsers = ({ searchTerm = "", sort = "", page = 1, limit = 1
         limit,
         role,
       }),
-    select: (res) => res.data.data,
+    select: (res) => res?.data?.data,
     staleTime: 5 * 60 * 1000,
     refetchOnMount: false,
+    // refetchOnWindowFocus: false,
   });
 };
 

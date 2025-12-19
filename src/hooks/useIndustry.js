@@ -13,7 +13,7 @@ export const useGetAllIndustries = ({ search = "", page = 1, limit = 10, sort = 
   return useQuery({
     queryKey,
     queryFn: () => getAllIndustryApi({ search, page, limit, sort, is_active }),
-    select: (res) => res.data,
+    select: (res) => res?.data,
     staleTime: 10 * 60 * 1000,
     cacheTime: 30 * 60 * 1000,
     refetchOnMount: false,

@@ -35,7 +35,7 @@ const EmployeeList = () => {
   }, [handleClickOutside]);
 
   const {
-    data: employees,
+    data: employees = [],
     isLoading,
     isError,
     error,
@@ -57,7 +57,7 @@ const EmployeeList = () => {
       cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 font-mono",
       renderCell: (params) => (
         <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-          {params.value ? params.value.slice(-6).toUpperCase() : ""}
+          {params?.value ? params?.value.slice(-6).toUpperCase() : ""}
         </span>
       ),
     },
@@ -81,7 +81,7 @@ const EmployeeList = () => {
       flex: 1,
       headerClassName: "custom-header",
       cellClassName: "px-6 py-4 text-left text-sm text-gray-600",
-      renderCell: (params) => params.value || "N/A",
+      renderCell: (params) => params?.value || "N/A",
     },
     // {
     //   field: "role",
@@ -105,13 +105,13 @@ const EmployeeList = () => {
       flex: 1,
       headerClassName: "custom-header",
       cellClassName: "px-6 py-4 text-left text-sm text-gray-600",
-      renderCell: (params) => new Date(params.value).toLocaleDateString(),
+      renderCell: (params) => new Date(params?.value).toLocaleDateString(),
     },
   ];
 
-  const visibleColumns = columns.filter((col) => {
-    const headerConfig = employeeHeaders.find((h) => h.key === col.headerName);
-    return headerConfig ? headerConfig.value : true;
+  const visibleColumns = columns?.filter((col) => {
+    const headerConfig = employeeHeaders?.find((h) => h?.key === col?.headerName);
+    return headerConfig ? headerConfig?.value : true;
   });
 
   return (
@@ -155,11 +155,11 @@ const EmployeeList = () => {
               ) : (
                 <DataTable
                   rows={employees}
-                  getRowId={(row) => row._id}
+                  getRowId={(row) => row?._id}
                   columns={visibleColumns}
                   page={currentPage}
                   pageSize={pageSize}
-                  totalCount={employees.length}
+                  totalCount={employees?.length}
                   setCurrentPage={setCurrentPage}
                   setPageSize={setPageSize}
                   sort="" // Client-side sorting not implemented yet, or can be added if needed

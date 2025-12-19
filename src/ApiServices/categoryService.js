@@ -3,7 +3,7 @@ import axiosInstance from "../axios/axiosInstance.js";
 const BASE_URL = "/category";
 
 export const getAllCategoryApi = async (params = {}) => {
-  const queryString = new URLSearchParams(params).toString();
+  const queryString = new URLSearchParams(params)?.toString();
   const res = await axiosInstance.get(`${BASE_URL}?${queryString}`);
   return res;
 };

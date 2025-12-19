@@ -61,7 +61,7 @@ const UsersList = () => {
       cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 font-mono",
       renderCell: (params) => (
         <span className="font-mono text-xs bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full">
-          {params.value ? params.value.slice(-6).toUpperCase() : ""}
+          {params?.value ? params?.value?.slice(-6).toUpperCase() : ""}
         </span>
       ),
     },
@@ -85,7 +85,7 @@ const UsersList = () => {
       flex: 1,
       headerClassName: "custom-header",
       cellClassName: "px-6 py-4 text-left text-sm text-gray-600",
-      renderCell: (params) => params.value || "N/A",
+      renderCell: (params) => params?.value || "N/A",
     },
     // {
     //   field: "createdAt",
@@ -98,9 +98,9 @@ const UsersList = () => {
     // },
   ];
 
-  const visibleColumns = columns.filter((col) => {
-    const headerConfig = userHeaders.find((h) => h.key === col.headerName);
-    return headerConfig ? headerConfig.value : true;
+  const visibleColumns = columns?.filter((col) => {
+    const headerConfig = userHeaders?.find((h) => h?.key === col?.headerName);
+    return headerConfig ? headerConfig?.value : true;
   });
 
   return (
@@ -139,7 +139,7 @@ const UsersList = () => {
             ) : (
               <DataTable
                 rows={users}
-                getRowId={(row) => row._id}
+                getRowId={(row) => row?._id}
                 columns={visibleColumns}
                 page={currentPage}
                 pageSize={pageSize}
@@ -153,7 +153,7 @@ const UsersList = () => {
                   { field: "createdAt", sort: "desc" }
                   createdAt:desc
                   */
-                  setSort(sortItem ? `${sortItem.field}:${sortItem.sort}` : "");
+                  setSort(sortItem ? `${sortItem?.field}:${sortItem?.sort}` : "");
                 }}
               />
             )}
