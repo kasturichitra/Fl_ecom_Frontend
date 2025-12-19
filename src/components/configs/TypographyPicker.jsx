@@ -38,7 +38,7 @@ const TypographyPicker = ({
       {/* Heading Size */}
       <SizeInput
         label="Heading Size (px)"
-        value={theme.typography.heading_size}
+        value={theme?.typography?.heading_size}
         onChange={(e) => onTypographyChange("heading_size", e.target.value)}
         min="16"
         max="72"
@@ -48,7 +48,7 @@ const TypographyPicker = ({
       {/* Body Size */}
       <SizeInput
         label="Body Size (px)"
-        value={theme.typography.body_size}
+        value={theme?.typography?.body_size}
         onChange={(e) => onTypographyChange("body_size", e.target.value)}
         min="12"
         max="24"
@@ -72,19 +72,19 @@ const TypographyPicker = ({
             <input
               type="text"
               placeholder="Enter Your Custom Font"
-              value={theme.typography.font_family}
+              value={theme?.typography?.font_family}
               onChange={(e) => onTypographyChange("font_family", e.target.value)}
               className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
             />
           </div>
         </div>
         <div className="space-y-2 max-h-128 overflow-y-auto pr-2 custom-scrollbar">
-          {popularFonts.map((font) => (
+          {popularFonts?.map((font) => (
             <button
               key={font}
               onClick={() => onTypographyChange("font_family", font)}
               className={`w-full px-4 py-3 rounded-lg text-left transition-all duration-200 ${
-                theme.typography.font_family === font
+                theme?.typography?.font_family === font
                   ? "bg-purple-600 text-white shadow-lg"
                   : "bg-white text-gray-800 hover:bg-purple-100 shadow-sm border border-gray-200"
               }`}
@@ -92,7 +92,7 @@ const TypographyPicker = ({
               <span className="font-semibold text-sm">{font}</span>
               <p
                 className={`text-xs mt-1 ${
-                  theme.typography.font_family === font
+                  theme?.typography?.font_family === font
                     ? "text-purple-100"
                     : "text-gray-500"
                 }`}
@@ -109,8 +109,8 @@ const TypographyPicker = ({
       <div
         className="mt-6 p-5 rounded-xl border-2 border-gray-200"
         style={{
-          backgroundColor: theme.colors.background,
-          fontFamily: theme.typography.font_family,
+          backgroundColor: theme?.colors?.background,
+          fontFamily: theme?.typography?.font_family,
         }}
       >
         <p className="text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wide">
@@ -118,9 +118,9 @@ const TypographyPicker = ({
         </p>
         <h3
           style={{
-            fontSize: `${theme.typography.heading_size}px`,
-            color: theme.colors.primary,
-            fontFamily: theme.typography.font_family,
+            fontSize: `${theme?.typography?.heading_size}px`,
+            color: theme?.colors?.primary,
+            fontFamily: theme?.typography?.font_family,
           }}
           className="font-bold mb-2"
         >
@@ -128,9 +128,9 @@ const TypographyPicker = ({
         </h3>
         <p
           style={{
-            fontSize: `${theme.typography.body_size}px`,
-            color: theme.colors.text,
-            fontFamily: theme.typography.font_family,
+            fontSize: `${theme?.typography?.body_size}px`,
+            color: theme?.colors?.text,
+            fontFamily: theme?.typography?.font_family,
           }}
         >
           This is body text preview. The quick brown fox jumps over the lazy

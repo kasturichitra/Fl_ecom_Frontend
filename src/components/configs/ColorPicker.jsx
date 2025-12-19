@@ -45,14 +45,14 @@ const ColorPicker = ({ theme, onColorChange, onModeChange }) => {
         <div className="flex items-center gap-4">
           <input
             type="color"
-            value={theme.colors.primary}
+            value={theme?.colors?.primary}
             onChange={(e) => onColorChange("primary", e.target.value)}
             className="w-20 h-12 rounded-lg cursor-pointer border-2 border-gray-300 shadow-sm hover:border-indigo-500 transition-colors"
           />
           <div className="flex-1">
             <input
               type="text"
-              value={theme.colors.primary}
+              value={theme?.colors?.primary}
               onChange={(e) => onColorChange("primary", e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
               placeholder="#4f46e5"
@@ -69,14 +69,14 @@ const ColorPicker = ({ theme, onColorChange, onModeChange }) => {
         <div className="flex items-center gap-4">
           <input
             type="color"
-            value={theme.colors.secondary}
+            value={theme?.colors?.secondary}
             onChange={(e) => onColorChange("secondary", e.target.value)}
             className="w-20 h-12 rounded-lg cursor-pointer border-2 border-gray-300 shadow-sm hover:border-purple-500 transition-colors"
           />
           <div className="flex-1">
             <input
               type="text"
-              value={theme.colors.secondary}
+              value={theme?.colors?.secondary}
               onChange={(e) => onColorChange("secondary", e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
               placeholder="#9333ea"
@@ -93,14 +93,14 @@ const ColorPicker = ({ theme, onColorChange, onModeChange }) => {
         <div className="flex items-center gap-4">
           <input
             type="color"
-            value={theme.colors.background}
+            value={theme?.colors?.background}
             onChange={(e) => onColorChange("background", e.target.value)}
             className="w-20 h-12 rounded-lg cursor-pointer border-2 border-gray-300 shadow-sm hover:border-blue-500 transition-colors"
           />
           <div className="flex-1">
             <input
               type="text"
-              value={theme.colors.background}
+              value={theme?.colors?.background}
               onChange={(e) => onColorChange("background", e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
               placeholder="#ffffff"
@@ -117,14 +117,14 @@ const ColorPicker = ({ theme, onColorChange, onModeChange }) => {
         <div className="flex items-center gap-4">
           <input
             type="color"
-            value={theme.colors.text}
+            value={theme?.colors?.text}
             onChange={(e) => onColorChange("text", e.target.value)}
             className="w-20 h-12 rounded-lg cursor-pointer border-2 border-gray-300 shadow-sm hover:border-gray-500 transition-colors"
           />
           <div className="flex-1">
             <input
               type="text"
-              value={theme.colors.text}
+              value={theme?.colors?.text}
               onChange={(e) => onColorChange("text", e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-gray-500 focus:border-transparent outline-none"
               placeholder="#1f2937"
@@ -141,14 +141,14 @@ const ColorPicker = ({ theme, onColorChange, onModeChange }) => {
         <div className="flex items-center gap-4">
           <input
             type="color"
-            value={theme.colors.ghost}
+            value={theme?.colors?.ghost}
             onChange={(e) => onColorChange("ghost", e.target.value)}
             className="w-20 h-12 rounded-lg cursor-pointer border-2 border-gray-300 shadow-sm hover:border-gray-400 transition-colors"
           />
           <div className="flex-1">
             <input
               type="text"
-              value={theme.colors.ghost}
+              value={theme?.colors?.ghost}
               onChange={(e) => onColorChange("ghost", e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-gray-400 focus:border-transparent outline-none"
               placeholder="#f3f4f6"
@@ -165,14 +165,14 @@ const ColorPicker = ({ theme, onColorChange, onModeChange }) => {
         <div className="flex items-center gap-4">
           <input
             type="color"
-            value={theme.colors.destructive}
+            value={theme?.colors?.destructive}
             onChange={(e) => onColorChange("destructive", e.target.value)}
             className="w-20 h-12 rounded-lg cursor-pointer border-2 border-gray-300 shadow-sm hover:border-red-500 transition-colors"
           />
           <div className="flex-1">
             <input
               type="text"
-              value={theme.colors.destructive}
+              value={theme?.colors?.destructive}
               onChange={(e) => onColorChange("destructive", e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
               placeholder="#ef4444"
