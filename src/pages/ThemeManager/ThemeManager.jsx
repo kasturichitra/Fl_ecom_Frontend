@@ -43,19 +43,19 @@ const ThemeManager = () => {
   useEffect(() => {
     if (currentConfig?.theme) {
       setTheme({
-        mode: currentConfig.theme.mode || "light",
+        mode: currentConfig?.theme?.mode || "light",
         colors: {
-          primary: currentConfig.theme.colors?.primary || "#4f46e5",
-          secondary: currentConfig.theme.colors?.secondary || "#9333ea",
-          background: currentConfig.theme.colors?.background || "#ffffff",
-          text: currentConfig.theme.colors?.text || "#1f2937",
-          ghost: currentConfig.theme.colors?.ghost || "#f3f4f6",
-          destructive: currentConfig.theme.colors?.destructive || "#ef4444",
+          primary: currentConfig?.theme?.colors?.primary || "#4f46e5",
+          secondary: currentConfig?.theme?.colors?.secondary || "#9333ea",
+          background: currentConfig?.theme?.colors?.background || "#ffffff",
+          text: currentConfig?.theme?.colors?.text || "#1f2937",
+          ghost: currentConfig?.theme?.colors?.ghost || "#f3f4f6",
+          destructive: currentConfig?.theme?.colors?.destructive || "#ef4444",
         },
         typography: {
-          font_family: currentConfig.theme.typography?.font_family || "Inter",
-          heading_size: currentConfig.theme.typography?.heading_size || 32,
-          body_size: currentConfig.theme.typography?.body_size || 16,
+          font_family: currentConfig?.theme?.typography?.font_family || "Inter",
+          heading_size: currentConfig?.theme?.typography?.heading_size || 32,
+          body_size: currentConfig?.theme?.typography?.body_size || 16,
         },
       });
     }
@@ -130,7 +130,7 @@ const ThemeManager = () => {
 
     // Update config via API
     await updateConfig({
-      id: currentConfig._id,
+      id: currentConfig?._id,
       data: themeData,
     });
   };
@@ -176,7 +176,7 @@ const ThemeManager = () => {
                   <FaCheckCircle className="text-green-600 text-2xl" />
                   <div>
                     <h3 className="text-xl font-bold text-gray-800">Current Active Theme</h3>
-                    <p className="text-sm text-gray-600">Saved on {savedTheme.savedAt}</p>
+                    <p className="text-sm text-gray-600">Saved on {savedTheme?.savedAt}</p>
                   </div>
                 </div>
 
@@ -187,16 +187,16 @@ const ThemeManager = () => {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Mode:</span>
-                        <span className="text-sm font-semibold text-gray-800 capitalize">{savedTheme.mode}</span>
+                        <span className="text-sm font-semibold text-gray-800 capitalize">{savedTheme?.mode}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Primary:</span>
                         <div className="flex items-center gap-2">
                           <div
                             className="w-8 h-8 rounded border-2 border-gray-200"
-                            style={{ backgroundColor: savedTheme.colors.primary }}
+                            style={{ backgroundColor: savedTheme?.colors?.primary }}
                           ></div>
-                          <span className="text-sm font-mono text-gray-800">{savedTheme.colors.primary}</span>
+                          <span className="text-sm font-mono text-gray-800">{savedTheme?.colors?.primary}</span>
                         </div>
                       </div>
                       <div className="flex items-center justify-between">
@@ -204,9 +204,9 @@ const ThemeManager = () => {
                         <div className="flex items-center gap-2">
                           <div
                             className="w-8 h-8 rounded border-2 border-gray-200"
-                            style={{ backgroundColor: savedTheme.colors.secondary }}
+                            style={{ backgroundColor: savedTheme?.colors?.secondary }}
                           ></div>
-                          <span className="text-sm font-mono text-gray-800">{savedTheme.colors.secondary}</span>
+                          <span className="text-sm font-mono text-gray-800">{savedTheme?.colors?.secondary}</span>
                         </div>
                       </div>
                       <div className="flex items-center justify-between">
@@ -214,9 +214,9 @@ const ThemeManager = () => {
                         <div className="flex items-center gap-2">
                           <div
                             className="w-8 h-8 rounded border-2 border-gray-200"
-                            style={{ backgroundColor: savedTheme.colors.background }}
+                            style={{ backgroundColor: savedTheme?.colors?.background }}
                           ></div>
-                          <span className="text-sm font-mono text-gray-800">{savedTheme.colors.background}</span>
+                          <span className="text-sm font-mono text-gray-800">{savedTheme?.colors?.background}</span>
                         </div>
                       </div>
                       <div className="flex items-center justify-between">
@@ -224,9 +224,9 @@ const ThemeManager = () => {
                         <div className="flex items-center gap-2">
                           <div
                             className="w-8 h-8 rounded border-2 border-gray-200"
-                            style={{ backgroundColor: savedTheme.colors.text }}
+                            style={{ backgroundColor: savedTheme?.colors?.text }}
                           ></div>
-                          <span className="text-sm font-mono text-gray-800">{savedTheme.colors.text}</span>
+                          <span className="text-sm font-mono text-gray-800">{savedTheme?.colors?.text}</span>
                         </div>
                       </div>
                       <div className="flex items-center justify-between">
@@ -234,9 +234,9 @@ const ThemeManager = () => {
                         <div className="flex items-center gap-2">
                           <div
                             className="w-8 h-8 rounded border-2 border-gray-200"
-                            style={{ backgroundColor: savedTheme.colors.ghost }}
+                            style={{ backgroundColor: savedTheme?.colors?.ghost }}
                           ></div>
-                          <span className="text-sm font-mono text-gray-800">{savedTheme.colors.ghost}</span>
+                          <span className="text-sm font-mono text-gray-800">{savedTheme?.colors?.ghost}</span>
                         </div>
                       </div>
                       <div className="flex items-center justify-between">
@@ -244,9 +244,9 @@ const ThemeManager = () => {
                         <div className="flex items-center gap-2">
                           <div
                             className="w-8 h-8 rounded border-2 border-gray-200"
-                            style={{ backgroundColor: savedTheme.colors.destructive }}
+                            style={{ backgroundColor: savedTheme?.colors?.destructive }}
                           ></div>
-                          <span className="text-sm font-mono text-gray-800">{savedTheme.colors.destructive}</span>
+                          <span className="text-sm font-mono text-gray-800">{savedTheme?.colors?.destructive}</span>
                         </div>
                       </div>
                     </div>
@@ -260,20 +260,20 @@ const ThemeManager = () => {
                         <span className="text-sm text-gray-600">Font Family:</span>
                         <span
                           className="text-sm font-semibold text-gray-800"
-                          style={{ fontFamily: savedTheme.typography.font_family }}
+                          style={{ fontFamily: savedTheme?.typography?.font_family }}
                         >
-                          {savedTheme.typography.font_family}
+                          {savedTheme?.typography?.font_family}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Heading Size:</span>
                         <span className="text-sm font-semibold text-gray-800">
-                          {savedTheme.typography.heading_size}px
+                          {savedTheme?.typography?.heading_size}px
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Body Size:</span>
-                        <span className="text-sm font-semibold text-gray-800">{savedTheme.typography.body_size}px</span>
+                        <span className="text-sm font-semibold text-gray-800">{savedTheme?.typography?.body_size}px</span>
                       </div>
                     </div>
                   </div>
