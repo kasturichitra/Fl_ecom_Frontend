@@ -4,11 +4,20 @@ import { useCreateOrder } from "../../hooks/useOrder";
 import SearchDropdown from "../../components/SearchDropdown";
 import DynamicForm from "../../components/DynamicForm";
 import PageHeader from "../../components/PageHeader";
+import QrScanner from "../../components/QrScanner";
+import ScannedProductModal from "../../components/ScannedProductModal";
+import { FiMaximize, FiX } from "react-icons/fi"; // FiMaximize might be unused now
+import toast from "react-hot-toast";
 
 const CreateOrder = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
+
+  // QR Scanner States
+  const [showScanner, setShowScanner] = useState(false);
+  const [showProductModal, setShowProductModal] = useState(false);
+  const [scannedProduct, setScannedProduct] = useState(null);
 
   const [customerForm, setCustomerForm] = useState({
     customerName: "",
@@ -32,7 +41,7 @@ const CreateOrder = () => {
     },
   ];
 
-  const { data: productsResponse, isLoading, isError } = useGetAllProducts({ searchTerm, page: 1, limit: 50 });
+  const { data: productsResponse, isLoading, isError } = useGetAllProducts({ searchTerm });
 
   const { mutateAsync: createOrder, isPending: isCreatingOrder } = useCreateOrder({
     onSuccess: () => {
@@ -51,7 +60,10 @@ const CreateOrder = () => {
 
   const handleSelectProduct = (item) => {
     const exists = selectedProducts.some((p) => p.product_unique_id === item.value);
-    if (exists) return;
+    if (exists) {
+      toast.error("Product already added to order");
+      return;
+    }
 
     setSelectedProducts((prev) => [
       ...prev,
@@ -97,6 +109,45 @@ const CreateOrder = () => {
     await createOrder(orderData);
   };
 
+  // QR Handler
+  const handleScan = (code) => {
+    if (!code) return;
+
+    try {
+      // Try to parse JSON
+      const parsedProduct = JSON.parse(code);
+
+      // Basic validation to ensure it has required fields
+      if (parsedProduct && (parsedProduct.product_unique_id || parsedProduct.id) && parsedProduct.product_name) {
+        setScannedProduct(parsedProduct);
+        setShowScanner(false);
+        setShowProductModal(true);
+        toast.success("Product found!");
+      } else {
+        toast.error("Invalid QR Code: Missing product details");
+      }
+    } catch (error) {
+      console.error("QR Parse Error", error);
+      toast.error("Scanned code is not a valid Product JSON");
+    }
+  };
+
+  const handleAddScannedProduct = (e) => {
+    e.preventDefault();
+    if (scannedProduct) {
+      handleSelectProduct({
+        value: scannedProduct.product_unique_id,
+        label: scannedProduct.product_name,
+        data: {
+          ...scannedProduct,
+          base_price: scannedProduct.base_price || scannedProduct.final_price, // Fallback if base_price missing
+        },
+      });
+      setShowProductModal(false);
+      setScannedProduct(null);
+    }
+  };
+
   const totalAmount = selectedProducts.reduce((sum, p) => sum + p.final_price * p.quantity, 0);
 
   const isFormValid =
@@ -109,8 +160,14 @@ const CreateOrder = () => {
           <PageHeader
             title="Create New Offline Order"
             subtitle="Manage all your store orders from here"
-            // actionLabel="Create Order"
-            // onAction={() => setShowAddModal(true)}
+            actionLabel={
+              <div className="flex items-center gap-2">
+                <FiMaximize className="text-xl" />
+                <span>Scan QR</span>
+              </div>
+            }
+            onAction={() => setShowScanner(true)}
+            createPermission="order:create"
           />
 
           <div className="p-8 space-y-10">
@@ -255,6 +312,35 @@ const CreateOrder = () => {
           </div>
         </div>
       </div>
+
+      {/* Scanner Modal */}
+      {showScanner && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative">
+            <div className="p-4 border-b flex justify-between items-center bg-gray-50">
+              <h3 className="text-lg font-bold text-gray-800">Scan Product QR</h3>
+              <button
+                onClick={() => setShowScanner(false)}
+                className="text-gray-500 hover:text-red-600 transition p-2 rounded-full hover:bg-gray-100"
+              >
+                <FiX size={24} />
+              </button>
+            </div>
+            <div className="p-6 flex flex-col items-center justify-center min-h-[300px] bg-gray-900">
+              <QrScanner onScan={handleScan} />
+              <p className="mt-4 text-gray-400 text-sm">Point your camera at a product QR code</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Product Found Modal */}
+      <ScannedProductModal
+        isOpen={showProductModal}
+        scannedProduct={scannedProduct}
+        onClose={() => setShowProductModal(false)}
+        onAdd={handleAddScannedProduct}
+      />
     </div>
   );
 };

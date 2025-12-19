@@ -28,10 +28,12 @@ const Dashboard = () => {
 
       {/* <div className="">
         <p>Scan QR, click on below button</p>
-        <QRScanner onScan={(text) => {
-          console.log("Scanned text:", text);
-          setScannedText(text);
-        }}/>
+        <QRScanner
+          onScan={(text) => {
+            console.log("Scanned text:", text);
+            setScannedText(text);
+          }}
+        />
         <p className="text-lg font-bold">Scanned text: {scannedText}</p>
       </div> */}
 
