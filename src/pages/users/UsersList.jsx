@@ -139,7 +139,7 @@ const UsersList = () => {
             ) : (
               <DataTable
                 rows={users}
-                getRowId={(row) => row._id}
+                getRowId={(row) => row?._id}
                 columns={visibleColumns}
                 page={currentPage}
                 pageSize={pageSize}
