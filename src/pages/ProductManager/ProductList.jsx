@@ -19,6 +19,7 @@ import {
   useDeleteProduct,
   useDownloadProductExcel,
   useGetAllProducts,
+  useGetProductQrPdf,
   useUpdateProduct,
 } from "../../hooks/useProduct";
 
@@ -30,6 +31,8 @@ import ProductManager from "./ProductManager";
 import useDebounce from "../../hooks/useDebounce.js";
 import useCheckPermission from "../../hooks/useCheckPermission.js";
 import VerifyPermission from "../../middleware/verifyPermission.js";
+import { QrCodeIcon } from "lucide-react";
+import QrCodeGeneratorModal from "../../components/QrCodeGeneratorModal";
 
 const ProductList = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -56,6 +59,10 @@ const ProductList = () => {
   // Bulk product result modal state
   const [showBulkResultModal, setShowBulkResultModal] = useState(false);
   const [bulkResultData, setBulkResultData] = useState(null);
+
+  // QR Modal state
+  const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [selectedQrProduct, setSelectedQrProduct] = useState(null);
 
   const handleClickOutside = useCallback((event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -140,6 +147,13 @@ const ProductList = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
 
+  const { mutate: getQrPdf, isPending: isGeneratingQr } = useGetProductQrPdf({
+    onSuccess: () => {
+      setIsQrModalOpen(false);
+      setSelectedQrProduct(null);
+    },
+  });
+
   const { data: categories } = useGetAllCategories({
     search: excelSearchTerm || uploadSearchTerm,
   });
@@ -217,6 +231,24 @@ const ProductList = () => {
   const handleCloseEdit = () => setEditingProduct(null);
   const handleCloseAdd = () => setShowAddModal(false);
 
+  const handleQrClick = (product) => {
+    setSelectedQrProduct(product);
+    setIsQrModalOpen(true);
+  };
+
+  const handleQrSubmit = (quantity) => {
+    if (!selectedQrProduct || !quantity) return;
+    getQrPdf({
+      product_unique_id: selectedQrProduct.product_unique_id,
+      quantity: parseInt(quantity),
+    });
+  };
+
+  const handleQrCancel = () => {
+    setIsQrModalOpen(false);
+    setSelectedQrProduct(null);
+  };
+
   const columns = [
     {
       field: "product_unique_id",
@@ -284,6 +316,22 @@ const ProductList = () => {
       flex: 1,
       headerClassName: "custom-header",
       cellClassName: "px-6 py-4 text-left text-sm text-gray-800",
+    },
+    {
+      field: "qr",
+      headerName: "QR",
+      flex: 1,
+      headerClassName: "custom-header",
+      cellClassName: "px-6 py-4 text-left text-sm text-gray-800",
+      renderCell: (params) => (
+        <button
+          onClick={() => handleQrClick(params.row)}
+          className="text-gray-600 hover:text-indigo-600 transition-colors p-2 rounded-full hover:bg-gray-100"
+          title="Generate QR"
+        >
+          <QrCodeIcon size={20} />
+        </button>
+      ),
     },
   ];
 
@@ -469,6 +517,16 @@ const ProductList = () => {
           resultData={bulkResultData}
         />
       </Activity>
+
+      {/*
+       */}
+      <QrCodeGeneratorModal
+        isOpen={isQrModalOpen}
+        onClose={handleQrCancel}
+        product={selectedQrProduct}
+        onSubmit={handleQrSubmit}
+        isLoading={isGeneratingQr}
+      />
     </>
   );
 };
