@@ -47,14 +47,14 @@ const IndustryTypeManager = ({ onCancel }) => {
   };
 
   return (
-    <div className="relative max-w-4xl mx-auto p-6 bg-white rounded-2xl shadow-xl">
+    <div className="relative w-full max-w-4xl mx-auto p-4 md:p-6 bg-white rounded-xl md:rounded-2xl shadow-xl">
       <button
         onClick={handleCancel}
-        className="absolute right-5 top-5 text-gray-400 hover:text-red-500 transition-colors"
+        className="absolute right-3 top-3 md:right-5 md:top-5 text-gray-400 hover:text-red-500 transition-colors"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-8 w-8"
+          className="h-6 w-6 md:h-8 md:w-8"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
