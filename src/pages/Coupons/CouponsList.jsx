@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Pencil, Trash2 } from "lucide-react";
 
 import PageHeader from "../../components/PageHeader";
 import SearchBar from "../../components/SearchBar";
@@ -6,13 +8,15 @@ import DataTable from "../../components/Table.jsx";
 import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector.jsx";
 import { DropdownFilter } from "../../components/DropdownFilter.jsx";
 
-import { useGetAllCoupons } from "../../hooks/useCoupons.js";
+import { useGetAllCoupons, useDeleteCoupon } from "../../hooks/useCoupons.js";
+import { toast } from "react-hot-toast";
 import { DEBOUNCED_DELAY, COUPON_STATUS_OPTIONS } from "../../lib/constants.js";
 import { useCouponTableHeadersStore } from "../../stores/CouponTableHeadersStore.js";
 
 import useDebounce from "../../hooks/useDebounce.js";
 
 const CouponsList = () => {
+    const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState("");
     const [pageSize, setPageSize] = useState(10);
     const [currentPage, setCurrentPage] = useState(0);
@@ -48,6 +52,21 @@ const CouponsList = () => {
         sort,
         status: activeStatus || undefined,
     });
+
+    const { mutate: deleteCoupon } = useDeleteCoupon();
+
+    const handleDelete = (id, code) => {
+        if (window.confirm(`Are you sure you want to delete coupon "${code}"?`)) {
+            deleteCoupon(id, {
+                onSuccess: () => {
+                    toast.success("Coupon deleted successfully");
+                },
+                onError: (err) => {
+                    toast.error(err?.response?.data?.message || "Failed to delete coupon");
+                }
+            });
+        }
+    };
 
     const columns = [
         {
@@ -131,6 +150,30 @@ const CouponsList = () => {
             flex: 1,
             renderCell: (params) => (params?.value ? new Date(params.value).toLocaleDateString() : "N/A"),
         },
+        {
+            field: "actions",
+            headerName: "ACTIONS",
+            width: 100,
+            sortable: false,
+            renderCell: (params) => (
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => navigate(`/coupons/edit/${params.row._id}`)}
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        title="Edit Coupon"
+                    >
+                        <Pencil className="h-5 w-5" />
+                    </button>
+                    <button
+                        onClick={() => handleDelete(params.row._id, params.row.coupon_code)}
+                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete Coupon"
+                    >
+                        <Trash2 className="h-5 w-5" />
+                    </button>
+                </div>
+            ),
+        }
     ];
 
     const visibleColumns = columns.filter((col) => {
@@ -145,6 +188,9 @@ const CouponsList = () => {
                     <PageHeader
                         title="Coupons"
                         subtitle="View all available coupons"
+                        actionLabel="Add New Coupon"
+                        createPermission="coupon:create"
+                        onAction={() => navigate("/coupons/create")}
                     />
 
                     <div className="p-6 flex flex-wrap items-center gap-4 bg-gray-50 border-b">
@@ -178,7 +224,11 @@ const CouponsList = () => {
                                     sort={sort}
                                     setSort={(newSort) => {
                                         const item = newSort[0];
-                                        setSort(item ? `${item.field}:${item.sort}` : "");
+                                        const sortString = item ? `${item.field}:${item.sort}` : "";
+                                        // Prevents "Cannot update a component while rendering a different component"
+                                        if (sortString !== sort) {
+                                            setSort(sortString);
+                                        }
                                     }}
                                     loading={loading}
                                     noRowsOverlay={
