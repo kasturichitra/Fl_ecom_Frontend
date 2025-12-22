@@ -39,10 +39,10 @@ const IndustryTypeList = () => {
 
   const debouncedSearchTerm = useDebounce(searchTerm, DEBOUNCED_DELAY);
 
-  // useEffect(() => {
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => document.removeEventListener("mousedown", handleClickOutside);
-  // }, [handleClickOutside]);
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [handleClickOutside]);
 
   const statusFun = () => {
     if (activeStatus === "active") return true;
