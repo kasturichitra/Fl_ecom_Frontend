@@ -15,25 +15,15 @@ const NotificationPopup = ({ open }) => {
     message: notification.message,
   }));
 
-  const maxVisible = 12; // number of notifications before scrolling
-  const itemHeight = 40; // approximate height per notification
-  const maxHeight = maxVisible * itemHeight;
-
   return (
-    <div className="absolute right-0 mt-2 w-90 bg-white shadow-xl rounded-xl p-4 border border-gray-200 z-50">
+    <div className="fixed top-16 left-1/2 -translate-x-1/2 w-[90vw] max-w-sm md:absolute md:top-full md:right-0 md:left-auto md:translate-x-0 md:w-96 md:mt-2 bg-white shadow-xl rounded-xl p-4 border border-gray-200 z-50">
       <h3 className="font-semibold mb-2 text-gray-700">Notifications</h3>
 
-      <ul
-        className="space-y-2"
-        style={{
-          maxHeight: notifications?.length > maxVisible ? `${maxHeight}px` : "auto",
-          overflowY: notifications?.length > maxVisible ? "auto" : "visible",
-        }}
-      >
+      <ul className="space-y-2 max-h-[60vh] overflow-y-auto">
         {notifications?.map((msg, index) => (
           <li
             key={index}
-            className="text-sm text-gray-600 bg-gray-50 p-2 rounded-lg hover:bg-gray-100 cursor-pointer"
+            className="text-sm text-gray-600 bg-gray-50 p-2 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors duration-200"
             onClick={() => navigate(msg.path)}
           >
             {msg.message}
