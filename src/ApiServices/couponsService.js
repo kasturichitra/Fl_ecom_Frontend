@@ -20,3 +20,11 @@ export const createCoupon = (couponData) => {
 export const updateCoupon = (id, couponData) => {
     return axiosInstance.put(`${BASE_URL}/update/${id}`, couponData)
 }
+
+export const getCouponById = (id) => {
+    return axiosInstance.get(`${BASE_URL}/${id}`)
+}
+
+export const deleteCoupon = (id) => {
+    return axiosInstance.delete(`${BASE_URL}/delete/${id}`)
+}
