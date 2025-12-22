@@ -74,9 +74,9 @@ const CreateOrder = () => {
         quantity: 1,
         // Store original prices for calculation
         base_price: basePrice,
-        original_final_price: finalPrice,
-        final_price: finalPrice,
-        discount: 0,
+        // original_final_price: finalPrice,
+        // final_price: finalPrice,
+        // discount: 0,
       },
     ]);
 
@@ -101,7 +101,7 @@ const CreateOrder = () => {
       setSelectedProducts((prev) =>
         prev?.map((p) => {
           if (p?.product_unique_id === productId) {
-            return { ...p, discount: 0, final_price: p.original_final_price };
+            return { ...p };
           }
           return p;
         })
@@ -115,15 +115,18 @@ const CreateOrder = () => {
 
     setSelectedProducts((prev) =>
       prev?.map((p) => {
+        console.log("P in map:", p);
+        console.log("Selected Product Id:", productId);
         if (p?.product_unique_id === productId) {
-          const newFinalPrice = p.original_final_price * (1 - discount / 100);
           return {
             ...p,
-            discount: discount,
-            final_price: newFinalPrice,
+            additional_discount_percentage: discount,
+            additional_discount_type: "percentage",
+            post_discount_final_price: p?.discounted_price - p?.discounted_price * (discount / 100),
+            // final_price: newFinalPrice,
           };
         }
-        return p;
+        // return p;
       })
     );
   };
@@ -139,6 +142,7 @@ const CreateOrder = () => {
   };
 
   const handleSubmitOrder = async () => {
+    console.log("Selected Products before API call:", selectedProducts);
     const orderData = {
       customer_name: customerForm?.customerName.trim(),
       mobile_number: customerForm?.mobileNumber.trim(),
@@ -153,15 +157,23 @@ const CreateOrder = () => {
         quantity: p?.quantity,
         unit_base_price: p?.base_price,
         unit_discount_price: p?.discount_price,
+        unit_tax_value: p?.tax_value,
         unit_discounted_price: p?.discounted_price,
         unit_final_price: p?.final_price, // This includes the product level discount
+        cgst: p?.cgst,
+        sgst: p?.sgst,
+        igst: p?.igst,
+        additional_discount_percentage: p?.additional_discount_percentage,
+        additional_discount_type: p?.additional_discount_type,
       })),
       // If backend accepted total discount, we would send it.
       // For now we assume the individual prices calculate up, or we might need to distribute global discount.
       // We will stick to modifying what we have.
     };
 
-    await createOrder(orderData);
+    console.log("Order Data before API call:", orderData);
+
+    // await createOrder(orderData);
   };
 
   // QR Handler
@@ -357,7 +369,7 @@ const CreateOrder = () => {
                   </div>
                 ) : (
                   selectedProducts.map((product) => {
-                    const itemTotal = product.final_price * product.quantity;
+                    const itemTotal = Number(product.post_discount_final_price) || product.final_price * product.quantity;
                     // Determine placeholder color based on ID for some visual variety
                     const hue = (parseInt(product.product_unique_id) || 0) % 360;
 
@@ -405,7 +417,7 @@ const CreateOrder = () => {
                           {/* Price Display */}
                           <div className="flex flex-col items-end min-w-20">
                             <span className="text-xs text-gray-400 strike-through">
-                              {(product.original_final_price * product.quantity).toFixed(2)}
+                              {(product.final_price * product.quantity).toFixed(2)}
                             </span>
                             <span className="text-lg font-bold text-blue-700">₹{itemTotal.toFixed(2)}</span>
                           </div>
