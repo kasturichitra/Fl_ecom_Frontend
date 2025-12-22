@@ -14,14 +14,14 @@ const OrdersTrendChart = () => {
   const ordersByMonth = ordersData?.map((order) => order.count) || defaultOrdersByMonth;
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-6">
+    <div className="bg-white rounded-2xl shadow-xl p-4 md:p-6">
       {/* Header with Title and Year Selector */}
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-center flex-1">Orders Trend</h2>
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-4">
+        <h2 className="text-xl md:text-2xl font-bold text-center md:text-left flex-1">Orders Trend</h2>
         <select
           value={selectedYear}
           onChange={(e) => setSelectedYear(e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none"
+          className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none w-full md:w-auto"
         >
           <option value="2025">2025</option>
         </select>

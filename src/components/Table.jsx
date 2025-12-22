@@ -20,55 +20,93 @@ export default function DataTable({
 
   const handlePageSizeChange = (newPageSize) => {
     setPageSize(newPageSize);
-    setCurrentPage(0); // Reset to first page
+    setCurrentPage(0);
   };
 
   return (
-    <Paper sx={{ maxHeight: 700, width: "100%", display: "flex", flexDirection: "column" }}>
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        getRowId={getRowId}
-        autoHeight={false} // Important when using fixed height
-        disableRowSelectionOnClick
-        sortingMode="server"
-        sortModel={
-          sort
-            ? [
-                {
-                  field: sort.split(":")[0],
-                  sort: sort.split(":")[1],
-                },
-              ]
-            : []
+    <Paper
+      sx={{
+        maxHeight: 700,
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {/* Scrollbar styles (VISIBLE like screenshot) */}
+      <style>{`
+        .table-scroll {
+          overflow-x: auto;
+          overflow-y: hidden;
         }
-        onSortModelChange={setSort}
-        onRowClick={onRowClick}
-        // Completely disable MUI's internal pagination
-        pagination={false} // This is the key!
-        hideFooter={true}
-        sx={{
-          ...(pathname === "/order" && {
-            "& .MuiDataGrid-row": {
-              cursor: "pointer",
-            },
-          }),
 
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: "#4f46e5",
-            color: "black",
-            fontWeight: "bold",
-            fontSize: 14,
-          },
-          "& .MuiDataGrid-columnHeaderTitle": {
-            fontWeight: "bold",
-          },
-          flex: 1,
-        }}
-      />
+        .table-scroll::-webkit-scrollbar {
+          height: 12px;
+        }
+
+        .table-scroll::-webkit-scrollbar-track {
+          background: #f1f5f9;
+        }
+
+        .table-scroll::-webkit-scrollbar-thumb {
+          background: #94a3b8;
+          border-radius: 6px;
+          border: 2px solid #f1f5f9;
+        }
+
+        .table-scroll::-webkit-scrollbar-thumb:hover {
+          background: #64748b;
+        }
+      `}</style>
+
+      {/* Table Wrapper */}
+      <div className="w-full flex-1 table-scroll pb-1">
+        <div className="min-w-[1000px] h-full">
+          <DataGrid
+            rows={rows}
+            columns={columns}
+            getRowId={getRowId}
+            autoHeight={false}
+            disableRowSelectionOnClick
+            sortingMode="server"
+            sortModel={
+              sort
+                ? [
+                  {
+                    field: sort.split(":")[0],
+                    sort: sort.split(":")[1],
+                  },
+                ]
+                : []
+            }
+            onSortModelChange={setSort}
+            onRowClick={onRowClick}
+            pagination={false}
+            hideFooter
+            sx={{
+              ...(pathname === "/order" && {
+                "& .MuiDataGrid-row": {
+                  cursor: "pointer",
+                },
+              }),
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#4f46e5",
+                color: "black",
+                fontWeight: "bold",
+                fontSize: 14,
+              },
+              "& .MuiDataGrid-columnHeaderTitle": {
+                fontWeight: "bold",
+              },
+              flex: 1,
+              height: "100%",
+              width: "100%",
+            }}
+          />
+        </div>
+      </div>
 
       {/* Custom Footer */}
-      <div className="flex justify-between items-center p-4 border-t bg-gray-50">
+      <div className="flex flex-col gap-4 md:flex-row justify-between items-center p-4 border-t bg-gray-50">
         <div className="flex items-center gap-2 text-sm text-gray-700">
           <span>Rows per page:</span>
           <select
@@ -83,7 +121,8 @@ export default function DataTable({
             ))}
           </select>
           <span>
-            {page * pageSize + 1} - {Math.min((page + 1) * pageSize, totalCount)} of {totalCount}
+            {page * pageSize + 1} -{" "}
+            {Math.min((page + 1) * pageSize, totalCount)} of {totalCount}
           </span>
         </div>
 

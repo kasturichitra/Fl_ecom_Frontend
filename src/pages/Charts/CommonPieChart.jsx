@@ -75,18 +75,18 @@ const CommonPieChart = ({ title, labels, counts, stats, colors, activeTab, data,
 
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-8">
-      <div className={activeTab === "performance" ? "flex items-center justify-between mb-2" : "mb-6"}>
-        <h1 className={`text-2xl font-bold text-gray-800 text-center mb-6`}>
+    <div className="bg-white rounded-2xl shadow-xl p-4 md:p-8">
+      <div className={activeTab === "performance" ? "flex flex-col md:flex-row items-center justify-between gap-4 mb-4" : "mb-6"}>
+        <h1 className={`text-xl md:text-2xl font-bold text-gray-800 text-center mb-0`}>
           {title}
         </h1>
-        {activeTab === "performance" && <SearchDropdown value={search} onChange={(value) => {
+        {activeTab === "performance" && <div className="w-full md:w-auto"><SearchDropdown value={search} onChange={(value) => {
           setSearch(value)
           setShowDropdown(true)
         }} results={showDropdown ? data : []} onSelect={(value) => {
           setSearch(value)
           setShowDropdown(false)
-        }} />}
+        }} /></div>}
       </div>
 
 

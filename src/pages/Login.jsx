@@ -71,9 +71,9 @@ const Login = () => {
   return (
     <div className="h-screen flex items-center justify-center bg-linear-to-br from-blue-50 via-white to-indigo-50 overflow-hidden">
       <div className="w-full max-w-6xl h-full flex items-center justify-center p-4">
-        <div className="w-full h-full max-h-[90vh] flex shadow-2xl rounded-3xl overflow-hidden bg-white">
-          {/* Left Section - Branding */}
-          <div className="w-1/2 bg-linear-to-br from-blue-500 via-blue-600 to-blue-700 flex flex-col items-center justify-center p-8 lg:p-12">
+        <div className="w-full h-full max-h-[90vh] flex flex-col md:flex-row shadow-2xl rounded-3xl overflow-hidden bg-white">
+          {/* Left Section - Branding (Hidden on Mobile) */}
+          <div className="hidden md:flex w-full md:w-1/2 bg-linear-to-br from-blue-500 via-blue-600 to-blue-700 flex-col items-center justify-center p-8 lg:p-12">
             <div className="flex items-center gap-4 mb-8">
               <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg">
                 <img
@@ -134,8 +134,23 @@ const Login = () => {
           </div>
 
           {/* Right Section - Login Form */}
-          <div className="w-1/2 flex items-center justify-center p-4 lg:p-6 overflow-y-auto max-h-full">
+          <div className="w-full md:w-1/2 flex items-center justify-center p-4 lg:p-6 overflow-y-auto max-h-full">
             <div className="w-full max-w-md bg-white py-4">
+              {/* Mobile Branding (Visible only on small screens) */}
+              <div className="flex md:hidden flex-col items-center mb-6">
+                <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center shadow-lg mb-3">
+                  <img
+                    src="/navLogo.png"
+                    alt="Logo"
+                    className="w-10 h-10 object-contain brightness-0 invert"
+                    onError={(e) => {
+                      e.target.style.display = "none";
+                    }}
+                  />
+                </div>
+                <h1 className="text-2xl font-bold text-gray-800">FlowPipe Ecom</h1>
+              </div>
+
               <div className="mb-8">
                 <h2 className="text-3xl font-bold text-gray-800 mb-2">Sign In</h2>
                 <p className="text-gray-600">Enter your credentials to access your account</p>
@@ -164,9 +179,8 @@ const Login = () => {
                       name="identifier"
                       value={formData.identifier}
                       onChange={handleChange}
-                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 outline-none ${
-                        errors.identifier ? "border-red-500" : "border-gray-300"
-                      }`}
+                      className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 outline-none ${errors.identifier ? "border-red-500" : "border-gray-300"
+                        }`}
                       placeholder="Enter email or mobile number"
                       required
                     />

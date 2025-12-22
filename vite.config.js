@@ -10,16 +10,16 @@ export default defineConfig({
     },
   },
   server: {
-  host: true,
-  port: 5173,
-  proxy: {
-    "/api": {
-      target: "http://10.1.1.156:3000", 
-      // target: "http://10.1.1.121:3000",
-      changeOrigin: true,
-      secure: false,
-      rewrite: (path) => path.replace(/^\/api/, ""),
+    host: true,
+    port: 5173,
+    proxy: {
+      "/api": {
+        // target: "http://10.1.1.156:3000",
+        target: "http://10.1.1.120:3000",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, ""),
+      },
     },
   },
-},
 });

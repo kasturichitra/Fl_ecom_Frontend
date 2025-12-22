@@ -4,7 +4,17 @@ import { useCreateOrder } from "../../hooks/useOrder";
 import SearchDropdown from "../../components/SearchDropdown";
 import QrScanner from "../../components/QrScanner";
 import ScannedProductModal from "../../components/ScannedProductModal";
-import { FiMaximize, FiX, FiTrash2, FiUser, FiSmartphone, FiMapPin, FiSearch, FiShoppingBag, FiSave } from "react-icons/fi";
+import {
+  FiMaximize,
+  FiX,
+  FiTrash2,
+  FiUser,
+  FiSmartphone,
+  FiMapPin,
+  FiSearch,
+  FiShoppingBag,
+  FiSave,
+} from "react-icons/fi";
 import toast from "react-hot-toast";
 import PageHeader from "../../components/PageHeader";
 
@@ -64,9 +74,9 @@ const CreateOrder = () => {
         quantity: 1,
         // Store original prices for calculation
         base_price: basePrice,
-        original_final_price: finalPrice,
-        final_price: finalPrice,
-        discount: 0,
+        // original_final_price: finalPrice,
+        // final_price: finalPrice,
+        // discount: 0,
       },
     ]);
 
@@ -91,7 +101,7 @@ const CreateOrder = () => {
       setSelectedProducts((prev) =>
         prev?.map((p) => {
           if (p?.product_unique_id === productId) {
-            return { ...p, discount: 0, final_price: p.original_final_price };
+            return { ...p };
           }
           return p;
         })
@@ -105,15 +115,18 @@ const CreateOrder = () => {
 
     setSelectedProducts((prev) =>
       prev?.map((p) => {
+        console.log("P in map:", p);
+        console.log("Selected Product Id:", productId);
         if (p?.product_unique_id === productId) {
-          const newFinalPrice = p.original_final_price * (1 - discount / 100);
           return {
             ...p,
-            discount: discount,
-            final_price: newFinalPrice
+            additional_discount_percentage: discount,
+            additional_discount_type: "percentage",
+            post_discount_final_price: p?.discounted_price - p?.discounted_price * (discount / 100),
+            // final_price: newFinalPrice,
           };
         }
-        return p;
+        // return p;
       })
     );
   };
@@ -129,10 +142,11 @@ const CreateOrder = () => {
   };
 
   const handleSubmitOrder = async () => {
+    console.log("Selected Products before API call:", selectedProducts);
     const orderData = {
       customer_name: customerForm?.customerName.trim(),
       mobile_number: customerForm?.mobileNumber.trim(),
-      // We don't send address as strictly per "Do not add or remove fields" from backend payload perspective 
+      // We don't send address as strictly per "Do not add or remove fields" from backend payload perspective
       // unless backend supports it, but we collect it in UI.
       order_type: "Offline",
       payment_method: "UPI",
@@ -142,14 +156,24 @@ const CreateOrder = () => {
         product_unique_id: p?.product_unique_id,
         quantity: p?.quantity,
         unit_base_price: p?.base_price,
+        unit_discount_price: p?.discount_price,
+        unit_tax_value: p?.tax_value,
+        unit_discounted_price: p?.discounted_price,
         unit_final_price: p?.final_price, // This includes the product level discount
+        cgst: p?.cgst,
+        sgst: p?.sgst,
+        igst: p?.igst,
+        additional_discount_percentage: p?.additional_discount_percentage,
+        additional_discount_type: p?.additional_discount_type,
       })),
-      // If backend accepted total discount, we would send it. 
+      // If backend accepted total discount, we would send it.
       // For now we assume the individual prices calculate up, or we might need to distribute global discount.
       // We will stick to modifying what we have.
     };
 
-    await createOrder(orderData);
+    console.log("Order Data before API call:", orderData);
+
+    // await createOrder(orderData);
   };
 
   // QR Handler
@@ -204,17 +228,16 @@ const CreateOrder = () => {
             title="Create New Offline Order"
             subtitle="Manage all your store orders from here"
             createPermission="order:create"
-          // We are hiding the default action button from PageHeader or keeping it if needed, 
-          // but the user has a Scan button below. 
-          // The original had Scan QR in PageHeader. Let's restore that look if they want "previous one".
-          // But the prompt in Step 0 asked for "Scan QR button aligned to the right" of search.
-          // The user said "header shoulbe look like previous one". 
-          // I will put the PageHeader back.
+            // We are hiding the default action button from PageHeader or keeping it if needed,
+            // but the user has a Scan button below.
+            // The original had Scan QR in PageHeader. Let's restore that look if they want "previous one".
+            // But the prompt in Step 0 asked for "Scan QR button aligned to the right" of search.
+            // The user said "header shoulbe look like previous one".
+            // I will put the PageHeader back.
           />
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6 h-full">
-
           {/* LEFT PANEL - Customer Details (30%) */}
           <div className="w-full lg:w-[30%] h-fit">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-6">
@@ -278,13 +301,11 @@ const CreateOrder = () => {
                   {!isFormValid ? "Please fill all required fields to proceed." : "Ready to create order."}
                 </p>
               </div>
-
             </div>
           </div>
 
           {/* RIGHT PANEL - Order Products (70%) */}
           <div className="w-full lg:w-[70%] flex flex-col gap-6">
-
             {/* Top Row: Search & Scan */}
             <div className="flex flex-col md:flex-row gap-4">
               <div className="relative grow z-20">
@@ -301,12 +322,21 @@ const CreateOrder = () => {
                     */}
                   <SearchDropdown
                     value={searchTerm}
-                    placeholder="        Search box for products..."
+                    placeholder="Search box for products..."
                     results={showDropdown ? formattedProducts : []}
-                    onChange={(val) => { setSearchTerm(val); setShowDropdown(val?.length > 0); }}
-                    onSearch={(val) => { setSearchTerm(val); setShowDropdown(val?.length > 0); }}
+                    onChange={(val) => {
+                      setSearchTerm(val);
+                      setShowDropdown(val?.length > 0);
+                    }}
+                    onSearch={(val) => {
+                      setSearchTerm(val);
+                      setShowDropdown(val?.length > 0);
+                    }}
                     onSelect={handleSelectProduct}
-                    clearResults={() => { setSearchTerm(""); setShowDropdown(false); }}
+                    clearResults={() => {
+                      setSearchTerm("");
+                      setShowDropdown(false);
+                    }}
                     customInputClass="w-full pl-12 pr-4 py-4 bg-white border border-gray-200 rounded-2xl shadow-sm focus:ring-2 focus:ring-blue-500 outline-none text-lg transition-all"
                   />
                 </div>
@@ -339,13 +369,15 @@ const CreateOrder = () => {
                   </div>
                 ) : (
                   selectedProducts.map((product) => {
-                    const itemTotal = product.final_price * product.quantity;
+                    const itemTotal = Number(product.post_discount_final_price) || product.final_price * product.quantity;
                     // Determine placeholder color based on ID for some visual variety
                     const hue = (parseInt(product.product_unique_id) || 0) % 360;
 
                     return (
-                      <div key={product.product_unique_id} className="group bg-white rounded-lg border border-gray-200 p-3 shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row gap-3 items-center">
-
+                      <div
+                        key={product.product_unique_id}
+                        className="group bg-white rounded-lg border border-gray-200 p-3 shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row gap-3 items-center"
+                      >
                         {/* Product Details Placeholder */}
                         <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 font-bold text-lg uppercase">
                           {product.product_name.charAt(0)}
@@ -358,7 +390,6 @@ const CreateOrder = () => {
 
                         {/* Controls */}
                         <div className="flex items-center gap-4 sm:gap-6 bg-gray-50 p-2 rounded-xl">
-
                           {/* Quantity */}
                           <div className="flex flex-col items-center">
                             <label className="text-[10px] text-gray-500 font-bold uppercase mb-1">Qty</label>
@@ -386,11 +417,9 @@ const CreateOrder = () => {
                           {/* Price Display */}
                           <div className="flex flex-col items-end min-w-20">
                             <span className="text-xs text-gray-400 strike-through">
-                              {(product.original_final_price * product.quantity).toFixed(2)}
+                              {(product.final_price * product.quantity).toFixed(2)}
                             </span>
-                            <span className="text-lg font-bold text-blue-700">
-                              ₹{itemTotal.toFixed(2)}
-                            </span>
+                            <span className="text-lg font-bold text-blue-700">₹{itemTotal.toFixed(2)}</span>
                           </div>
                         </div>
 
@@ -401,7 +430,6 @@ const CreateOrder = () => {
                         >
                           <FiTrash2 size={20} />
                         </button>
-
                       </div>
                     );
                   })
@@ -411,7 +439,6 @@ const CreateOrder = () => {
               {/* Order Summary & Actions */}
               <div className="bg-gray-50 border-t border-gray-200 p-6">
                 <div className="flex flex-col items-end gap-3">
-
                   <div className="text-right space-y-2 w-full max-w-sm">
                     <div className="flex justify-between items-center text-gray-600 text-sm">
                       <span>Subtotal:</span>
@@ -419,7 +446,9 @@ const CreateOrder = () => {
                     </div>
 
                     <div className="flex justify-between items-center gap-4">
-                      <label className="text-sm font-semibold text-gray-600 whitespace-nowrap">Additional Discount (%):</label>
+                      <label className="text-sm font-semibold text-gray-600 whitespace-nowrap">
+                        Additional Discount (%):
+                      </label>
                       <div className="relative w-24">
                         <input
                           type="text"
@@ -437,17 +466,17 @@ const CreateOrder = () => {
                       <span className="text-blue-600">₹{finalTotal.toFixed(2)}</span>
                     </div>
                   </div>
-
                 </div>
 
                 <div className="mt-6">
                   <button
                     onClick={handleSubmitOrder}
                     disabled={!isFormValid || isCreatingOrder}
-                    className={`w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transition-all flex items-center justify-center gap-3 ${!isFormValid || isCreatingOrder
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-blue-600 hover:bg-blue-700 hover:shadow-blue-200 hover:-translate-y-1"
-                      }`}
+                    className={`w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transition-all flex items-center justify-center gap-3 ${
+                      !isFormValid || isCreatingOrder
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700 hover:shadow-blue-200 hover:-translate-y-1"
+                    }`}
                   >
                     {isCreatingOrder ? (
                       <>Processing...</>
@@ -458,13 +487,9 @@ const CreateOrder = () => {
                     )}
                   </button>
                 </div>
-
               </div>
-
             </div>
-
           </div>
-
         </div>
       </div>
 

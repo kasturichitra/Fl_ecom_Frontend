@@ -57,7 +57,7 @@ const DynamicTable = ({
     <div className="overflow-x-auto">
       <table className="w-full border-collapse">
         <thead>
-          <tr className="bg-gradient-to-r from-indigo-600 to-purple-700 text-white">
+          <tr className="bg-linear-to-r from-indigo-600 to-purple-700 text-white">
             {filteredColumns.map((col) => (
               <th
                 key={col.key}

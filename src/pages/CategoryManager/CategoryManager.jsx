@@ -2,6 +2,7 @@
 import { useState } from "react";
 import CategoryForm from "../../form/categorys/categoryForm";
 import FormActionButtons from "../../components/FormActionButtons";
+import ScrollWrapper from "../../components/ui/ScrollWrapper";
 import { useCreateCategory } from "../../hooks/useCategory";
 import { useGetAllIndustries } from "../../hooks/useIndustry";
 
@@ -78,7 +79,7 @@ const CategoryManager = ({ onCancel }) => {
   const categoryFields = [
     {
       key: "industry_unique_id",
-      label: "Industry",
+      label: "Industry *",
       type: "search",
       onSearch: (searchTerm) => {
         setSearchTerm(searchTerm);
@@ -97,19 +98,13 @@ const CategoryManager = ({ onCancel }) => {
     },
     {
       key: "category_name",
-      label: "Category Name",
+      label: "Category Name *",
       type: "text",
       placeholder: "e.g. Electronics, Fashion",
     },
-    // {
-    //   key: "category_unique_id",
-    //   label: "Category Unique ID",
-    //   type: "text",
-    //   placeholder: "e.g. CAT001",
-    // },
     {
       key: "image",
-      label: "Category Image",
+      label: "Category Image *",
       type: "file",
       accept: "image/*",
     },
@@ -117,141 +112,159 @@ const CategoryManager = ({ onCancel }) => {
   ];
 
   return (
-    <div className="bg-white max-w-4xl mx-auto border border-gray-200 rounded-2xl shadow-xl overflow-hidden">
-      {/* Header */}
-      {/* <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-8 py-10">
-        <h2 className="text-3xl font-bold">Add New Category</h2>
-        <p className="mt-2 text-blue-100">Fill in the details to create a new category</p>
-      </div> */}
+    <div className="relative w-full max-w-4xl mx-auto p-4 md:p-6 bg-white rounded-xl md:rounded-2xl shadow-xl">
+      {/* Close Button */}
+      <button
+        onClick={onCancel}
+        className="absolute right-3 top-3 md:right-5 md:top-5 text-gray-400 hover:text-red-500 transition-colors"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6 md:h-8 md:w-8"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
 
-      {/* Form Body */}
-      <div className="p-8 bg-gray-50/50 max-h-[85vh] overflow-y-auto">
-        {/* Category Details */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
-          <h3 className="text-2xl font-semibold text-gray-800 mb-6">Category Details</h3>
-          <CategoryForm
-            fields={categoryFields}
-            onSubmit={handleSubmit}
-            isSubmitting={isCreatingCategory}
-            onCancel={onCancel}
-            additionalContent={
-              <>
-                {/* Attributes Section */}
-                <div>
-                  {!showAttributes ? (
-                    <button
-                      type="button"
-                      onClick={() => setShowAttributes(true)}
-                      className="flex items-center gap-3 px-6 py-4 bg-gray-900 text-white font-medium rounded-xl hover:bg-black transition-all hover:shadow-lg"
-                    >
-                      <span className="text-2xl font-bold">+</span>
-                      Add Category Attributes (Optional)
-                    </button>
-                  ) : (
-                    <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
-                      <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-2xl font-semibold text-gray-800">Attributes</h3>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setShowAttributes(false);
-                            setAttributes([
-                              {
-                                name: "",
-                                code: "",
-                                description: "",
-                                units: "",
-                                is_active: true,
-                              },
-                            ]);
-                          }}
-                          className="text-red-600 hover:text-red-700 font-medium underline"
-                        >
-                          Remove All
-                        </button>
-                      </div>
+      <ScrollWrapper maxHeight="800px">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">Create Category</h1>
+          <p className="text-gray-600 mt-2">Fill the required fields to create a new category.</p>
+        </div>
 
-                      <div className="space-y-6">
-                        {attributes.map((attr, index) => (
-                          <div key={index} className="border border-gray-300 rounded-xl p-6 bg-gray-50">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <input
-                                type="text"
-                                placeholder="Attribute Name (e.g. Screen Size)"
-                                value={attr?.name}
-                                onChange={(e) => handleAttributeChange(index, "name", e.target.value)}
-                                className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                              />
-                              <input
-                                type="text"
-                                placeholder="Code (e.g. SCRN)"
-                                value={attr?.code}
-                                onChange={(e) => handleAttributeChange(index, "code", e.target.value)}
-                                className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                              />
-                              <input
-                                type="text"
-                                placeholder="Description (optional)"
-                                value={attr?.description}
-                                onChange={(e) => handleAttributeChange(index, "description", e.target.value)}
-                                className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                              />
-                              <input
-                                type="text"
-                                placeholder="Units (e.g. inches, GB)"
-                                value={attr?.units}
-                                onChange={(e) => handleAttributeChange(index, "units", e.target.value)}
-                                className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                              />
-                            </div>
-
-                            <div className="flex items-center justify-between mt-5">
-                              <label className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                  type="checkbox"
-                                  checked={attr?.is_active}
-                                  onChange={(e) => handleAttributeChange(index, "is_active", e.target.checked)}
-                                  className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
-                                />
-                                <span className="text-gray-700 font-medium">Active</span>
-                              </label>
-
-                              {attributes.length > 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => deleteAttribute(index)}
-                                  className="text-red-600 hover:text-red-700 font-medium underline cursor-pointer"
-                                >
-                                  Delete
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
+        {/* Form Body */}
+        <CategoryForm
+          fields={categoryFields}
+          onSubmit={handleSubmit}
+          isSubmitting={isCreatingCategory}
+          onCancel={onCancel}
+          className="grid grid-cols-1 gap-4"
+          additionalContent={
+            <>
+              {/* Attributes Section */}
+              <div className="mt-6 border-t pt-6">
+                {!showAttributes ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowAttributes(true)}
+                    className="flex items-center gap-3 px-6 py-4 bg-gray-900 text-white font-medium rounded-xl hover:bg-black transition-all hover:shadow-lg w-full justify-center"
+                  >
+                    <span className="text-2xl font-bold">+</span>
+                    Add Category Attributes (Optional)
+                  </button>
+                ) : (
+                  <div className="bg-gray-50 rounded-2xl border border-gray-200 p-6 shadow-sm">
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="text-xl font-semibold text-gray-800">Attributes</h3>
                       <button
                         type="button"
-                        onClick={addAttribute}
-                        className="mt-6 px-5 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition cursor-pointer"
+                        onClick={() => {
+                          setShowAttributes(false);
+                          setAttributes([
+                            {
+                              name: "",
+                              code: "",
+                              description: "",
+                              units: "",
+                              is_active: true,
+                            },
+                          ]);
+                        }}
+                        className="text-red-600 hover:text-red-700 font-medium underline"
                       >
-                        + Add Another Attribute
+                        Remove All
                       </button>
                     </div>
-                  )}
-                </div>
 
-                {/* Form Action Buttons */}
-                <FormActionButtons
-                  submitLabel="Create Category"
-                  onCancel={onCancel}
-                  isSubmitting={isCreatingCategory}
-                />
-              </>
-            }
-          />
-        </div>
-      </div>
+                    <div className="space-y-6">
+                      {attributes.map((attr, index) => (
+                        <div key={index} className="border border-gray-300 rounded-xl p-6 bg-white">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input
+                              type="text"
+                              placeholder="Attribute Name (e.g. Screen Size)"
+                              value={attr?.name}
+                              onChange={(e) => handleAttributeChange(index, "name", e.target.value)}
+                              className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Code (e.g. SCRN)"
+                              value={attr?.code}
+                              onChange={(e) => handleAttributeChange(index, "code", e.target.value)}
+                              className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Description (optional)"
+                              value={attr?.description}
+                              onChange={(e) => handleAttributeChange(index, "description", e.target.value)}
+                              className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                            />
+                            <input
+                              type="text"
+                              placeholder="Units (e.g. inches, GB)"
+                              value={attr?.units}
+                              onChange={(e) => handleAttributeChange(index, "units", e.target.value)}
+                              className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                            />
+                          </div>
+
+                          <div className="flex items-center justify-between mt-5">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={attr?.is_active}
+                                onChange={(e) => handleAttributeChange(index, "is_active", e.target.checked)}
+                                className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                              />
+                              <span className="text-gray-700 font-medium">Active</span>
+                            </label>
+
+                            {attributes.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => deleteAttribute(index)}
+                                className="text-red-600 hover:text-red-700 font-medium underline cursor-pointer"
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={addAttribute}
+                      className="mt-6 px-5 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition cursor-pointer w-full"
+                    >
+                      + Add Another Attribute
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Form Action Buttons */}
+              <FormActionButtons
+                submitLabel={isCreatingCategory ? "Creating..." : "Create Category"}
+                onCancel={onCancel}
+                isSubmitting={isCreatingCategory}
+              />
+            </>
+          }
+        />
+      </ScrollWrapper>
     </div>
   );
 };
