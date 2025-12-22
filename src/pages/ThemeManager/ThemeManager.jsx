@@ -111,19 +111,19 @@ const ThemeManager = () => {
     // Prepare data in the required format
     const themeData = {
       theme: {
-        mode: theme.mode,
+        mode: theme?.mode,
         colors: {
-          primary: theme.colors.primary,
-          secondary: theme.colors.secondary,
-          background: theme.colors.background,
-          text: theme.colors.text,
-          ghost: theme.colors.ghost,
-          destructive: theme.colors.destructive,
+          primary: theme?.colors?.primary,
+          secondary: theme?.colors?.secondary,
+          background: theme?.colors?.background,
+          text: theme?.colors?.text,
+          ghost: theme?.colors?.ghost,
+          destructive: theme?.colors?.destructive,
         },
         typography: {
-          font_family: theme.typography.font_family,
-          heading_size: theme.typography.heading_size,
-          body_size: theme.typography.body_size,
+          font_family: theme?.typography?.font_family,
+          heading_size: theme?.typography?.heading_size,
+          body_size: theme?.typography?.body_size,
         },
       },
     };
@@ -273,7 +273,9 @@ const ThemeManager = () => {
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-600">Body Size:</span>
-                        <span className="text-sm font-semibold text-gray-800">{savedTheme?.typography?.body_size}px</span>
+                        <span className="text-sm font-semibold text-gray-800">
+                          {savedTheme?.typography?.body_size}px
+                        </span>
                       </div>
                     </div>
                   </div>
