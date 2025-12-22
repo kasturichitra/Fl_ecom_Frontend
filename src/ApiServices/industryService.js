@@ -9,8 +9,8 @@ export const getAllIndustryApi = (params = {}) => {
 };
 
 // CREATE
-export const createIndustryApi = (formData) => {
-  return axiosInstance.post(`${BASE_URL}/`, formData);
+export const createIndustryApi = (payload) => {
+  return axiosInstance.post(`${BASE_URL}/`, payload);
 };
 
 // DELETE

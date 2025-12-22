@@ -2,7 +2,7 @@ import FormActionButtons from "../../components/FormActionButtons";
 import ScrollWrapper from "../../components/ui/ScrollWrapper";
 import IndustryTypeForm from "../../form/industyrTypes/industyTypeForm";
 import { useCreateIndustry } from "../../hooks/useIndustry";
-import { objectToFormData } from "../../utils/ObjectToFormData";
+import toBase64 from "../../utils/toBase64";
 
 const IndustryTypeManager = ({ onCancel }) => {
   const { mutateAsync: createIndustry, isPending: isCreatingIndustry } = useCreateIndustry({
@@ -29,7 +29,7 @@ const IndustryTypeManager = ({ onCancel }) => {
       placeholder: "Enter description",
     },
     {
-      key: "image",
+      key: "image_url",
       label: "Industry Image *",
       type: "file",
       accept: "image/*",
@@ -41,9 +41,12 @@ const IndustryTypeManager = ({ onCancel }) => {
     },
   ];
 
-  const handleAddIndustryType = async (formData) => {
-    const result = objectToFormData(formData);
-    await createIndustry(result);
+  const handleAddIndustryType = async (payload) => {
+    // const result = objectToFormData(formData);
+    console.log("Payload before going to the API", payload);
+
+    const imageBase64 = await toBase64(payload.image_url);
+    await createIndustry({ ...payload, image_base64: imageBase64 });
   };
 
   return (
@@ -59,12 +62,7 @@ const IndustryTypeManager = ({ onCancel }) => {
           viewBox="0 0 24 24"
           stroke="currentColor"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M6 18L18 6M6 6l12 12"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
 
