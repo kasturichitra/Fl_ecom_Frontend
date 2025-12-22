@@ -4,7 +4,16 @@ import { brandSchema } from "./brands.schema";
 import DynamicForm from "../../components/DynamicForm";
 import CategorySelector from "../../components/CategorySelector";
 
-const BrandForm = ({ fields, categories, onSubmit, onCancel, defaultValues, isSubmitting }) => {
+const BrandForm = ({
+  fields,
+  categories,
+  onSubmit,
+  onCancel,
+  defaultValues,
+  isSubmitting,
+  additionalContent,
+  className,
+}) => {
   const {
     register,
     handleSubmit,
@@ -21,7 +30,7 @@ const BrandForm = ({ fields, categories, onSubmit, onCancel, defaultValues, isSu
   const formData = watch();
 
   return (
-    <>
+    <form onSubmit={handleSubmit(onSubmit)} className={className}>
       <CategorySelector
         categories={categories}
         selected={formData?.categories}
@@ -38,20 +47,8 @@ const BrandForm = ({ fields, categories, onSubmit, onCancel, defaultValues, isSu
         errors={errors}
       />
 
-      <div className="flex justify-end space-x-2 mt-4">
-        <button type="button" onClick={onCancel} className="px-4 py-2 rounded-md border bg-gray-200 text-gray-700">
-          Cancel
-        </button>
-        <button
-          type="button"
-          onClick={handleSubmit(onSubmit)}
-          disabled={isSubmitting}
-          className="px-4 py-2 rounded-md bg-blue-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? "Submitting..." : "Submit"}
-        </button>
-      </div>
-    </>
+      {additionalContent}
+    </form>
   );
 };
 

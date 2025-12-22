@@ -113,9 +113,8 @@ const BrandListManager = () => {
       valueGetter: (params) => (params.value ? "Active" : "Inactive"), // Convert boolean → string
       renderCell: (params) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${
-            params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            }`}
         >
           {params.row?.is_active ? "Active" : "Inactive"}
         </span>
@@ -241,13 +240,7 @@ const BrandListManager = () => {
 
       <Activity mode={showAddModal ? "visible" : "hidden"}>
         <div className="fixed inset-0 flex items-center justify-center backdrop-blur-lg bg-black/40 z-50">
-          <div className="bg-white rounded-xl shadow-xl p-8 max-w-3xl w-full relative">
-            <button
-              onClick={handleCloseAddModal}
-              className="absolute right-4 top-4 text-gray-800 text-4xl hover:text-red-600 transition "
-            >
-              ×
-            </button>
+          <div className="w-full">
             <BrandManager setShowAddModal={setShowAddModal} onCancel={handleCloseAddModal} />
           </div>
         </div>

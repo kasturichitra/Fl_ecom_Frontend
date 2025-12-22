@@ -1,5 +1,6 @@
 import FormActionButtons from "../../components/FormActionButtons";
 import SaleTrendForm from "../../form/saleTrends/saleTrendForm";
+import ScrollWrapper from "../../components/ui/ScrollWrapper";
 import { useCreateSaleTrend } from "../../hooks/useSaleTrend";
 
 const SaleTrendsManager = ({ onCancel }) => {
@@ -14,9 +15,22 @@ const SaleTrendsManager = ({ onCancel }) => {
   };
 
   const fields = [
-    { key: "trend_name", label: "Trend Name", type: "text", width: 400 },
-    { key: "trend_from", label: "From Date", type: "date", width: 400 },
-    { key: "trend_to", label: "To Date", type: "date", width: 400 },
+    {
+      key: "trend_name",
+      label: "Trend Name *",
+      type: "text",
+      placeholder: "Enter trend name",
+    },
+    {
+      key: "trend_from",
+      label: "From Date *",
+      type: "date",
+    },
+    {
+      key: "trend_to",
+      label: "To Date *",
+      type: "date",
+    },
   ];
 
   const handleAddSaleTrend = async (formData) => {
@@ -24,29 +38,50 @@ const SaleTrendsManager = ({ onCancel }) => {
   };
 
   return (
-    <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200 relative">
-      {/* ONLY ADDED THIS BUTTON — NO OTHER CHANGE */}
-      <button onClick={onCancel} className="absolute text-white right-3 top-1 hover:text-red-600 text-3xl">
-        ×
+    <div className="relative max-w-4xl mx-auto p-6 bg-white rounded-2xl shadow-xl">
+      {/* Close Button */}
+      <button
+        onClick={handleCancel}
+        className="absolute right-5 top-5 text-gray-400 hover:text-red-500 transition-colors"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-8 w-8"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
       </button>
 
-      <div className="bg-linear-to-r from-indigo-600 to-purple-700 text-white px-8 py-10 text-center">
-        <h2 className="text-4xl font-extrabold">Add New Sale Trend</h2>
-      </div>
+      <ScrollWrapper maxHeight="800px">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">Create Sale Trend</h1>
+          <p className="text-gray-600 mt-2">Fill the required fields to create a new sale trend.</p>
+        </div>
 
-      <div className="p-8 bg-gray-50">
+        {/* Form Body */}
         <SaleTrendForm
           fields={fields}
           onSubmit={handleAddSaleTrend}
+          onCancel={handleCancel}
+          className="grid grid-cols-1 gap-4"
           additionalContent={
             <FormActionButtons
-              submitLabel="Create Sale Trend"
+              submitLabel={isCreatingSaleTrend ? "Creating..." : "Create Sale Trend"}
               isSubmitting={isCreatingSaleTrend}
               onCancel={handleCancel}
             />
           }
         />
-      </div>
+      </ScrollWrapper>
     </div>
   );
 };
