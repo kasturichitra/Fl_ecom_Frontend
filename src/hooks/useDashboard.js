@@ -59,20 +59,20 @@ export const useGetOrdersByType = ({ from = "", to = "" }) => {
   });
 };
 
-export const useGetTopBrands = ({ category_unique_id = "" }) => {
+export const useGetTopBrands = ({ category_unique_id = "", from = "", to = ""  }) => {
   return useQuery({
-    queryKey: ["top-brands", category_unique_id],
-    queryFn: () => getTopBrands({ category_unique_id }),
+    queryKey: ["top-brands", category_unique_id, from, to],
+    queryFn: () => getTopBrands({ category_unique_id, from, to }),
     select: (res) => res?.data?.data,
     staleTime: 3 * 60 * 1000,
     cacheTime: 10 * 60 * 1000,
   });
 };
 
-export const useGetTopProducts = ({ category_unique_id = "" }) => {
+export const useGetTopProducts = ({ category_unique_id = "",from = "", to = ""  }) => {
   return useQuery({
-    queryKey: ["top-products", category_unique_id],
-    queryFn: () => getTopProducts({ category_unique_id }),
+    queryKey: ["top-products", category_unique_id, from, to],
+    queryFn: () => getTopProducts({ category_unique_id, from, to }),
     select: (res) => res?.data?.data,
     staleTime: 3 * 60 * 1000,
     cacheTime: 10 * 60 * 1000,

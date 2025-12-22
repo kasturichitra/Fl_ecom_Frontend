@@ -23,7 +23,10 @@ const ContactInfoManager = ({ onCancel }) => {
 
   /* ---------- SUBMIT ---------- */
   const handleSaveContactInfo = async (formValues) => {
-    const formData = objectToFormData(formValues);
+    console.log("formValues", formValues);
+    const {logo_image, ...rest} = formValues;
+    const formData = objectToFormData(rest);
+    formData.append("logo_image", logo_image[0]);
     await saveContactInfo(formData); // SAME PUT for create + update
   };
 

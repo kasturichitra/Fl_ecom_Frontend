@@ -55,46 +55,44 @@ const ReusableLineChart = ({
 
   const totalOrders = dataValues.reduce((sum, val) => sum + val, 0);
 
-const options = {
-  responsive: true,
-  plugins: {
-    legend: {
-      position: "top",
-      labels: {
-        generateLabels: (chart) => {
-          return chart.data.datasets.map((dataset, i) => ({
-            text: `${dataset.label} - (Total: ${totalOrders})`,
-            fillStyle: dataset.backgroundColor,
-            strokeStyle: dataset.borderColor,
-            lineWidth: 2,
-            hidden: false,
-            index: i,
-          }));
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: "top",
+        labels: {
+          generateLabels: (chart) => {
+            return chart.data.datasets.map((dataset, i) => ({
+              text: `${dataset.label} - (Total: ${totalOrders})`,
+              fillStyle: dataset.backgroundColor,
+              strokeStyle: dataset.borderColor,
+              lineWidth: 2,
+              hidden: false,
+              index: i,
+            }));
+          },
+        },
+      },
+      title: {
+        display: true,
+        text: `Orders Overview`,
+      },
+      tooltip: {
+        callbacks: {
+          label: (ctx) => `${tooltipLabel}: ${ctx.parsed.y}`,
         },
       },
     },
-    title: {
-      display: true,
-      text: `Orders Overview`,
+    scales: {
+      y: { beginAtZero: true },
     },
-    tooltip: {
-      callbacks: {
-        label: (ctx) => `${tooltipLabel}: ${ctx.parsed.y}`,
-      },
-    },
-  },
-  scales: {
-    y: { beginAtZero: true },
-  },
-};
+  };
 
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-6">
-      <h2 className="text-2xl font-bold mb-4 text-center">{cardTitle}</h2>
-      <div className="h-96">
-        <Line data={data} options={options} />
-      </div>
+    <div className="h-96 w-full">
+      {cardTitle && <h2 className="text-2xl font-bold mb-4 text-center">{cardTitle}</h2>}
+      <Line data={data} options={options} />
     </div>
   );
 };

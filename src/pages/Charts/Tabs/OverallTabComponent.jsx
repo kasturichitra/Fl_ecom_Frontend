@@ -16,7 +16,7 @@ const OverallTabComponent = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-4 items-center justify-end pr-2">
+      <div className="flex flex-wrap gap-4 items-center justify-end pr-2">
         <div className="flex flex-col">
           <label className="text-sm text-gray-600 mb-1">From</label>
           <input type="date" value={fromDate} onChange={handleFromDateChange} className="border rounded p-2 text-sm" />
@@ -27,13 +27,13 @@ const OverallTabComponent = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <OrdersStatusChart from={fromDate} to={toDate} />
         <OrderTypeChart from={fromDate} to={toDate} />
         <PaymentMethodChart from={fromDate} to={toDate} />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <OrdersTrendChart />
         <UsersTrendChart />
       </div>
