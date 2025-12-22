@@ -54,7 +54,7 @@ const DynamicTable = ({
   }
 
   return (
-    <div className="">
+    <div className="overflow-x-auto">
       <table className="w-full border-collapse">
         <thead>
           <tr className="bg-linear-to-r from-indigo-600 to-purple-700 text-white">
