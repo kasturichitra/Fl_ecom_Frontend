@@ -18,14 +18,14 @@ const MainLayout = ({ children }) => {
       {isSidebarOpen && (
         <div
           onClick={() => setIsSidebarOpen(false)}
-          className="fixed inset-0 bg-black/50 z-40 md:hidden backdrop-blur-sm"
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm"
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-screen w-64 md:w-72 bg-gray-900 text-white shadow-2xl z-50 overflow-y-auto transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0`}
+        className={`fixed top-0 left-0 h-screen w-64 lg:w-72 bg-gray-900 text-white shadow-2xl z-50 overflow-y-auto transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } lg:translate-x-0`}
       >
         <div className="p-8 border-b border-gray-800 flex justify-between items-center">
           <Link to={"/"}>
@@ -37,7 +37,7 @@ const MainLayout = ({ children }) => {
           {/* Mobile Close Button */}
           <button
             onClick={() => setIsSidebarOpen(false)}
-            className="md:hidden text-gray-400 hover:text-white"
+            className="lg:hidden text-gray-400 hover:text-white"
           >
             <svg
               className="w-6 h-6"
@@ -85,8 +85,8 @@ const MainLayout = ({ children }) => {
       <Navbar onToggleSidebar={() => setIsSidebarOpen(true)} />
 
       {/* Main Content Area */}
-      <main className="md:ml-72 ml-0 pt-20 min-h-screen bg-linear-to-br from-gray-50 to-indigo-50 transition-all duration-300">
-        <div className="p-4 md:p-6">{children}</div>
+      <main className="lg:ml-72 ml-0 pt-20 min-h-screen bg-linear-to-br from-gray-50 to-indigo-50 transition-all duration-300">
+        <div className="p-4 lg:p-6">{children}</div>
       </main>
     </>
   );

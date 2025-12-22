@@ -98,13 +98,7 @@ export const useVerifyOtp = () => {
     mutationFn: (data) => verifyOtp(data),
     onSuccess: (response) => {
       toast.success("User verified successfully");
-
-      // Navigate based on reason
-      if (response?.data?.reason === "signup") {
-        navigate("/login");
-      } else {
-        navigate("/");
-      }
+      navigate("/");
     },
     onError: () => {
       toast.error("Failed to verify user");

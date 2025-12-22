@@ -115,8 +115,8 @@ const CreateOrder = () => {
 
     setSelectedProducts((prev) =>
       prev?.map((p) => {
-        console.log("P in map:", p);
-        console.log("Selected Product Id:", productId);
+        // console.log("P in map:", p);
+        // console.log("Selected Product Id:", productId);
         if (p?.product_unique_id === productId) {
           return {
             ...p,
@@ -126,7 +126,7 @@ const CreateOrder = () => {
             // final_price: newFinalPrice,
           };
         }
-        // return p;
+        return p;
       })
     );
   };
@@ -142,38 +142,40 @@ const CreateOrder = () => {
   };
 
   const handleSubmitOrder = async () => {
-    console.log("Selected Products before API call:", selectedProducts);
+    // console.log("Selected Products before API call:", selectedProducts);
     const orderData = {
       customer_name: customerForm?.customerName.trim(),
       mobile_number: customerForm?.mobileNumber.trim(),
-      // We don't send address as strictly per "Do not add or remove fields" from backend payload perspective
-      // unless backend supports it, but we collect it in UI.
       order_type: "Offline",
       payment_method: "UPI",
       payment_status: "Paid",
+      shipping_charges: 0,
+      is_from_cart: false,
       order_products: selectedProducts?.map((p) => ({
-        product_name: p?.product_name,
         product_unique_id: p?.product_unique_id,
+        product_name: p?.product_name,
         quantity: p?.quantity,
         unit_base_price: p?.base_price,
-        unit_discount_price: p?.discount_price,
-        unit_tax_value: p?.tax_value,
+        unit_discount_price: p?.discount_price || 0,
         unit_discounted_price: p?.discounted_price,
-        unit_final_price: p?.final_price, // This includes the product level discount
-        cgst: p?.cgst,
-        sgst: p?.sgst,
-        igst: p?.igst,
-        additional_discount_percentage: p?.additional_discount_percentage,
-        additional_discount_type: p?.additional_discount_type,
+        unit_tax_value: p?.tax_value || 0,
+        unit_final_price: p?.final_price,
+        additional_discount_percentage: p?.additional_discount_percentage || 0,
+        additional_discount_amount: p?.additional_discount_amount || 0,
+        additional_discount_type: p?.additional_discount_type || null,
+        cgst: p?.cgst || 0,
+        sgst: p?.sgst || 0,
+        igst: p?.igst || 0,
       })),
-      // If backend accepted total discount, we would send it.
-      // For now we assume the individual prices calculate up, or we might need to distribute global discount.
-      // We will stick to modifying what we have.
+      // Order-level additional discount
+      additional_discount_percentage: orderDiscount,
+      additional_discount_amount: 0,
+      additional_discount_type: orderDiscount > 0 ? "percentage" : null,
     };
 
-    console.log("Order Data before API call:", orderData);
+    // console.log("Order Data before API call:", orderData);
 
-    // await createOrder(orderData);
+    await createOrder(orderData);
   };
 
   // QR Handler
@@ -182,7 +184,7 @@ const CreateOrder = () => {
 
     try {
       const parsedProduct = JSON.parse(code);
-      if (parsedProduct && (parsedProduct.product_unique_id || parsedProduct.id) && parsedProduct.product_name) {
+      if (parsedProduct && (parsedproduct?.product_unique_id || parsedproduct?.id) && parsedproduct?.product_name) {
         setScannedProduct(parsedProduct);
         setShowScanner(false);
         setShowProductModal(true);
@@ -200,12 +202,12 @@ const CreateOrder = () => {
     e.preventDefault();
     if (scannedProduct) {
       handleSelectProduct({
-        value: scannedProduct.product_unique_id,
-        label: scannedProduct.product_name,
+        value: scannedproduct?.product_unique_id,
+        label: scannedproduct?.product_name,
         data: {
           ...scannedProduct,
-          base_price: scannedProduct.base_price || scannedProduct.final_price,
-          final_price: scannedProduct.final_price || scannedProduct.base_price,
+          base_price: scannedproduct?.base_price || scannedproduct?.final_price,
+          final_price: scannedproduct?.final_price || scannedproduct?.base_price,
         },
       });
       setShowProductModal(false);
@@ -214,7 +216,10 @@ const CreateOrder = () => {
   };
 
   // Calculations
-  const subTotal = selectedProducts.reduce((sum, p) => sum + p.final_price * p.quantity, 0);
+  const subTotal = selectedProducts.reduce(
+    (sum, p) => sum + (p?.post_discount_final_price || p?.final_price) * p?.quantity,
+    0
+  );
   const finalTotal = subTotal * (1 - orderDiscount / 100);
 
   const isFormValid =
@@ -369,23 +374,26 @@ const CreateOrder = () => {
                   </div>
                 ) : (
                   selectedProducts.map((product) => {
-                    const itemTotal = Number(product.post_discount_final_price) || product.final_price * product.quantity;
+                    const itemTotal =
+                      (Number(product?.post_discount_final_price) || product?.final_price) * product?.quantity;
                     // Determine placeholder color based on ID for some visual variety
-                    const hue = (parseInt(product.product_unique_id) || 0) % 360;
+                    const hue = (parseInt(product?.product_unique_id) || 0) % 360;
 
                     return (
                       <div
-                        key={product.product_unique_id}
+                        key={product?.product_unique_id}
                         className="group bg-white rounded-lg border border-gray-200 p-3 shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row gap-3 items-center"
                       >
                         {/* Product Details Placeholder */}
                         <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 font-bold text-lg uppercase">
-                          {product.product_name.charAt(0)}
+                          {product?.product_name.charAt(0)}
                         </div>
 
                         {/* Info */}
                         <div className="flex-1 text-center sm:text-left">
-                          <h3 className="font-bold text-gray-800 text-sm leading-tight mb-1">{product.product_name}</h3>
+                          <h3 className="font-bold text-gray-800 text-sm leading-tight mb-1">
+                            {product?.product_name}
+                          </h3>
                         </div>
 
                         {/* Controls */}
@@ -396,8 +404,8 @@ const CreateOrder = () => {
                             <input
                               type="number"
                               min="1"
-                              value={product.quantity}
-                              onChange={(e) => handleQuantityChange(product.product_unique_id, e.target.value)}
+                              value={product?.quantity}
+                              onChange={(e) => handleQuantityChange(product?.product_unique_id, e.target.value)}
                               className="w-16 text-center font-bold text-gray-800 bg-white border border-gray-200 rounded-lg py-1 focus:ring-2 focus:ring-blue-500 outline-none"
                             />
                           </div>
@@ -407,9 +415,13 @@ const CreateOrder = () => {
                             <label className="text-[10px] text-gray-500 font-bold uppercase mb-1">Disc %</label>
                             <input
                               type="text"
-                              value={product.discount === 0 ? "" : product.discount}
+                              value={
+                                product?.additional_discount_percentage === 0
+                                  ? ""
+                                  : product?.additional_discount_percentage || ""
+                              }
                               placeholder="0"
-                              onChange={(e) => handleProductDiscountChange(product.product_unique_id, e.target.value)}
+                              onChange={(e) => handleProductDiscountChange(product?.product_unique_id, e.target.value)}
                               className="w-16 text-center font-bold text-orange-600 bg-white border border-gray-200 rounded-lg py-1 focus:ring-2 focus:ring-orange-500 outline-none"
                             />
                           </div>
@@ -417,7 +429,7 @@ const CreateOrder = () => {
                           {/* Price Display */}
                           <div className="flex flex-col items-end min-w-20">
                             <span className="text-xs text-gray-400 strike-through">
-                              {(product.final_price * product.quantity).toFixed(2)}
+                              {(product?.final_price * product?.quantity).toFixed(2)}
                             </span>
                             <span className="text-lg font-bold text-blue-700">₹{itemTotal.toFixed(2)}</span>
                           </div>
@@ -425,7 +437,7 @@ const CreateOrder = () => {
 
                         {/* Remove */}
                         <button
-                          onClick={() => handleRemoveProduct(product.product_unique_id)}
+                          onClick={() => handleRemoveProduct(product?.product_unique_id)}
                           className="w-10 h-10 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
                         >
                           <FiTrash2 size={20} />

@@ -46,6 +46,14 @@ export default function OrderProductsDetailes() {
       </div>
     );
   }
+
+  const orderProductsDiscountPrice = orderData?.order_products?.reduce(
+    (total, product) => total + product?.total_discount_price + product?.additional_discount_amount,
+    0
+  );
+
+  const orderTotalDiscountPrice = orderProductsDiscountPrice + orderData?.additional_discount_amount;
+
   return (
     <div className="">
       <div className="mx-auto">
@@ -232,21 +240,17 @@ export default function OrderProductsDetailes() {
           <h3 className="text-xl font-bold text-gray-800 mb-6">Order Summary</h3>
           <div className="space-y-3">
             {[
-              ["Subtotal", toIndianCurrency(orderData?.order_products[0]?.total_base_price || 0), "text-gray-700"],
+              ["Subtotal", toIndianCurrency(orderData?.base_price || 0), "text-gray-700"],
               [
                 "Discount",
-                orderData?.order_products[0]?.total_discount_price === 0
-                  ? "FREE"
-                  : `-${toIndianCurrency(orderData?.order_products[0]?.total_discount_price)}`,
+                orderTotalDiscountPrice === 0 ? "FREE" : `-${toIndianCurrency(orderTotalDiscountPrice)}`,
                 "text-green-600",
               ],
-              [
-                "Tax",
-                orderData?.order_products[0]?.total_tax_value === 0
-                  ? "FREE"
-                  : `${toIndianCurrency(orderData?.order_products[0]?.total_tax_value)}`,
-                "text-green-600",
-              ],
+              // [
+              //   "Tax",
+              //   orderData?.tax_value === 0 ? "FREE" : `${toIndianCurrency(orderData?.tax_value)}`,
+              //   "text-green-600",
+              // ],
               [
                 "Shipping Charges",
                 orderData?.shipping_charges === 0 ? "FREE" : `${toIndianCurrency(orderData?.shipping_charges)}`,
@@ -262,7 +266,9 @@ export default function OrderProductsDetailes() {
               <div className="flex justify-between items-center">
                 <span className="text-xl font-bold text-gray-800">Total Amount</span>
                 <div className="flex flex-row items-end text-right align-center justify-center">
-                  <span className="text-3xl font-bold text-indigo-600">{toIndianCurrency(orderData?.total_amount)}</span>
+                  <span className="text-3xl font-bold text-indigo-600">
+                    {toIndianCurrency(orderData?.total_amount)}
+                  </span>
                   {/* <p className="text-right text-sm text-gray-500 mt-1">{orderData?.currency}</p> */}
                 </div>
               </div>
