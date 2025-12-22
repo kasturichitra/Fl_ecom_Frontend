@@ -24,11 +24,11 @@ const Navbar = ({ onToggleSidebar }) => {
   };
 
   return (
-    <div className="fixed top-0 md:left-72 left-0 right-0 z-40 bg-white shadow-md p-3 px-4 md:px-10 flex justify-between items-center transition-all duration-300">
+    <div className="fixed top-0 lg:left-72 left-0 right-0 z-40 bg-white shadow-md p-3 px-4 lg:px-10 flex justify-between items-center transition-all duration-300">
       {/* Mobile Toggle Button */}
       <button
         onClick={onToggleSidebar} // Accepts prop from MainLayout
-        className="md:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-lg focus:outline-none"
+        className="lg:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-lg focus:outline-none"
       >
         <svg
           className="w-6 h-6"
@@ -46,7 +46,7 @@ const Navbar = ({ onToggleSidebar }) => {
       </button>
 
       {/* Placeholder to push content right on desktop if no hamburger */}
-      <div className="hidden md:block"></div>
+      <div className="hidden lg:block"></div>
 
       <div className="flex items-center gap-2 md:gap-4">
         {/* Notification Bell */}
