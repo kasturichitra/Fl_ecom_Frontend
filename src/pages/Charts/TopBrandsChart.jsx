@@ -3,7 +3,7 @@ import { useGetAllCategories } from "../../hooks/useCategory.js";
 import { useGetTopBrands } from "../../hooks/useDashboard.js";
 import CommonPieChart from "./CommonPieChart.jsx";
 
-const TopBrands = ({ activeTab }) => {
+const TopBrands = ({ activeTab , from, to }) => {
   const colors = ["#a78bfa", "#60a5fa", "#93c5fd", "#6ee7b7", "#f87171", "#fb923c"];
   const [searchLabel, setSearchLabel] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState("");
@@ -15,7 +15,7 @@ const TopBrands = ({ activeTab }) => {
       value: ind?.category_unique_id,
     })) || [];
 
-  const { data, isLoading, isError } = useGetTopBrands({ category_unique_id: selectedCategoryId });
+  const { data, isLoading, isError } = useGetTopBrands({ category_unique_id: selectedCategoryId, from, to });
 
   const brands =
     data?.[0]?.brands ||    
