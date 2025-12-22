@@ -67,8 +67,8 @@ const CouponManager = () => {
     const { data: couponData, isLoading: isLoadingCoupon } = useGetCouponById(id);
 
     const discountType = watch("discount_type");
-    const applyOn = watch("apply_on");
     const couponType = watch("coupon_type");
+    const applyOn = watch("apply_on");
     const selectedBrands = watch("brands");
     const selectedCategories = watch("categories");
     const selectedProducts = watch("products");
@@ -95,12 +95,6 @@ const CouponManager = () => {
     }, [couponData, isEditMode, reset]);
 
     useEffect(() => {
-        if (couponType === "Generic") {
-            setValue("user", []);
-        }
-    }, [couponType, setValue]);
-
-    useEffect(() => {
         if (applyOn === "Order") {
             setValue("products", []);
             setValue("categories", []);
@@ -117,6 +111,12 @@ const CouponManager = () => {
         }
     }, [applyOn, setValue]);
 
+    useEffect(() => {
+        if (couponType === "Generic") {
+            setValue("user", []);
+        }
+    }, [couponType, setValue]);
+
     // Fetching data based on application scope
     const { data: categoryData } = useGetAllCategories({
         search: applyOn === "Category" ? debouncedSearch : "",
@@ -131,7 +131,7 @@ const CouponManager = () => {
         limit: 100
     });
     const { data: userData } = useGetAllUsers({
-        searchTerm: couponType === "User_Specific" && !showSuggestions ? "" : debouncedSearch,
+        searchTerm: couponType === "User_Specific" ? debouncedSearch : "",
         limit: 100
     });
 
@@ -182,6 +182,15 @@ const CouponManager = () => {
         return [];
     };
 
+    const getUserDropdownOptions = () => {
+        if (!userData) return [];
+        const items = Array.isArray(userData) ? userData : (userData?.data || userData?.user || []);
+        return items.map(user => ({
+            label:user.email,
+            value: user._id
+        }));
+    };
+
     const handleSelect = (item) => {
         const fieldMap = {
             "Category": "categories",
@@ -217,20 +226,36 @@ const CouponManager = () => {
     };
 
     const onSubmit = (data) => {
+        console.log("Coupon Data:", data);
+        // Validation: Check if users are selected for User_Specific coupons
+        if (data.coupon_type === "User_Specific" && (!data.user || data.user.length === 0)) {
+            toast.error("Please select at least one user for User Specific coupons");
+            return;
+        }
+
         const payload = {
-            ...data,
+            coupon_code: data.coupon_code,
+            coupon_type: data.coupon_type,
+            status: data.status,
+            discount_type: data.discount_type,
+            discount_percentage: data.discount_percentage,
+            discount_amount: data.discount_amount,
+            max_discount_amount: data.max_discount_amount,
+            min_order_amount: data.min_order_amount,
+            apply_on: data.apply_on,
+            total_useage_limit: data.total_useage_limit,
+            coupon_start_date: data.coupon_start_date,
+            coupon_end_date: data.coupon_end_date,
+            user_usage_limit: data.per_user_limit,
             // Map back to API field names - now sending full objects/arrays of objects
             selected_brands: data.apply_on === "Brand" ? data.brands : [],
             selected_categories: data.apply_on === "Category" ? data.categories : [],
             selected_products: data.apply_on === "Product" ? data.products : [],
-            user_usage_limit: data.per_user_limit,
+            user: data.coupon_type === "User_Specific" ? data.user : [],
         };
 
-        // Clean up redundant/frontend-only fields
-        delete payload.brands;
-        delete payload.categories;
-        delete payload.products;
-        delete payload.per_user_limit;
+        console.log("Final Payload:", payload);
+        console.log("Final Payload.user:", payload.user);
 
         // Clean up payload based on discount type
         if (payload.discount_type === "Percentage") {
@@ -284,6 +309,16 @@ const CouponManager = () => {
                             errors={errors}
                             handleGenerateCode={handleGenerateCode}
                             isGenerating={isGenerating}
+                            couponType={couponType}
+                            searchTerm={searchTerm}
+                            showSuggestions={showSuggestions}
+                            handleSearchChange={handleSearchChange}
+                            getUserDropdownOptions={getUserDropdownOptions}
+                            handleSelect={handleSelect}
+                            handleRemove={handleRemove}
+                            selectedUsers={selectedUsers}
+                            setValue={setValue}
+                            setShowSuggestions={setShowSuggestions}
                         />
 
                         <DiscountSection
@@ -339,7 +374,22 @@ const CouponManager = () => {
 };
 
 // Basic Information Section
-const BasicInfoSection = ({ register, errors, handleGenerateCode, isGenerating }) => (
+const BasicInfoSection = ({
+    register,
+    errors,
+    handleGenerateCode,
+    isGenerating,
+    couponType,
+    searchTerm,
+    showSuggestions,
+    handleSearchChange,
+    getUserDropdownOptions,
+    handleSelect,
+    handleRemove,
+    selectedUsers,
+    setValue,
+    setShowSuggestions
+}) => (
     <section>
         <div className="flex items-center gap-2 mb-6 border-l-4 border-blue-600 pl-4">
             <h2 className="text-xl font-bold text-gray-800">Basic Information</h2>
@@ -390,6 +440,50 @@ const BasicInfoSection = ({ register, errors, handleGenerateCode, isGenerating }
                 </select>
             </div>
         </div>
+
+        {/* User Selection for User_Specific coupons */}
+        {couponType === "User_Specific" && (
+            <div className="mt-6 p-6 bg-blue-50 rounded-2xl border border-blue-100 space-y-4">
+                <p className="text-sm font-semibold text-gray-700">Select Users for this Coupon</p>
+                <div className="relative">
+                    <SearchDropdown
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        results={showSuggestions && searchTerm ? getUserDropdownOptions() : []}
+                        onSelect={(user) => {
+                            const currentUsers = selectedUsers;
+                            if (!currentUsers.some(u => u.value === user.value)) {
+                                setValue("user", [...currentUsers, user]);
+                            }
+                            handleSearchChange("");
+                            setShowSuggestions(false);
+                        }}
+                        clearResults={() => setShowSuggestions(false)}
+                        placeholder="Type to search users..."
+                        customInputClass="w-full px-4 py-3 bg-white border border-blue-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"
+                    />
+
+                    <div className="mt-4 flex flex-wrap gap-2 max-h-20 overflow-y-auto custom-scrollbar p-2 rounded-xl bg-white/50">
+                        {selectedUsers.map((user) => (
+                            <span
+                                key={user.value}
+                                className="px-3 py-1.5 bg-blue-100 border border-blue-300 text-blue-700 rounded-full text-xs font-bold flex items-center gap-2 transition-all hover:bg-blue-200 shadow-sm"
+                            >
+                                {user.label}
+                                <Trash2
+                                    className="w-3.5 h-3.5 cursor-pointer text-blue-400 hover:text-red-500 transition-colors"
+                                    onClick={() => handleRemove(user.value, "user")}
+                                />
+                            </span>
+                        ))}
+
+                        {selectedUsers.length === 0 && (
+                            <p className="text-gray-400 text-sm italic p-2">No users selected yet. This coupon will be available to all users.</p>
+                        )}
+                    </div>
+                </div>
+            </div>
+        )}
     </section>
 );
 
