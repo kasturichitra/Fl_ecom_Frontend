@@ -43,19 +43,19 @@ const ThemeManager = () => {
   useEffect(() => {
     if (currentConfig?.theme) {
       setTheme({
-        mode: currentConfig.theme.mode || "light",
+        mode: currentConfig?.theme?.mode || "light",
         colors: {
-          primary: currentConfig.theme.colors?.primary || "#4f46e5",
-          secondary: currentConfig.theme.colors?.secondary || "#9333ea",
-          background: currentConfig.theme.colors?.background || "#ffffff",
-          text: currentConfig.theme.colors?.text || "#1f2937",
-          ghost: currentConfig.theme.colors?.ghost || "#f3f4f6",
-          destructive: currentConfig.theme.colors?.destructive || "#ef4444",
+          primary: currentConfig?.theme?.colors?.primary || "#4f46e5",
+          secondary: currentConfig?.theme?.colors?.secondary || "#9333ea",
+          background: currentConfig?.theme?.colors?.background || "#ffffff",
+          text: currentConfig?.theme?.colors?.text || "#1f2937",
+          ghost: currentConfig?.theme?.colors?.ghost || "#f3f4f6",
+          destructive: currentConfig?.theme?.colors?.destructive || "#ef4444",
         },
         typography: {
-          font_family: currentConfig.theme.typography?.font_family || "Inter",
-          heading_size: currentConfig.theme.typography?.heading_size || 32,
-          body_size: currentConfig.theme.typography?.body_size || 16,
+          font_family: currentConfig?.theme?.typography?.font_family || "Inter",
+          heading_size: currentConfig?.theme?.typography?.heading_size || 32,
+          body_size: currentConfig?.theme?.typography?.body_size || 16,
         },
       });
     }

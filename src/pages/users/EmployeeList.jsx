@@ -155,11 +155,11 @@ const EmployeeList = () => {
               ) : (
                 <DataTable
                   rows={employees}
-                  getRowId={(row) => row._id}
+                  getRowId={(row) => row?._id}
                   columns={visibleColumns}
                   page={currentPage}
                   pageSize={pageSize}
-                  totalCount={employees.length}
+                  totalCount={employees?.length}
                   setCurrentPage={setCurrentPage}
                   setPageSize={setPageSize}
                   sort="" // Client-side sorting not implemented yet, or can be added if needed

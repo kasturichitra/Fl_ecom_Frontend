@@ -45,20 +45,28 @@ const DynamicForm = ({
 
             {field.type === "text" && (
               <>
-                <input
-                  type="text"
-                  {...(isUsingRHF ? register(field.key) : {})}
-                  value={isUsingRHF ? undefined : (formData[field.key] || "")}
-                  placeholder={field.placeholder}
-                  required={field.required}
-                  disabled={field.disabled}
-                  onChange={isUsingRHF ? undefined : (e) => handleChange(field.key, e.target.value)}
-                  className={cn(
-                    "border p-3 rounded-lg w-full",
-                    field.disabled && "bg-gray-100 cursor-not-allowed",
-                    hasError && "border-red-500 focus:ring-red-500"
+                <div className="flex gap-2 items-center relative">
+                  <input
+                    type="text"
+                    {...(isUsingRHF ? register(field.key) : {})}
+                    value={isUsingRHF ? undefined : (formData[field.key] || "")}
+                    placeholder={field.placeholder}
+                    required={field.required}
+                    disabled={field.disabled}
+                    onChange={isUsingRHF ? undefined : (e) => handleChange(field.key, e.target.value)}
+                    className={cn(
+                      "border p-3 rounded-lg w-full",
+                      field.disabled && "bg-gray-100 cursor-not-allowed",
+                      hasError && "border-red-500 focus:ring-red-500",
+                      field.renderRight && "pr-24"
+                    )}
+                  />
+                  {field.renderRight && (
+                    <div className="absolute right-1 top-1/2 -translate-y-1/2">
+                      {field.renderRight()}
+                    </div>
                   )}
-                />
+                </div>
                 {hasError && <span className="text-red-500 text-sm">{fieldError.message}</span>}
               </>
             )}

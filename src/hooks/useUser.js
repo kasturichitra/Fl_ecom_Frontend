@@ -22,6 +22,7 @@ export const useGetAllUsers = ({ searchTerm = "", sort = "", page = 1, limit = 1
     select: (res) => res?.data?.data,
     staleTime: 5 * 60 * 1000,
     refetchOnMount: false,
+    // refetchOnWindowFocus: false,
   });
 };
 

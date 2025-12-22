@@ -403,7 +403,7 @@ const CreateOrder = () => {
                           </div>
 
                           {/* Price Display */}
-                          <div className="flex flex-col items-end min-w-[80px]">
+                          <div className="flex flex-col items-end min-w-20">
                             <span className="text-xs text-gray-400 strike-through">
                               {(product.original_final_price * product.quantity).toFixed(2)}
                             </span>

@@ -6,7 +6,7 @@ export const notificationColumns = [
     field: "message",
     headerName: "MESSAGE",
     flex: 1,
-    renderCell: (params) => <span className="font-semibold text-gray-800">{params.value}</span>,
+    renderCell: (params) => <span className="font-semibold text-gray-800">{params?.value}</span>,
   },
   {
     field: "updatedAt",
@@ -23,27 +23,27 @@ export const industryTypeColumns = [
     headerName: "UNIQUE ID",
     flex: 1,
     renderCell: (params) => (
-      <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">{params.value}</span>
+      <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">{params?.value}</span>
     ),
   },
   {
     field: "industry_name",
     headerName: "INDUSTRY NAME",
     flex: 1,
-    renderCell: (params) => <span className="font-semibold text-gray-800">{params.value}</span>,
+    renderCell: (params) => <span className="font-semibold text-gray-800">{params?.value}</span>,
   },
   {
     field: "is_active",
     headerName: "STATUS",
     flex: 1,
-    valueGetter: (params) => (params.value ? "Active" : "Inactive"),
+    valueGetter: (params) => (params?.value ? "Active" : "Inactive"),
     renderCell: (params) => (
       <span
         className={`px-3 py-1 rounded-full text-xs font-bold ${
-          params.row.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+          params?.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
         }`}
       >
-        {params.row.is_active ? "Active" : "Inactive"}
+        {params?.row?.is_active ? "Active" : "Inactive"}
       </span>
     ),
   },
@@ -57,14 +57,14 @@ export const industryTypeColumns = [
     renderCell: (params) => (
       <div className="flex gap-3 items-center">
         <button
-          onClick={() => handleEdit(params.row)}
+          onClick={() => handleEdit(params?.row)}
           className="text-indigo-600 hover:text-indigo-800 transition"
           title="Edit"
         >
           <FaEdit size={18} />
         </button>
         <button
-          onClick={() => handleDelete(params.row)}
+          onClick={() => handleDelete(params?.row)}
           className="text-indigo-600 hover:text-indigo-800 transition"
           title="Delete"
         >
