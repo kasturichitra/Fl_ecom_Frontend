@@ -35,6 +35,7 @@ const CategoryListManager = lazy(() => import("./pages/CategoryManager/CategoryL
 const BrandListManager = lazy(() => import("./pages/BrandManager/BrandListManager"));
 const OrderProductsDetailes = lazy(() => import("./pages/Orders/OrderProductsDetailes"));
 const ThemeManager = lazy(() => import("./pages/ThemeManager/ThemeManager"));
+const CouponsList = lazy(() => import("./pages/Coupons/CouponsList"));
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -169,6 +170,7 @@ const App = () => {
                     <Route path="/notificationList" element={<NotificationList />} />
 
                     <Route path="/contactInfo" element={<ContactInfoManager />} />
+                    <Route path="/coupons" element={<CouponsList />} />
 
 
                     <Route path="*" element={<PageNotFound />} />

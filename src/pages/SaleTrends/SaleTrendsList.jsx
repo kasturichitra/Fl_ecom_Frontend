@@ -139,9 +139,8 @@ const SaleTrends = () => {
       flex: 1,
       renderCell: (params) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${
-            params?.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${params?.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            }`}
         >
           {params?.row?.is_active ? "Active" : "Inactive"}
         </span>
@@ -247,8 +246,10 @@ const SaleTrends = () => {
 
         {/* Add Modal */}
         <Activity mode={showModal ? "visible" : "hidden"}>
-          <div className="fixed inset-0 bg-white/20 backdrop-blur-lg flex items-center justify-center z-50">
-            <SaleTrendsManager onCancel={() => setShowModal(false)} />
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="w-full">
+              <SaleTrendsManager onCancel={() => setShowModal(false)} />
+            </div>
           </div>
         </Activity>
 

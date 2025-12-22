@@ -11,6 +11,7 @@ import {
   Palette,
   Tag,
   Users,
+  BadgePercent
 } from "lucide-react";
 
 /**
@@ -83,6 +84,12 @@ export const sidebarElements = [
     path: "/users",
     label: "Users",
     icon: Users,
+  },
+  {
+    id: "coupons",
+    path: "/coupons",
+    label: "Coupons",
+    icon: BadgePercent,
   },
   {
     id: "notifications",
