@@ -58,10 +58,21 @@ const ProductManager = ({ onCancel }) => {
     label: brand?.brand_name,
   }));
 
+  const [resetKey, setResetKey] = useState(0);
+
   const { mutateAsync: createProduct, isPending: isSubmitting } = useCreateProduct({
     onSuccess: () => {
+      // Force a remount of the entire form to clear all fields and hook-form state
+      setResetKey((prev) => prev + 1);
+
+      // Reset local state
+      setSelectedCategory(null);
+      setCategorySearchTerm("");
+      setBrandSearchTerm("");
+
+      // Close the modal
       onCancel();
-    }
+    },
   });
 
   // --------------------------
@@ -177,6 +188,7 @@ const ProductManager = ({ onCancel }) => {
         </div>
 
         <ProductForm
+          key={resetKey}
           fields={productFields}
           onSubmit={handleSubmit}
           onCancel={onCancel}
