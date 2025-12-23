@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import EditModalLayout from "../../components/EditModalLayout";
 import DynamicForm from "../../components/DynamicForm";
+import toBase64 from "../../utils/toBase64";
 
 const IndustryTypeEditModal = ({
   formData: initialData,
@@ -15,18 +16,21 @@ const IndustryTypeEditModal = ({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const submitData = new FormData();
 
-    submitData.append("industry_name", formData?.industry_name || "");
-    submitData.append("industry_unique_id", formData?.industry_unique_id || "");
-    submitData.append("description", formData?.description || "");
-    submitData.append("is_active", formData?.is_active ?? true);
-
+    let imageBase64 = null;
     if (imageFile) {
-      submitData.append("image", imageFile);
+      imageBase64 = await toBase64(imageFile);
     }
 
-    await onSubmit(submitData);
+    const payload = {
+      industry_name: formData?.industry_name ?? initialData?.industry_name,
+      industry_unique_id: formData?.industry_unique_id ?? initialData?.industry_unique_id,
+      description: formData?.description ?? initialData?.description,
+      is_active: formData?.is_active ?? initialData?.is_active,
+      ...(imageBase64 && { image_base64: imageBase64 }),
+    };
+
+    await onSubmit(payload);
   };
 
   const fields = [
@@ -87,9 +91,11 @@ const IndustryTypeEditModal = ({
           ...initialData,
           ...formData,
           currentImage:
-            formData.currentImage ??
-            initialData?.image_url?.low ??
-            "",
+            formData.currentImage ||
+            initialData?.image_url?.low ||
+            initialData?.image_url?.medium ||
+            initialData?.image_url?.original ||
+            (typeof initialData?.image_url === "string" ? initialData.image_url : ""),
         }}
         setFormData={setLocalFormData}
       />

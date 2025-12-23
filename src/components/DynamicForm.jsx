@@ -27,7 +27,7 @@ const DynamicForm = ({
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  console.log(formData.currentImage,"image url")
+  console.log(formData.currentImage, "image url")
 
   const isUsingRHF = register !== null;
 
@@ -193,8 +193,11 @@ const DynamicForm = ({
 
                 {formData?.currentImage && field?.key === "image" && (
                   <img
-                    src={formData?.currentImage}
-                    className="w-32 h-32 object-cover rounded-lg mt-2"
+                    src={formData.currentImage}
+                    alt="Preview"
+                    className="w-32 h-32 object-cover rounded-lg mt-2 border border-gray-200"
+                    onLoad={() => console.log("Image loaded successfully:", formData.currentImage)}
+                    onError={(e) => console.error("Image failed to load:", formData.currentImage, e)}
                   />
                 )}
 

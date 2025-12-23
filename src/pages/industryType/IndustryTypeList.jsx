@@ -80,11 +80,12 @@ const IndustryTypeList = () => {
   //   return () => clearTimeout(handler);
   // }, [searchTerm]);
 
-  const handleUpdate = async (formData) => {
+  const handleUpdate = async (payload) => {
     if (!editingIndustry) return;
+    // console.log("Input data coming into API  call:", payload);
     await updateIndustry({
       id: editingIndustry?.industry_unique_id,
-      data: formData,
+      data: payload,
     });
   };
 
