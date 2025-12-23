@@ -39,10 +39,10 @@ const IndustryTypeList = () => {
 
   const debouncedSearchTerm = useDebounce(searchTerm, DEBOUNCED_DELAY);
 
-  // useEffect(() => {
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => document.removeEventListener("mousedown", handleClickOutside);
-  // }, [handleClickOutside]);
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [handleClickOutside]);
 
   const statusFun = () => {
     if (activeStatus === "active") return true;
@@ -80,11 +80,12 @@ const IndustryTypeList = () => {
   //   return () => clearTimeout(handler);
   // }, [searchTerm]);
 
-  const handleUpdate = async (formData) => {
+  const handleUpdate = async (payload) => {
     if (!editingIndustry) return;
+    // console.log("Input data coming into API  call:", payload);
     await updateIndustry({
       id: editingIndustry?.industry_unique_id,
-      data: formData,
+      data: payload,
     });
   };
 

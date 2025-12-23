@@ -4,7 +4,7 @@ import SearchDropdown from "./SearchDropdown";
 
 /**
  * DynamicForm - A reusable form component that supports both controlled (react-hook-form) and uncontrolled (state-based) usage
- * 
+ *
  * @param {Array} fields - Array of field configurations
  * @param {Object} formData - Current form data
  * @param {Function} setFormData - Function to update form data
@@ -21,11 +21,13 @@ const DynamicForm = ({
   register = null,
   errors = {},
   control = null,
-  className = ""
+  className = "",
 }) => {
   const handleChange = (key, value) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
+
+  console.log(formData.currentImage, "image url")
 
   const isUsingRHF = register !== null;
 
@@ -49,7 +51,7 @@ const DynamicForm = ({
                   <input
                     type="text"
                     {...(isUsingRHF ? register(field.key) : {})}
-                    value={isUsingRHF ? undefined : (formData[field.key] || "")}
+                    value={isUsingRHF ? undefined : formData[field.key] || ""}
                     placeholder={field.placeholder}
                     required={field.required}
                     disabled={field.disabled}
@@ -62,9 +64,7 @@ const DynamicForm = ({
                     )}
                   />
                   {field.renderRight && (
-                    <div className="absolute right-1 top-1/2 -translate-y-1/2">
-                      {field.renderRight()}
-                    </div>
+                    <div className="absolute right-1 top-1/2 -translate-y-1/2">{field.renderRight()}</div>
                   )}
                 </div>
                 {hasError && <span className="text-red-500 text-sm">{fieldError.message}</span>}
@@ -76,14 +76,11 @@ const DynamicForm = ({
                 <input
                   type="number"
                   {...(isUsingRHF ? register(field.key, { valueAsNumber: true }) : {})}
-                  value={isUsingRHF ? undefined : (formData[field.key] || "")}
+                  value={isUsingRHF ? undefined : formData[field.key] || ""}
                   placeholder={field.placeholder}
                   required={field.required}
                   onChange={isUsingRHF ? undefined : (e) => handleChange(field.key, e.target.value)}
-                  className={cn(
-                    "border p-3 rounded-lg w-full",
-                    hasError && "border-red-500 focus:ring-red-500"
-                  )}
+                  className={cn("border p-3 rounded-lg w-full", hasError && "border-red-500 focus:ring-red-500")}
                 />
                 {hasError && <span className="text-red-500 text-sm">{fieldError.message}</span>}
               </>
@@ -94,14 +91,11 @@ const DynamicForm = ({
                 <textarea
                   rows={field.rows || 4}
                   {...(isUsingRHF ? register(field.key) : {})}
-                  value={isUsingRHF ? undefined : (formData[field.key] || "")}
+                  value={isUsingRHF ? undefined : formData[field.key] || ""}
                   placeholder={field.placeholder}
                   required={field.required}
                   onChange={isUsingRHF ? undefined : (e) => handleChange(field.key, e.target.value)}
-                  className={cn(
-                    "border p-3 rounded-lg w-full",
-                    hasError && "border-red-500 focus:ring-red-500"
-                  )}
+                  className={cn("border p-3 rounded-lg w-full", hasError && "border-red-500 focus:ring-red-500")}
                 />
                 {hasError && <span className="text-red-500 text-sm">{fieldError.message}</span>}
               </>
@@ -112,14 +106,11 @@ const DynamicForm = ({
                 <input
                   type="date"
                   {...(isUsingRHF ? register(field.key) : {})}
-                  value={isUsingRHF ? undefined : (formData[field.key] || "")}
+                  value={isUsingRHF ? undefined : formData[field.key] || ""}
                   placeholder={field.placeholder}
                   required={field.required}
                   onChange={isUsingRHF ? undefined : (e) => handleChange(field.key, e.target.value)}
-                  className={cn(
-                    "border p-3 rounded-lg w-full",
-                    hasError && "border-red-500 focus:ring-red-500"
-                  )}
+                  className={cn("border p-3 rounded-lg w-full", hasError && "border-red-500 focus:ring-red-500")}
                 />
                 {hasError && <span className="text-red-500 text-sm">{fieldError.message}</span>}
               </>
@@ -131,7 +122,7 @@ const DynamicForm = ({
                   <input
                     type="checkbox"
                     {...(isUsingRHF ? register(field.key) : {})}
-                    checked={isUsingRHF ? undefined : (formData[field.key] || false)}
+                    checked={isUsingRHF ? undefined : formData[field.key] || false}
                     onChange={isUsingRHF ? undefined : (e) => handleChange(field.key, e.target.checked)}
                   />
                   <span>{field.label}</span>
@@ -140,25 +131,29 @@ const DynamicForm = ({
               </>
             )}
 
-            {field.type === "file" && (
+            {/* {field.type === "file" && (
               <div>
                 {isUsingRHF && control ? (
                   <Controller
                     name={field.key}
                     control={control}
-                    render={({ field: { onChange, value, ...rest } }) => (
-                      <input
-                        type="file"
-                        accept={field.accept}
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          onChange(file);
-                          if (field.onChange) field.onChange(file);
-                        }}
-                        className={cn(hasError && "border-red-500")}
-                        {...rest}
-                      />
-                    )}
+                    render={({ field: { onChange, value, ...rest } }) => {
+                      return (
+                        <input
+                          type="file"
+                          accept={field.accept}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            onChange(file);
+                            if (field.onChange) {
+                              field.onChange(file);
+                            }
+                          }}
+                          className={cn(hasError && "border-red-500")}
+                          {...rest}
+                        />
+                      );
+                    }}
                   />
                 ) : (
                   <input
@@ -166,7 +161,9 @@ const DynamicForm = ({
                     accept={field.accept}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (field.onChange) field.onChange(file);
+                      if (field.onChange) {
+                        field.onChange(file);
+                      }
                       handleChange(field.key, file);
                     }}
                   />
@@ -178,19 +175,49 @@ const DynamicForm = ({
 
                 {hasError && <span className="text-red-500 text-sm">{fieldError.message}</span>}
               </div>
+            )} */}
+
+            {field.type === "file" && (
+              <div>
+                <input
+                  type="file"
+                  accept={field?.accept}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (field.onChange) {
+                      field.onChange(file);
+                    }
+                  }}
+                  className={cn(hasError && "border-red-500")}
+                />
+
+                {formData?.currentImage && field?.key === "image" && (
+                  <img
+                    src={formData.currentImage}
+                    alt="Preview"
+                    className="w-32 h-32 object-cover rounded-lg mt-2 border border-gray-200"
+                    onLoad={() => console.log("Image loaded successfully:", formData.currentImage)}
+                    onError={(e) => console.error("Image failed to load:", formData.currentImage, e)}
+                  />
+                )}
+
+                {hasError && (
+                  <span className="text-red-500 text-sm">
+                    {fieldError?.message}
+                  </span>
+                )}
+              </div>
             )}
+
 
             {field.type === "select" && (
               <>
                 <select
                   {...(isUsingRHF ? register(field.key) : {})}
-                  className={cn(
-                    "border p-3 rounded-lg",
-                    hasError && "border-red-500 focus:ring-red-500"
-                  )}
-                  value={isUsingRHF ? undefined : (formData[field.key] || "")}
-                  onChange={isUsingRHF ? undefined : (e) =>
-                    setFormData((prev) => ({ ...prev, [field.key]: e.target.value }))
+                  className={cn("border p-3 rounded-lg", hasError && "border-red-500 focus:ring-red-500")}
+                  value={isUsingRHF ? undefined : formData[field.key] || ""}
+                  onChange={
+                    isUsingRHF ? undefined : (e) => setFormData((prev) => ({ ...prev, [field.key]: e.target.value }))
                   }
                 >
                   <option value="">Select</option>

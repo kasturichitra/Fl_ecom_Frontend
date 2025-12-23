@@ -1,12 +1,10 @@
-import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { industryTypeSchema } from "./industry.schema.js";
-import { industryDefaultValues } from "./industry.default.js";
+import { useForm } from "react-hook-form";
 import DynamicForm from "../../components/DynamicForm.jsx";
+import { industryDefaultValues } from "./industry.default.js";
+import { industryTypeSchema } from "./industry.schema.js";
 
-const IndustryTypeForm = (
-  { fields = [], onSubmit, onCancel, isSubmitting, additionalContent = null, className }
-) => {
+const IndustryTypeForm = ({ fields = [], onSubmit, onCancel, isSubmitting, additionalContent = null, className }) => {
   const {
     register,
     handleSubmit,
@@ -29,8 +27,6 @@ const IndustryTypeForm = (
     });
   };
 
-  console.log("Form data", formData);
-
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <DynamicForm
@@ -46,7 +42,7 @@ const IndustryTypeForm = (
       {/* Render additional content like AttributeRepeater */}
       {additionalContent}
     </form>
-  )
-}
+  );
+};
 
 export default IndustryTypeForm;
