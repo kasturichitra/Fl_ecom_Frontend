@@ -23,6 +23,8 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
     currentImage: null,
   });
 
+  console.log("CategoryEditModal formData:", formData);
+
   const [attributes, setAttributes] = useState([]);
 
   // Load Category Data into Form
