@@ -8,20 +8,12 @@ export const getAllBrandApi = (params = {}) => {
   return axiosInstance.get(`${BASE_URL}${queryString ? `?${queryString}` : ""} `);
 };
 
-export const createBrandApi = (formData) => {
-  return axiosInstance.post(`${BASE_URL}/`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+export const createBrandApi = (payload) => {
+  return axiosInstance.post(`${BASE_URL}/`, payload);
 };
 
-export const updateBrandApi = async (uniqueId, formData) => {
-  return await axiosInstance.put(`${BASE_URL}/${uniqueId}`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+export const updateBrandApi = async (uniqueId, payload) => {
+  return await axiosInstance.put(`${BASE_URL}/${uniqueId}`, payload);
 };
 
 export const deleteBrandApi = async (uniqueId) => {
