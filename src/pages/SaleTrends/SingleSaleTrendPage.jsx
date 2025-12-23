@@ -302,9 +302,9 @@ const SingleSaleTrendPage = () => {
                     </div>
                   </div>
                   <img
-                    src={getProductImage(product)}
+                    src={product?.product_image?.low}
                     alt={product?.product_name}
-                    className="w-12 h-12 rounded-lg object-cover border border-gray-100"
+                    className="size-12 rounded-lg object-cover"
                   />
                   <div className="ml-4 flex-1">
                     <h3 className="font-semibold text-gray-800 text-sm">{product?.product_name}</h3>
@@ -390,9 +390,9 @@ const SingleSaleTrendPage = () => {
                 </div>
 
                 <img
-                  src={getProductImage(product)}
+                  src={product?.product_image?.low}
                   alt={product?.product_name}
-                  className="w-12 h-12 rounded-lg object-cover border border-gray-100 opacity-90"
+                  className="size-12 rounded-lg object-cover"
                 />
 
                 <div className="ml-4 flex-1">

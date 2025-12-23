@@ -385,9 +385,15 @@ const CreateOrder = () => {
                         className="group bg-white rounded-lg border border-gray-200 p-3 shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row gap-3 items-center"
                       >
                         {/* Product Details Placeholder */}
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 font-bold text-lg uppercase">
+                        {/* <div className="w-10 h-10 sm:w-12 sm:h-12 shrink-0 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400 font-bold text-lg uppercase">
                           {product?.product_name.charAt(0)}
-                        </div>
+                        </div> */}
+
+                        <img 
+                          src={product?.product_image?.low || "https://placehold.co/400x400/indigo/white?text=Product"}
+                          className="object-cover size-12 rounded-md"
+                          alt={product?.product_name}
+                        />
 
                         {/* Info */}
                         <div className="flex-1 text-center sm:text-left">
