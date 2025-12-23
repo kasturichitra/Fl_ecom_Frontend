@@ -27,6 +27,8 @@ const DynamicForm = ({
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
+  console.log(formData.currentImage, "image url")
+
   const isUsingRHF = register !== null;
 
   return (
@@ -129,7 +131,7 @@ const DynamicForm = ({
               </>
             )}
 
-            {field.type === "file" && (
+            {/* {field.type === "file" && (
               <div>
                 {isUsingRHF && control ? (
                   <Controller
@@ -173,7 +175,40 @@ const DynamicForm = ({
 
                 {hasError && <span className="text-red-500 text-sm">{fieldError.message}</span>}
               </div>
+            )} */}
+
+            {field.type === "file" && (
+              <div>
+                <input
+                  type="file"
+                  accept={field?.accept}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (field.onChange) {
+                      field.onChange(file);
+                    }
+                  }}
+                  className={cn(hasError && "border-red-500")}
+                />
+
+                {formData?.currentImage && field?.key === "image" && (
+                  <img
+                    src={formData.currentImage}
+                    alt="Preview"
+                    className="w-32 h-32 object-cover rounded-lg mt-2 border border-gray-200"
+                    onLoad={() => console.log("Image loaded successfully:", formData.currentImage)}
+                    onError={(e) => console.error("Image failed to load:", formData.currentImage, e)}
+                  />
+                )}
+
+                {hasError && (
+                  <span className="text-red-500 text-sm">
+                    {fieldError?.message}
+                  </span>
+                )}
+              </div>
             )}
+
 
             {field.type === "select" && (
               <>
