@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import AttributeRepeater from "../../components/AttributeRepeater";
 import FormActionButtons from "../../components/FormActionButtons";
 import ScrollWrapper from "../../components/ui/ScrollWrapper";
@@ -8,6 +8,7 @@ import { useGetAllCategories, useGetCategoryByUniqueId } from "../../hooks/useCa
 import { useCreateProduct } from "../../hooks/useProduct";
 import { objectToFormData } from "../../utils/ObjectToFormData";
 import ProductForm from "../../form/products/productForm";
+import toBase64 from "../../utils/toBase64";
 
 const ProductManager = ({ onCancel }) => {
   // Ref to get attributes from AttributeRepeater
@@ -57,16 +58,27 @@ const ProductManager = ({ onCancel }) => {
     label: brand?.brand_name,
   }));
 
+  const [resetKey, setResetKey] = useState(0);
+
   const { mutateAsync: createProduct, isPending: isSubmitting } = useCreateProduct({
     onSuccess: () => {
+      // Force a remount of the entire form to clear all fields and hook-form state
+      setResetKey((prev) => prev + 1);
+
+      // Reset local state
+      setSelectedCategory(null);
+      setCategorySearchTerm("");
+      setBrandSearchTerm("");
+
+      // Close the modal
       onCancel();
-    }
+    },
   });
 
   // --------------------------
   // PRODUCT FIELD LIST
   // --------------------------
-  const productFields = [
+  const productFields = useMemo(() => [
     {
       key: "category_unique_id",
       label: "Category Unique ID *",
@@ -99,14 +111,14 @@ const ProductManager = ({ onCancel }) => {
         setShowBrandDropdown(false);
       },
       onSelect: (value) => {
-        // No additional action needed, react-hook-form handles the valu
+        // No additional action needed, react-hook-form handles the value
         setBrandSearchTerm("");
         setShowBrandDropdown(false);
       },
       placeholder: "e.g., apple1",
     },
-     ...PRODUCT_STATIC_FIELDS?.filter(field => !field?.isEditOnly),
-  ];
+    ...PRODUCT_STATIC_FIELDS?.filter((field) => !field?.isEditOnly),
+  ], [showCategoryDropdown, formattedCategories, showBrandDropdown, formattedBrands]);
 
   // CALLBACK: Update attributes ref
   const handleAttributesChange = (attributes) => {
@@ -115,7 +127,6 @@ const ProductManager = ({ onCancel }) => {
 
   // FORM SUBMIT
   const handleSubmit = async (formData) => {
-    console.log("formData", formData);
     // Get current attributes from the ref
     const currentAttributes = attributesRef.current;
 
@@ -127,13 +138,45 @@ const ProductManager = ({ onCancel }) => {
         value: attr?.value,
       }));
 
-    const { product_image, product_attributes, ...rest } = formData;
+    const { product_image, product_images, ...rest } = formData;
 
-    const formDataToSend = objectToFormData(rest);
-    formDataToSend.append("product_image", product_image);
-    formDataToSend.append("product_attributes", JSON.stringify(validAttributes));
-    
-    await createProduct(formDataToSend);
+    // Helper to strip base64 prefix
+    const cleanBase64 = (b64) => {
+      if (typeof b64 !== "string") return b64;
+      return b64.includes(";base64,") ? b64.split(";base64,")[1] : b64;
+    };
+
+    // Convert hero image to base64
+    let heroImageBase64 = null;
+    if (product_image instanceof File) {
+      const b64 = await toBase64(product_image);
+      heroImageBase64 = cleanBase64(b64);
+    }
+
+    // Convert multiple product images to base64
+    let productImagesBase64 = [];
+    if (Array.isArray(product_images)) {
+      productImagesBase64 = await Promise.all(
+        product_images.map(async (file) => {
+          if (file instanceof File) {
+            const b64 = await toBase64(file);
+            return cleanBase64(b64);
+          }
+          return null; // Skip non-files
+        })
+      );
+    }
+
+    const payload = {
+      ...rest,
+      product_attributes: JSON.stringify(validAttributes),
+      ...(heroImageBase64 && { product_image: heroImageBase64 }),
+      ...(productImagesBase64.filter(Boolean).length > 0 && {
+        product_images: productImagesBase64.filter(Boolean)
+      }),
+    };
+
+    await createProduct(payload);
   };
 
   return (
@@ -145,6 +188,7 @@ const ProductManager = ({ onCancel }) => {
         </div>
 
         <ProductForm
+          key={resetKey}
           fields={productFields}
           onSubmit={handleSubmit}
           onCancel={onCancel}
@@ -153,10 +197,10 @@ const ProductManager = ({ onCancel }) => {
           additionalContent={
             <>
               {/* Attribute Repeater - automatically shows DB attributes + allows custom ones */}
-              <AttributeRepeater 
-                label="Product Attributes" 
-                predefined={dbAttributes} 
-                onChange={handleAttributesChange} 
+              <AttributeRepeater
+                label="Product Attributes"
+                predefined={dbAttributes}
+                onChange={handleAttributesChange}
               />
 
               {/* Form Action Buttons */}
