@@ -5,6 +5,7 @@ import FormActionButtons from "../../components/FormActionButtons";
 import ScrollWrapper from "../../components/ui/ScrollWrapper";
 import { useCreateCategory } from "../../hooks/useCategory";
 import { useGetAllIndustries } from "../../hooks/useIndustry";
+import toBase64 from "../../utils/toBase64";
 
 const CategoryManager = ({ onCancel }) => {
   // const { items: industryTypes = [] } = useSelector((state) => state.industryTypes || {});
@@ -44,31 +45,39 @@ const CategoryManager = ({ onCancel }) => {
   };
 
   const handleSubmit = async (formData) => {
-    const data = new FormData();
-    data.append("industry_unique_id", formData?.industry_unique_id);
-    data.append("category_unique_id", formData?.category_unique_id);
-    data.append("category_name", formData?.category_name);
-    console.log("Form image", formData?.image);
-    if (formData?.image) data.append("image", formData?.image);
-    data.append("is_active", formData?.is_active);
-    data.append("created_by", "Admin");
-    data.append("updated_by", "Admin");
+    // const data = new FormData();
+    // data.append("industry_unique_id", formData?.industry_unique_id);
+    // data.append("category_unique_id", formData?.category_unique_id);
+    // data.append("category_name", formData?.category_name);
+    // console.log("Form image", formData?.image);
+    // if (formData?.image) data.append("image", formData?.image);
+    // data.append("is_active", formData?.is_active);
+    // data.append("created_by", "Admin");
+    // data.append("updated_by", "Admin");
 
-    if (showAttributes && attributes?.some((a) => a?.name.trim())) {
-      attributes.forEach((attr, i) => {
-        if (!attr?.name.trim()) return;
-        data.append(`attributes[${i}][name]`, attr?.name);
-        data.append(`attributes[${i}][code]`, attr?.code);
-        data.append(`attributes[${i}][slug]`, attr?.name.toLowerCase().replace(/\s+/g, "-"));
-        data.append(`attributes[${i}][description]`, attr?.description);
-        data.append(`attributes[${i}][units]`, attr?.units || "N/A");
-        data.append(`attributes[${i}][is_active]`, attr?.is_active);
-        data.append(`attributes[${i}][created_by]`, "Admin");
-        data.append(`attributes[${i}][updated_by]`, "Admin");
-      });
-    }
+    // if (showAttributes && attributes?.some((a) => a?.name.trim())) {
+    //   attributes.forEach((attr, i) => {
+    //     if (!attr?.name.trim()) return;
+    //     data.append(`attributes[${i}][name]`, attr?.name);
+    //     data.append(`attributes[${i}][code]`, attr?.code);
+    //     data.append(`attributes[${i}][slug]`, attr?.name.toLowerCase().replace(/\s+/g, "-"));
+    //     data.append(`attributes[${i}][description]`, attr?.description);
+    //     data.append(`attributes[${i}][units]`, attr?.units || "N/A");
+    //     data.append(`attributes[${i}][is_active]`, attr?.is_active);
+    //     data.append(`attributes[${i}][created_by]`, "Admin");
+    //     data.append(`attributes[${i}][updated_by]`, "Admin");
+    //   });
+    // }
+     console.log("Payload before going to the API", formData);
 
-    await createCategory(data);
+    // const imageBase64 = await toBase64(payload.image_url);
+    // await createIndustry({ ...payload, image_base64: imageBase64 });
+
+   const imageBase64 = await toBase64(formData?.image);
+  //  console.log({})
+  // console.log("Image base64", imageBase64);
+  const {image, ...rest} = formData
+    await createCategory({ ...rest, image_base64: imageBase64 });
   };
 
   const formattedIndustryTypes = industryTypes?.data?.map((i) => ({
