@@ -12,7 +12,6 @@ const IndustryTypeEditModal = ({
   const [formData, setLocalFormData] = useState({});
   const [imageFile, setImageFile] = useState(null);
 
-  console.log("initail Data", initialData)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
