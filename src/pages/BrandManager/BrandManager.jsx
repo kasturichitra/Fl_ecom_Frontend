@@ -34,7 +34,7 @@ const BrandManager = ({ setShowAddModal, onCancel }) => {
       placeholder: "Enter brand description",
     },
     {
-      key: "brand_image",
+      key: "image",
       label: "Brand Image *",
       type: "file",
       accept: "image/*",
@@ -48,8 +48,8 @@ const BrandManager = ({ setShowAddModal, onCancel }) => {
 
   const handleCreateBrand = async (formData) => {
     let image_base64 = null;
-    if (formData?.brand_image instanceof File) {
-      image_base64 = await toBase64(formData.brand_image);
+    if (formData?.image instanceof File) {
+      image_base64 = await toBase64(formData.image);
     }
 
     const payload = {

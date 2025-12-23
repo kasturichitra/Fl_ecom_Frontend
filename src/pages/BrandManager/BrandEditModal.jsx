@@ -33,7 +33,7 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
         brand_name: brand?.brand_name || "",
         brand_unique_id: brand?.brand_unique_id || "",
         brand_description: brand?.brand_description || "",
-        brand_image: lowUrl,
+        image: null,
         currentImage: lowUrl || null,
         is_active: brand?.is_active ?? true,
       });
@@ -43,7 +43,7 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
   const removeImage = () => {
     setForm((prev) => ({
       ...prev,
-      brand_image: "REMOVE",
+      image: "REMOVE",
       currentImage: null,
     }));
   };
@@ -61,8 +61,8 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
     if (!validate()) return;
 
     let image_base64 = null;
-    if (form?.brand_image instanceof File) {
-      image_base64 = await toBase64(form.brand_image);
+    if (form?.image instanceof File) {
+      image_base64 = await toBase64(form.image);
     }
 
     const payload = {
@@ -71,7 +71,7 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
       categories: form?.categories,
       is_active: form?.is_active,
       ...(image_base64 && { image_base64 }),
-      ...(form.brand_image === "REMOVE" && { remove_image: true }),
+      ...(form.image === "REMOVE" && { remove_image: true }),
     };
 
     await updateBrand({
@@ -102,7 +102,7 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
       rows: 4,
     },
     {
-      key: "brand_image",
+      key: "image",
       label: "Brand Image",
       type: "file",
       accept: "image/*",
@@ -111,7 +111,7 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
         const previewUrl = URL.createObjectURL(file);
         setForm((prev) => ({
           ...prev,
-          brand_image: file,
+          image: file,
           currentImage: previewUrl,
         }));
       },
