@@ -1,5 +1,5 @@
 // src/pages/CategoryManager/CategoryManager.jsx
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import CategoryForm from "../../form/categorys/categoryForm";
 import FormActionButtons from "../../components/FormActionButtons";
 import ScrollWrapper from "../../components/ui/ScrollWrapper";
@@ -68,15 +68,15 @@ const CategoryManager = ({ onCancel }) => {
     //     data.append(`attributes[${i}][updated_by]`, "Admin");
     //   });
     // }
-     console.log("Payload before going to the API", formData);
+    console.log("Payload before going to the API", formData);
 
     // const imageBase64 = await toBase64(payload.image_url);
     // await createIndustry({ ...payload, image_base64: imageBase64 });
 
-   const imageBase64 = await toBase64(formData?.image);
-  //  console.log({})
-  // console.log("Image base64", imageBase64);
-  const {image, ...rest} = formData
+    const imageBase64 = await toBase64(formData?.image);
+    //  console.log({})
+    // console.log("Image base64", imageBase64);
+    const { image, ...rest } = formData
     await createCategory({ ...rest, image_base64: imageBase64 });
   };
 
@@ -85,7 +85,7 @@ const CategoryManager = ({ onCancel }) => {
     value: i?.industry_unique_id,
   }));
 
-  const categoryFields = [
+  const categoryFields = useMemo(() => [
     {
       key: "industry_unique_id",
       label: "Industry *",
@@ -99,8 +99,8 @@ const CategoryManager = ({ onCancel }) => {
         setSearchTerm("");
         setShowDropdown(false);
       },
-      onSelect: (value) => {
-        setSearchTerm(value);
+      onSelect: (item) => {
+        setSearchTerm(item.label);
         setShowDropdown(false);
       },
       options: formattedIndustryTypes,
@@ -118,7 +118,7 @@ const CategoryManager = ({ onCancel }) => {
       accept: "image/*",
     },
     { key: "is_active", label: "Active", type: "checkbox" },
-  ];
+  ], [formattedIndustryTypes, showDropdown]);
 
   return (
     <div className="relative w-full max-w-4xl mx-auto p-4 md:p-6 bg-white rounded-xl md:rounded-2xl shadow-xl">

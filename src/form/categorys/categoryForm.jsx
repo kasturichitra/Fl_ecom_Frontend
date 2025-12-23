@@ -20,6 +20,7 @@ const CategoryForm = ({
     formState: { errors },
     watch,
     setValue,
+    getValues,
   } = useForm({
     resolver: yupResolver(categorySchema),
     defaultValues: categoryDefaultValues,
@@ -29,32 +30,33 @@ const CategoryForm = ({
   const formData = watch();
 
   const setFormData = (updater) => {
-    const newData = typeof updater === "function"
-      ? updater(formData)
-      : updater;
+    const currentData = getValues();
+    const newData = typeof updater === "function" ? updater(currentData) : updater;
 
     Object?.keys(newData)?.forEach((key) => {
-      setValue(key, newData[key], { shouldValidate: true });
+      if (newData[key] !== currentData[key]) {
+        setValue(key, newData[key], { shouldValidate: true });
+      }
     });
   };
 
   return (
     <>
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-10">
 
-      <DynamicForm
-        fields={fields}
-        formData={formData}
-        setFormData={setFormData}
-        register={register}
-        errors={errors}
-        control={control}
-        className={className}
-      />
+        <DynamicForm
+          fields={fields}
+          formData={formData}
+          setFormData={setFormData}
+          register={register}
+          errors={errors}
+          control={control}
+          className={className}
+        />
 
-      {/* Render additional items like action buttons */}
-      {additionalContent}
-    </form>
+        {/* Render additional items like action buttons */}
+        {additionalContent}
+      </form>
     </>
   );
 };
