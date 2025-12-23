@@ -5,6 +5,7 @@ import EditModalLayout from "../../components/EditModalLayout";
 
 import { useCategoryUpdate } from "../../hooks/useCategory";
 import { useGetAllIndustries } from "../../hooks/useIndustry";
+import toBase64 from "../../utils/toBase64";
 
 const CategoryEditModal = ({ category, onClose, onSuccess }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,7 +20,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
     category_unique_id: "",
     industry_unique_id: "",
     is_active: true,
-    image: null,
+    category_image: null,
     currentImage: null,
   });
 
@@ -35,8 +36,8 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
         category_unique_id: category?.category_unique_id,
         industry_unique_id: category?.industry_unique_id,
         is_active: category?.is_active,
-        image: null,
-        currentImage: category?.image ? `${import.meta.env.VITE_API_URL}/${category.image}` : null,
+        category_image: category?.category_image?.['low'],
+        currentImage: category?.category_image?.['low'] ? `${category.category_image?.['low']}` : null,
       });
 
       setAttributes(
@@ -59,7 +60,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
   const removeImage = () => {
     setFormData((prev) => ({
       ...prev,
-      image: "REMOVE",
+      category_image: "REMOVE",
       currentImage: null,
     }));
   };
@@ -107,28 +108,30 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const fd = new FormData();
-    fd.append("category_name", formData?.category_name);
-    fd.append("category_unique_id", formData?.category_unique_id);
-    fd.append("industry_unique_id", formData?.industry_unique_id);
-    fd.append("is_active", formData?.is_active);
+    // const fd = new FormData();
+    const payload = {
+      category_name: formData?.category_name,
+      category_unique_id: formData?.category_unique_id,
+      industry_unique_id: formData?.industry_unique_id,
+      is_active: formData?.is_active,
+    };
+
+    console.log("payload", payload);
+    console.log("Form Data", formData);
 
     // Image logic
     if (formData?.image && formData?.image !== "REMOVE") {
-      fd.append("image", formData?.image);
-    }
-    if (formData?.image === "REMOVE") {
-      fd.append("remove_image", "true");
+      payload.image_base64 = await toBase64(formData?.image);
     }
 
     // Attributes
     attributes.forEach((attr, i) => {
       Object?.entries(attr)?.forEach(([key, value]) => {
-        if (value !== null) fd?.append(`attributes[${i}][${key}]`, value);
+        if (value !== null) payload[`attributes[${i}][${key}]`] = value;
       });
     });
 
-    await updateCategory({ uniqueId: category?.category_unique_id, payload: fd });
+    await updateCategory({ uniqueId: category?.category_unique_id, payload });
     onClose()
   };
 
