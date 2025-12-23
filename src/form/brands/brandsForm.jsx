@@ -20,6 +20,7 @@ const BrandForm = ({
     watch,
     setValue,
     control,
+    getValues,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(brandSchema),
@@ -41,7 +42,15 @@ const BrandForm = ({
       <DynamicForm
         fields={fields}
         formData={formData}
-        setFormData={(data) => Object?.keys(data)?.forEach((key) => setValue(key, data[key], { shouldValidate: true }))}
+        setFormData={(updater) => {
+          const currentData = getValues();
+          const newData = typeof updater === "function" ? updater(currentData) : updater;
+          Object.keys(newData).forEach((key) => {
+            if (newData[key] !== currentData[key]) {
+              setValue(key, newData[key], { shouldValidate: true });
+            }
+          });
+        }}
         register={register}
         control={control}
         errors={errors}

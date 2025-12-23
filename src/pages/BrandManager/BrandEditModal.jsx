@@ -1,84 +1,84 @@
-import { useState } from "react";
-import CategorySelector from "../../components/CategorySelector";
+import { useEffect, useState } from "react";
 import DynamicForm from "../../components/DynamicForm";
 import EditModalLayout from "../../components/EditModalLayout";
 import { useUpdateBrand } from "../../hooks/useBrand";
 import { useGetAllCategories } from "../../hooks/useCategory";
+import toBase64 from "../../utils/toBase64";
+import CategorySelector from "../../components/CategorySelector";
 
-const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }) => {
-  const { mutateAsync: updateBrand, isPending: isUpdatingBrand } = useUpdateBrand({
-    onSettled: () => {
-      setEditingBrand(null);
-    },
-  });
-
-  const { data: categoriesData, isLoaing, isError } = useGetAllCategories({});
-
-  const getSelectedCategoryObjects = (brandCategories = [], categoriesData = []) => {
-    if (!Array?.isArray(brandCategories) || !Array?.isArray(categoriesData)) return [];
-
-    return categoriesData?.filter((cat) => brandCategories?.includes(cat?._id));
-  };
+const BrandEditModal = ({ brand, onClose, onSuccess }) => {
+  const { mutateAsync: updateBrand, isPending: isUpdatingBrand } = useUpdateBrand();
+  const { data: categoriesData } = useGetAllCategories({});
 
   const [form, setForm] = useState({
-    categories: brand?.categories || [],
-    brand_name: brand?.brand_name || "",
-    brand_unique_id: brand?.brand_unique_id || "",
-    brand_description: brand?.brand_description || "",
-    brand_image: brand?.brand_image || "",
-    is_active: brand?.is_active ?? true,
+    categories: [],
+    brand_name: "",
+    brand_unique_id: "",
+    brand_description: "",
+    brand_image: null,
+    currentImage: null,
+    is_active: true,
   });
 
-  const [imagePreview, setImagePreview] = useState(brand?.brand_image || "");
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (brand) {
+      const baseUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
+
+      const lowUrl = brand?.brand_image?.low || brand?.brand_image?.url || "";
+
+      setForm({
+        categories: brand?.categories || [],
+        brand_name: brand?.brand_name || "",
+        brand_unique_id: brand?.brand_unique_id || "",
+        brand_description: brand?.brand_description || "",
+        brand_image: lowUrl,
+        currentImage: lowUrl || null,
+        is_active: brand?.is_active ?? true,
+      });
+    }
+  }, [brand]);
+
+  const removeImage = () => {
+    setForm((prev) => ({
+      ...prev,
+      brand_image: "REMOVE",
+      currentImage: null,
+    }));
+  };
 
   const validate = () => {
     const e = {};
     if (!form?.categories?.length) e.categories = "Please select at least one category";
     if (!form?.brand_name?.trim()) e.brand_name = "Brand name is required";
-    if (!form?.brand_unique_id?.trim()) e.brand_unique_id = "Brand unique ID is required";
     setErrors(e);
     return Object.keys(e).length === 0;
-  };
-
-  const handleImageChange = (file) => {
-    if (file) {
-      setForm({ ...form, brand_image: file });
-      setImagePreview(URL.createObjectURL(file));
-    }
-  };
-
-  const handleRemoveImage = () => {
-    setForm({ ...form, brand_image: "" });
-    setImagePreview("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
 
-    const fd = new FormData();
-
-    form.categories.forEach((id) => fd?.append("categories[]", id));
-
-    fd.append("brand_name", form?.brand_name);
-    // fd.append("brand_unique_id", form.brand_unique_id);
-    fd.append("brand_description", form?.brand_description || "");
-
-    fd.append("is_active", form.is_active);
-
-    if (form?.brand_image && typeof form?.brand_image !== "string") {
-      fd.append("brand_image", form?.brand_image);
+    let image_base64 = null;
+    if (form?.brand_image instanceof File) {
+      image_base64 = await toBase64(form.brand_image);
     }
 
-    if (!imagePreview && brand?.brand_image) {
-      fd.append("brand_image", "");
-    }
+    const payload = {
+      brand_name: form?.brand_name,
+      brand_description: form?.brand_description || "",
+      categories: form?.categories,
+      is_active: form?.is_active,
+      ...(image_base64 && { image_base64 }),
+      ...(form.brand_image === "REMOVE" && { remove_image: true }),
+    };
 
     await updateBrand({
-      id: brand?._id,
-      data: fd,
+      id: form?.brand_unique_id,
+      data: payload,
     });
+    onClose();
   };
 
   const fields = [
@@ -93,7 +93,7 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
       key: "brand_unique_id",
       label: "Brand Unique ID",
       type: "text",
-      disabled: true, // DynamicForm will render read-only
+      disabled: true,
     },
     {
       key: "brand_description",
@@ -103,10 +103,19 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
     },
     {
       key: "brand_image",
-      label: "Upload New Image",
+      label: "Brand Image",
       type: "file",
       accept: "image/*",
-      onChange: handleImageChange,
+      onChange: (file) => {
+        if (!file) return;
+        const previewUrl = URL.createObjectURL(file);
+        setForm((prev) => ({
+          ...prev,
+          brand_image: file,
+          currentImage: previewUrl,
+        }));
+      },
+      onRemove: removeImage,
     },
     {
       key: "is_active",
@@ -123,7 +132,6 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
       submitLabel="Update Brand"
       isLoading={isUpdatingBrand}
     >
-      {/* Category Selector (Not in DynamicForm) */}
       <div className="mb-6">
         <label className="block text-sm font-semibold text-gray-700 mb-3">
           Categories <span className="text-red-500">*</span>
@@ -136,31 +144,7 @@ const BrandEditModal = ({ brand, onClose, setEditingBrand, onSuccess, onSubmit }
         {errors?.categories && <p className="text-red-500 text-sm mt-2">{errors?.categories}</p>}
       </div>
 
-      {/* ⭐ Dynamic Form Handles all other fields */}
       <DynamicForm fields={fields} formData={form} setFormData={setForm} />
-
-      {/* Image Preview Section */}
-      {imagePreview && (
-        <div className="mt-4">
-          <p className="text-sm font-semibold text-gray-700 mb-2">Current Image</p>
-          <div className="flex items-center gap-6">
-            <div className="relative">
-              <img
-                src={imagePreview}
-                alt="Brand"
-                className="w-32 h-32 object-cover rounded-xl border-4 border-gray-200 shadow-lg"
-              />
-              <button
-                type="button"
-                onClick={handleRemoveImage}
-                className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full w-9 h-9 flex items-center justify-center shadow-lg hover:bg-red-600"
-              >
-                ×
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </EditModalLayout>
   );
 };
