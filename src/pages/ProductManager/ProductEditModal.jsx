@@ -5,8 +5,8 @@ import { useGetAllCategories } from "../../hooks/useCategory";
 import { useGetAllBrands } from "../../hooks/useBrand";
 import { useUpdateProduct } from "../../hooks/useProduct";
 import { PRODUCT_STATIC_FIELDS } from "../../constants/productFields";
-import { objectToFormData } from "../../utils/ObjectToFormData";
 import AttributeRepeater from "../../components/AttributeRepeater";
+import toBase64 from "../../utils/toBase64";
 
 const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
   const [form, setForm] = useState({
@@ -18,8 +18,9 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
     product_color: "",
     product_size: "",
     product_image: null,
+    product_images: [],
     currentImage: null,
-    price: "",
+    base_price: "",
     discount_percentage: "",
     cgst: "",
     sgst: "",
@@ -38,6 +39,10 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
   const { data: brands } = useGetAllBrands({ search: brandSearchTerm });
 
   const attributesRef = useRef([]);
+
+
+  console.log("product", product)
+  console.log("product_image", product?.product_image?.["low"])
 
   // Map product.product_attributes to the AttributeRepeater 'predefined' format
   const productDbAttributes = useMemo(
@@ -62,7 +67,38 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
 
   useEffect(() => {
     if (!product) return;
-    // Only set once to prevent extra rerenders
+    const baseUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
+
+    // Path resolution helper supporting nested .low property
+    const getFullUrl = (img) => {
+      if (!img) return null;
+      let imgStr = "";
+      if (typeof img === "string") {
+        imgStr = img;
+      } else if (typeof img === "object") {
+        // Prioritize the 'low' property as per user information, then fallbacks
+        imgStr = img.low || img.url || img.image_url || img.path || img.image || img.file || "";
+      }
+
+      if (!imgStr || typeof imgStr !== "string") return null;
+      if (imgStr.startsWith("http")) return imgStr;
+
+      const path = imgStr.replace(/\\/g, "/").replace(/^\//, "");
+      return `${baseUrl}/${path}`;
+    };
+
+    // Map hero image
+    const heroSource = product?.product_image || product?.Product_Image || product?.image || product?.Image;
+    const heroUrl = getFullUrl(heroSource);
+
+    // Map gallery images
+    const gallerySource = product?.product_images || product?.Product_Images || product?.product_gallery || product?.images || [];
+    const sourceArray = Array.isArray(gallerySource)
+      ? gallerySource
+      : (typeof gallerySource === "string" && gallerySource.length > 0 ? gallerySource.split(",").map(s => s.trim()) : []);
+
+    const existingGalleryUrls = sourceArray?.map(getFullUrl).filter(Boolean);
+
     setForm({
       category_unique_id: product?.category_unique_id ?? "",
       brand_unique_id: product?.brand_unique_id ?? "",
@@ -72,18 +108,19 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
       product_color: product?.product_color ?? "",
       product_size: product?.product_size ?? "",
       product_image: null,
-      currentImage: product?.product_images?.[0] ? `${import.meta.env.VITE_API_URL}/${product.product_images[0]}` : null,
-      price: product?.price ?? "",
-      discount_percentage: product?.discount_percentage ?? "",
-      cgst: product?.cgst ?? "",
-      sgst: product?.sgst ?? "",
-      igst: product?.igst ?? "",
+      product_images: existingGalleryUrls,
+      currentImage: heroUrl,
+      base_price: product?.base_price ?? product?.price ?? "",
+      discount_percentage: product?.discount_percentage ?? 0,
+      cgst: product?.cgst ?? 0,
+      sgst: product?.sgst ?? 0,
+      igst: product?.igst ?? 0,
       stock_quantity: product?.stock_quantity ?? "",
       min_order_limit: product?.min_order_limit ?? "",
       gender: product?.gender ?? "",
       product_attributes: attributesRef?.current,
     });
-  }, [product]);
+  }, [product?.product_unique_id || product]);
 
   // format dropdowns
   const formattedCategories = categories?.data?.map((c) => ({ value: c?.category_unique_id, label: c?.category_name }));
@@ -93,8 +130,13 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e?.preventDefault?.();
-    // No validation here
-    const { product_image, product_attributes, ...rest } = form;
+    const { product_image, product_images, product_attributes, currentImage, ...rest } = form;
+
+    // Helper to strip base64 prefix
+    const cleanBase64 = (b64) => {
+      if (typeof b64 !== "string") return b64;
+      return b64.includes(";base64,") ? b64.split(";base64,")[1] : b64;
+    };
 
     // Use attributesRef for the latest repeater values
     const currentAttributes = attributesRef?.current || [];
@@ -105,13 +147,38 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
         value: attr?.value,
       }));
 
-    const formData = objectToFormData(rest);
-    if (product_image) formData?.append("product_image", product_image);
-    if (validAttributes.length) formData?.append("product_attributes", JSON.stringify(validAttributes));
+    // Process Hero Image: Only send if it's a new file
+    let heroImagePayload = null;
+    if (product_image instanceof File) {
+      const b64 = await toBase64(product_image);
+      heroImagePayload = cleanBase64(b64);
+    }
 
-    await updateProduct({ uniqueId: product?.product_unique_id, payload: formData });
+    // Process Gallery Images: Only send the new ones
+    let productImagesPayload = [];
+    if (Array.isArray(product_images)) {
+      productImagesPayload = await Promise.all(
+        product_images.map(async (item) => {
+          if (item instanceof File) {
+            const b64 = await toBase64(item);
+            return cleanBase64(b64);
+          }
+          return null; // Don't send existing URLs back as images
+        })
+      );
+    }
 
-    // if (onSuccess) onSuccess();
+    // Final Payload Structure
+    const newGalleryImages = productImagesPayload.filter(Boolean);
+    const payload = {
+      ...rest,
+      product_attributes: JSON.stringify(validAttributes),
+      // Only include these keys if there is actually new data to upload
+      ...(heroImagePayload && { product_image: heroImagePayload }),
+      ...(newGalleryImages.length > 0 && { product_images: newGalleryImages }),
+    };
+
+    await updateProduct({ uniqueId: product?.product_unique_id, payload });
     closeModal();
   };
 
