@@ -116,7 +116,6 @@ const ProductManager = ({ onCancel }) => {
 
   // FORM SUBMIT
   const handleSubmit = async (formData) => {
-    console.log("formData", formData);
     // Get current attributes from the ref
     const currentAttributes = attributesRef.current;
 
@@ -130,10 +129,17 @@ const ProductManager = ({ onCancel }) => {
 
     const { product_image, product_images, ...rest } = formData;
 
+    // Helper to strip base64 prefix
+    const cleanBase64 = (b64) => {
+      if (typeof b64 !== "string") return b64;
+      return b64.includes(";base64,") ? b64.split(";base64,")[1] : b64;
+    };
+
     // Convert hero image to base64
     let heroImageBase64 = null;
     if (product_image instanceof File) {
-      heroImageBase64 = await toBase64(product_image);
+      const b64 = await toBase64(product_image);
+      heroImageBase64 = cleanBase64(b64);
     }
 
     // Convert multiple product images to base64
@@ -142,9 +148,10 @@ const ProductManager = ({ onCancel }) => {
       productImagesBase64 = await Promise.all(
         product_images.map(async (file) => {
           if (file instanceof File) {
-            return await toBase64(file);
+            const b64 = await toBase64(file);
+            return cleanBase64(b64);
           }
-          return file; // if it's already a string URL
+          return null; // Skip non-files
         })
       );
     }
@@ -152,11 +159,12 @@ const ProductManager = ({ onCancel }) => {
     const payload = {
       ...rest,
       product_attributes: JSON.stringify(validAttributes),
-      product_image: heroImageBase64,
-      product_images: productImagesBase64,
+      ...(heroImageBase64 && { product_image: heroImageBase64 }),
+      ...(productImagesBase64.filter(Boolean).length > 0 && {
+        product_images: productImagesBase64.filter(Boolean)
+      }),
     };
 
-    console.log("payload", payload);
     await createProduct(payload);
   };
 
