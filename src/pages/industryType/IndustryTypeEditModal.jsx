@@ -2,14 +2,17 @@ import React, { useState } from "react";
 import EditModalLayout from "../../components/EditModalLayout";
 import DynamicForm from "../../components/DynamicForm";
 
-const IndustryTypeEditModal = ({ formData: initialData, closeModal, onSubmit, isSubmitting }) => {
-  const [formData, setLocalFormData] = useState({
-    ...initialData,
-  });
-
+const IndustryTypeEditModal = ({
+  formData: initialData,
+  closeModal,
+  onSubmit,
+  isSubmitting,
+}) => {
+  const [formData, setLocalFormData] = useState({});
   const [imageFile, setImageFile] = useState(null);
 
-  // Submit handler
+  console.log("initail Data", initialData)
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const submitData = new FormData();
@@ -19,7 +22,6 @@ const IndustryTypeEditModal = ({ formData: initialData, closeModal, onSubmit, is
     submitData.append("description", formData?.description || "");
     submitData.append("is_active", formData?.is_active ?? true);
 
-    // Only append NEW image
     if (imageFile) {
       submitData.append("image", imageFile);
     }
@@ -39,9 +41,7 @@ const IndustryTypeEditModal = ({ formData: initialData, closeModal, onSubmit, is
       key: "industry_unique_id",
       label: "Unique ID",
       type: "text",
-      required: false,
-      placeholder: "",
-      disabled: true, // DynamicForm will need to support disabled
+      disabled: true,
     },
     {
       key: "description",
@@ -54,7 +54,17 @@ const IndustryTypeEditModal = ({ formData: initialData, closeModal, onSubmit, is
       label: "Upload Image (New Only)",
       type: "file",
       accept: "image/*",
-      onChange: (file) => setImageFile(file), // override DynamicForm handler
+      onChange: (file) => {
+        if (!file) return;
+
+        const previewUrl = URL.createObjectURL(file);
+
+        setImageFile(file);
+        setLocalFormData((prev) => ({
+          ...prev,
+          currentImage: previewUrl,
+        }));
+      },
     },
     {
       key: "is_active",
@@ -72,9 +82,15 @@ const IndustryTypeEditModal = ({ formData: initialData, closeModal, onSubmit, is
       isLoading={isSubmitting}
     >
       <DynamicForm
-        // onCancel={onCancel}
         fields={fields}
-        formData={formData}
+        formData={{
+          ...initialData,
+          ...formData,
+          currentImage:
+            formData.currentImage ??
+            initialData?.image_url?.low ??
+            "",
+        }}
         setFormData={setLocalFormData}
       />
     </EditModalLayout>
