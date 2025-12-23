@@ -8,6 +8,7 @@ import { useGetAllCategories, useGetCategoryByUniqueId } from "../../hooks/useCa
 import { useCreateProduct } from "../../hooks/useProduct";
 import { objectToFormData } from "../../utils/ObjectToFormData";
 import ProductForm from "../../form/products/productForm";
+import toBase64 from "../../utils/toBase64";
 
 const ProductManager = ({ onCancel }) => {
   // Ref to get attributes from AttributeRepeater
@@ -105,7 +106,7 @@ const ProductManager = ({ onCancel }) => {
       },
       placeholder: "e.g., apple1",
     },
-     ...PRODUCT_STATIC_FIELDS?.filter(field => !field?.isEditOnly),
+    ...PRODUCT_STATIC_FIELDS?.filter(field => !field?.isEditOnly),
   ];
 
   // CALLBACK: Update attributes ref
@@ -127,13 +128,36 @@ const ProductManager = ({ onCancel }) => {
         value: attr?.value,
       }));
 
-    const { product_image, product_attributes, ...rest } = formData;
+    const { product_image, product_images, ...rest } = formData;
 
-    const formDataToSend = objectToFormData(rest);
-    formDataToSend.append("product_image", product_image);
-    formDataToSend.append("product_attributes", JSON.stringify(validAttributes));
-    
-    await createProduct(formDataToSend);
+    // Convert hero image to base64
+    let heroImageBase64 = null;
+    if (product_image instanceof File) {
+      heroImageBase64 = await toBase64(product_image);
+    }
+
+    // Convert multiple product images to base64
+    let productImagesBase64 = [];
+    if (Array.isArray(product_images)) {
+      productImagesBase64 = await Promise.all(
+        product_images.map(async (file) => {
+          if (file instanceof File) {
+            return await toBase64(file);
+          }
+          return file; // if it's already a string URL
+        })
+      );
+    }
+
+    const payload = {
+      ...rest,
+      product_attributes: JSON.stringify(validAttributes),
+      product_image: heroImageBase64,
+      product_images: productImagesBase64,
+    };
+
+    console.log("payload", payload);
+    await createProduct(payload);
   };
 
   return (
@@ -153,10 +177,10 @@ const ProductManager = ({ onCancel }) => {
           additionalContent={
             <>
               {/* Attribute Repeater - automatically shows DB attributes + allows custom ones */}
-              <AttributeRepeater 
-                label="Product Attributes" 
-                predefined={dbAttributes} 
-                onChange={handleAttributesChange} 
+              <AttributeRepeater
+                label="Product Attributes"
+                predefined={dbAttributes}
+                onChange={handleAttributesChange}
               />
 
               {/* Form Action Buttons */}

@@ -53,6 +53,14 @@ export const productSchema = yup.object().shape({
       return value instanceof File && value.type.startsWith("image/");
     }),
 
+  product_images: yup.array().of(
+    yup.mixed().test("fileType", "Only image files are allowed", (value) => {
+      if (!value) return true;
+      if (typeof value === "string") return true;
+      return value instanceof File && value.type.startsWith("image/");
+    })
+  ).max(5, "You can only upload up to 5 images").nullable(),
+
   // Optional fields with validation
   product_description: yup.string().trim().max(1000, "Description cannot exceed 1000 characters").nullable(),
 

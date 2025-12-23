@@ -8,13 +8,9 @@ export const getAllProductsApi = (params = {}) => {
   return axiosInstance.get(`${BASE_URL}${queryString ? `?${queryString}` : ""}`);
 };
 
-// =========================== CREATE (JSON Body) ===========================
+// =========================== CREATE (JSON Body with Base64) ===========================
 export const createProductApi = (data) => {
-  return axiosInstance.post(`${BASE_URL}`, data, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  return axiosInstance.post(`${BASE_URL}`, data);
 };
 
 // =========================== UPDATE (multipart/form-data) ===========================
