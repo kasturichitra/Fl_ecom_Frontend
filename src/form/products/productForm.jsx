@@ -30,6 +30,7 @@ const ProductForm = ({
     formState: { errors },
     watch,
     setValue,
+    getValues,
   } = useForm({
     resolver: yupResolver(productSchema),
     defaultValues: productDefaultValues,
@@ -41,9 +42,28 @@ const ProductForm = ({
 
   // Handle form data changes from DynamicForm
   const setFormData = (updater) => {
-    const newData = typeof updater === "function" ? updater(formData) : updater;
-    Object?.keys(newData)?.forEach((key) => {
-      setValue(key, newData[key], { shouldValidate: true });
+    const currentValues = getValues();
+    const newData = typeof updater === "function" ? updater(currentValues) : updater;
+
+    if (!newData) return;
+
+    // Only update keys that have actually changed to prevent race conditions and unnecessary resets
+    Object.keys(newData).forEach((key) => {
+      const val1 = newData[key];
+      const val2 = currentValues[key];
+
+      // Handle comparison of files/arrays/primitives
+      const isDifferent = Array.isArray(val1)
+        ? JSON.stringify(val1) !== JSON.stringify(val2)
+        : val1 !== val2;
+
+      if (isDifferent) {
+        setValue(key, val1, {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true
+        });
+      }
     });
   };
 

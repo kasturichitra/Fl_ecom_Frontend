@@ -113,8 +113,11 @@ const DynamicForm = ({
   control = null,
   className = "",
 }) => {
-  const handleChange = (key, value) => {
-    setFormData((prev) => ({ ...prev, [key]: value }));
+  const handleChange = (key, valueOrUpdater) => {
+    setFormData((prev) => {
+      const nextValue = typeof valueOrUpdater === "function" ? valueOrUpdater(prev[key]) : valueOrUpdater;
+      return { ...prev, [key]: nextValue };
+    });
   };
 
   const handleRemoveFile = (key, index) => {
@@ -170,20 +173,27 @@ const DynamicForm = ({
 
     // Apply Max Count Limit
     if (field.multiple && field.maxCount) {
-      const currentCount = Array.isArray(formData[field.key]) ? formData[field.key].length : 0;
+      // Use the freshest possible count
+      const currentImages = formData[field.key] || [];
+      const currentCount = Array.isArray(currentImages) ? currentImages.length : 0;
+
       if (currentCount + files.length > field.maxCount) {
         alert(`You can only upload up to ${field.maxCount} images.`);
         files = files.slice(0, field.maxCount - currentCount);
       }
     }
 
+    if (files.length === 0 && field.multiple) return;
+
     // Update State
     if (field.onChange) {
       field.onChange(files);
     } else {
       if (field.multiple) {
-        const existing = Array.isArray(formData[field.key]) ? formData[field.key] : [];
-        handleChange(field.key, [...existing, ...files]);
+        handleChange(field.key, (existing) => {
+          const prevList = Array.isArray(existing) ? existing : [];
+          return [...prevList, ...files];
+        });
       } else {
         handleChange(field.key, files);
       }

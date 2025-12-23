@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import AttributeRepeater from "../../components/AttributeRepeater";
 import FormActionButtons from "../../components/FormActionButtons";
 import ScrollWrapper from "../../components/ui/ScrollWrapper";
@@ -67,7 +67,7 @@ const ProductManager = ({ onCancel }) => {
   // --------------------------
   // PRODUCT FIELD LIST
   // --------------------------
-  const productFields = [
+  const productFields = useMemo(() => [
     {
       key: "category_unique_id",
       label: "Category Unique ID *",
@@ -100,14 +100,14 @@ const ProductManager = ({ onCancel }) => {
         setShowBrandDropdown(false);
       },
       onSelect: (value) => {
-        // No additional action needed, react-hook-form handles the valu
+        // No additional action needed, react-hook-form handles the value
         setBrandSearchTerm("");
         setShowBrandDropdown(false);
       },
       placeholder: "e.g., apple1",
     },
-    ...PRODUCT_STATIC_FIELDS?.filter(field => !field?.isEditOnly),
-  ];
+    ...PRODUCT_STATIC_FIELDS?.filter((field) => !field?.isEditOnly),
+  ], [showCategoryDropdown, formattedCategories, showBrandDropdown, formattedBrands]);
 
   // CALLBACK: Update attributes ref
   const handleAttributesChange = (attributes) => {
