@@ -117,6 +117,7 @@ const BrandManager = ({ setShowAddModal, onCancel }) => {
           onCancel={handleCancel}
           defaultValues={defaultValues}
           isSubmitting={isCreatingBrand}
+          shouldReset={true}
           className="grid grid-cols-1 gap-4"
           additionalContent={
             <>
