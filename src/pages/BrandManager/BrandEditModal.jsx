@@ -17,10 +17,17 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
     brand_name: brand?.brand_name || "",
     brand_unique_id: brand?.brand_unique_id || "",
     brand_description: brand?.brand_description || "",
-    brand_image: brand?.brand_image?.low || null,
-    currentImage: brand?.brand_image?.low || brand?.brand_image?.medium || brand?.brand_image?.original || null,
+    // store existing image url for reference
+    brand_image: brand?.brand_image?.low || brand?.brand_image?.medium || brand?.brand_image?.original || null,
+    currentImage:
+      brand?.brand_image?.low ||
+      brand?.brand_image?.medium ||
+      brand?.brand_image?.original ||
+      brand?.brand_image?.url ||
+      null,
     is_active: brand?.is_active ?? true,
   });
+  const [imageFile, setImageFile] = useState(null);
 
   const [errors, setErrors] = useState({});
 
@@ -35,20 +42,17 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
       brand_unique_id: brand?.brand_unique_id || "",
       brand_description: brand?.brand_description || "",
       brand_image: lowUrl,
-      currentImage: lowUrl,
+      currentImage:
+        lowUrl ||
+        brand?.brand_image?.medium ||
+        brand?.brand_image?.original ||
+        brand?.brand_image?.url ||
+        null,
       is_active: brand?.is_active ?? true,
     });
+    setImageFile(null);
   }, [brand]);
-
   // if (!form) return null;
-
-  const removeImage = () => {
-    setForm((prev) => ({
-      ...prev,
-      brand_image: "REMOVE",
-      currentImage: null,
-    }));
-  };
 
   const validate = () => {
     const e = {};
@@ -63,9 +67,17 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
     if (!validate()) return;
 
     let image_base64 = null;
-    if (form?.brand_image instanceof File) {
-      image_base64 = await toBase64(form.brand_image);
+    if (imageFile instanceof File) {
+      image_base64 = await toBase64(imageFile);
     }
+
+    const hadInitialImage =
+      !!(brand?.brand_image?.low ||
+        brand?.brand_image?.medium ||
+        brand?.brand_image?.original ||
+        brand?.brand_image?.url);
+
+    const shouldRemoveImage = hadInitialImage && !imageFile && !form?.currentImage;
 
     const payload = {
       brand_name: form?.brand_name,
@@ -73,7 +85,7 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
       categories: form?.categories,
       is_active: form?.is_active,
       ...(image_base64 && { image_base64 }),
-      ...(form.currentImage === "REMOVE" && { remove_image: true }),
+      ...(shouldRemoveImage && { remove_image: true }),
     };
 
     await updateBrand({
@@ -104,22 +116,20 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
       rows: 4,
     },
     {
-      key: "brand_image",
+      key: "image",
       label: "Brand Image",
       type: "file",
       accept: "image/*",
-      // onRemove: removeImage,
       onChange: (file) => {
         if (!file) return;
 
         const previewUrl = URL.createObjectURL(file);
 
-        // setImageFile(file);
         setForm((prev) => ({
           ...prev,
-          brand_image: file,
           currentImage: previewUrl,
         }));
+        setImageFile(file);
       },
     },
     {
@@ -153,13 +163,13 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
         fields={fields}
         formData={{
           ...form,
-          // currentImage:
-          //   form?.currentImage ||
-          //   brand?.brand_image?.low ||
-          //   brand?.brand_image?.medium ||
-          //   brand?.brand_image?.high ||
-          //   brand?.brand_image?.url ||
-          //   "",
+          currentImage:
+            form?.currentImage ||
+            brand?.brand_image?.low ||
+            brand?.brand_image?.medium ||
+            brand?.brand_image?.original ||
+            brand?.brand_image?.url ||
+            "",
         }}
         setFormData={setForm}
       />
