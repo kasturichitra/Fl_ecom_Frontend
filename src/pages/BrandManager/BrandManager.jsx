@@ -34,7 +34,7 @@ const BrandManager = ({ setShowAddModal, onCancel }) => {
       placeholder: "Enter brand description",
     },
     {
-      key: "image",
+      key: "brand_image",
       label: "Brand Image *",
       type: "file",
       accept: "image/*",
@@ -47,24 +47,34 @@ const BrandManager = ({ setShowAddModal, onCancel }) => {
   ], []);
 
   const handleCreateBrand = async (formData) => {
-    let image_base64 = null;
-    if (formData?.image instanceof File) {
-      image_base64 = await toBase64(formData.image);
+    try {
+      let image_base64 = null;
+      if (formData?.brand_image instanceof File) {
+        image_base64 = await toBase64(formData.brand_image);
+      }
+
+      const payload = {
+        brand_name: formData?.brand_name,
+        brand_description: formData?.brand_description,
+        categories: formData?.categories,
+        is_active: formData?.is_active,
+        // created_by: "Admin",
+        // updated_by: "Admin",
+        ...(image_base64 && { image_base64 }),
+      };
+
+      console.log("payload", payload);
+
+      await createBrand(payload);
+
+      // Close the modal after successful creation
+      if (setShowAddModal) {
+        setShowAddModal(false);
+      }
+    } catch (error) {
+      console.error("Error creating brand:", error);
+      // Error will be handled by the mutation hook
     }
-
-    const payload = {
-      brand_name: formData?.brand_name,
-      brand_description: formData?.brand_description,
-      categories: formData?.categories,
-      is_active: formData?.is_active,
-      // created_by: "Admin",
-      // updated_by: "Admin",
-      ...(image_base64 && { image_base64 }),
-    };
-
-    console.log("payload", payload);
-
-    await createBrand(payload);
   };
 
   const defaultValues = brandFormDefaults();
@@ -107,6 +117,7 @@ const BrandManager = ({ setShowAddModal, onCancel }) => {
           onCancel={handleCancel}
           defaultValues={defaultValues}
           isSubmitting={isCreatingBrand}
+          shouldReset={true}
           className="grid grid-cols-1 gap-4"
           additionalContent={
             <>
