@@ -13,6 +13,7 @@ const BrandForm = ({
   isSubmitting,
   additionalContent,
   className,
+  shouldReset = false,
 }) => {
   const {
     register,
@@ -21,6 +22,7 @@ const BrandForm = ({
     setValue,
     control,
     getValues,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(brandSchema),
@@ -30,8 +32,15 @@ const BrandForm = ({
 
   const formData = watch();
 
+  const handleFormSubmit = async (data) => {
+    await onSubmit(data);
+    if (shouldReset) {
+      reset(defaultValues);
+    }
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className={className}>
+    <form onSubmit={handleSubmit(handleFormSubmit)} className={className}>
       <CategorySelector
         categories={categories}
         selected={formData?.categories}
