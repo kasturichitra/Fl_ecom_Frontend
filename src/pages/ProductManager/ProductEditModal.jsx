@@ -1,11 +1,11 @@
-import { useEffect, useState, useMemo, useRef } from "react";
-import EditModalLayout from "../../components/EditModalLayout";
-import DynamicForm from "../../components/DynamicForm";
-import { useGetAllCategories } from "../../hooks/useCategory";
-import { useGetAllBrands } from "../../hooks/useBrand";
-import { useUpdateProduct } from "../../hooks/useProduct";
-import { PRODUCT_STATIC_FIELDS } from "../../constants/productFields";
+import { useEffect, useMemo, useRef, useState } from "react";
 import AttributeRepeater from "../../components/AttributeRepeater";
+import DynamicForm from "../../components/DynamicForm";
+import EditModalLayout from "../../components/EditModalLayout";
+import { PRODUCT_STATIC_FIELDS } from "../../constants/productFields";
+import { useGetAllBrands } from "../../hooks/useBrand";
+import { useGetAllCategories } from "../../hooks/useCategory";
+import { useUpdateProduct } from "../../hooks/useProduct";
 import toBase64 from "../../utils/toBase64";
 
 const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {

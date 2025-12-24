@@ -1,13 +1,12 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import AttributeRepeater from "../../components/AttributeRepeater";
 import FormActionButtons from "../../components/FormActionButtons";
 import ScrollWrapper from "../../components/ui/ScrollWrapper";
 import { PRODUCT_STATIC_FIELDS } from "../../constants/productFields";
+import ProductForm from "../../form/products/productForm";
 import { useGetAllBrands } from "../../hooks/useBrand";
 import { useGetAllCategories, useGetCategoryByUniqueId } from "../../hooks/useCategory";
 import { useCreateProduct } from "../../hooks/useProduct";
-import { objectToFormData } from "../../utils/ObjectToFormData";
-import ProductForm from "../../form/products/productForm";
 import toBase64 from "../../utils/toBase64";
 
 const ProductManager = ({ onCancel }) => {

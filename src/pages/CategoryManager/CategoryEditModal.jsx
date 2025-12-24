@@ -180,7 +180,7 @@ const CategoryEditModal = ({ category, onClose, onSuccess }) => {
       label: "Category Image",
       type: "file",
       accept: "image/*",
-      onRemove: removeImage,
+      // onRemove: removeImage,
     },
     {
       key: "is_active",

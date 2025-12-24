@@ -9,7 +9,9 @@ const IndustryTypeEditModal = ({
   onSubmit,
   isSubmitting,
 }) => {
-  const [formData, setLocalFormData] = useState({});
+  const [formData, setLocalFormData] = useState({
+    currentImage: initialData?.image_url?.low || null,
+  });
   const [imageFile, setImageFile] = useState(null);
 
   const handleSubmit = async (e) => {
@@ -88,12 +90,6 @@ const IndustryTypeEditModal = ({
         formData={{
           ...initialData,
           ...formData,
-          currentImage:
-            formData.currentImage ||
-            initialData?.image_url?.low ||
-            initialData?.image_url?.medium ||
-            initialData?.image_url?.original ||
-            (typeof initialData?.image_url === "string" ? initialData.image_url : ""),
         }}
         setFormData={setLocalFormData}
       />
