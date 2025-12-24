@@ -126,7 +126,7 @@ const ProductManager = ({ onCancel }) => {
         value: attr?.value,
       }));
 
-    const { product_image, product_images, ...rest } = formData;
+    const { product_image, product_images, currentImage, ...rest } = formData;
 
     // Helper to strip base64 prefix
     const cleanBase64 = (b64) => {
