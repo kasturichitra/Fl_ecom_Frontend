@@ -132,7 +132,7 @@ const DynamicForm = ({
       return {
         ...prev,
         [key]: null,
-        currentImage: key === "image" ? null : prev.currentImage,
+        currentImage: null,
       };
     });
   };
@@ -195,7 +195,13 @@ const DynamicForm = ({
           return [...prevList, ...files];
         });
       } else {
-        handleChange(field.key, files);
+        // Clear currentImage when new file is selected and set manual preview
+        const previewUrl = URL.createObjectURL(files);
+        setFormData((prev) => ({
+          ...prev,
+          [field.key]: files,
+          currentImage: previewUrl,
+        }));
       }
     }
   };
@@ -346,10 +352,16 @@ const DynamicForm = ({
                 <input
                   id={field.key}
                   type="file"
+                  {...(isUsingRHF ? register(field.key) : {})}
                   accept={field.accept}
                   multiple={field.multiple}
                   className="hidden"
-                  onChange={(e) => processFiles(field, e.target.files)}
+                  onChange={(e) => {
+                    processFiles(field, e.target.files);
+                    if (isUsingRHF) {
+                      register(field.key).onChange(e);
+                    }
+                  }}
                 />
 
                 {/* Generic Image Previews */}

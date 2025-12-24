@@ -122,6 +122,14 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
     });
   }, [product?.product_unique_id || product]);
 
+  const removeImage = () => {
+    setForm((prev) => ({
+      ...prev,
+      product_image: "REMOVE",
+      currentImage: null,
+    }));
+  };
+
   // format dropdowns
   const formattedCategories = categories?.data?.map((c) => ({ value: c?.category_unique_id, label: c?.category_name }));
   const formattedBrands = brands?.data?.map((b) => ({ value: b?.brand_unique_id, label: b?.brand_name }));
@@ -175,6 +183,7 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
       product_attributes: JSON.stringify(validAttributes),
       // Only include these keys if there is actually new data to upload
       ...(heroImagePayload && { product_image: heroImagePayload }),
+      ...(form.product_image === "REMOVE" && { remove_image: true }),
       ...(newGalleryImages.length > 0 && { product_images: newGalleryImages }),
     };
 
@@ -224,7 +233,11 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
 
       // image not required on edit
       if (field.key === "product_image") {
-        return { ...field, required: false };
+        return {
+          ...field,
+          required: false,
+          onRemove: removeImage
+        };
       }
 
       return field;
