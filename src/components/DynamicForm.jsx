@@ -83,7 +83,7 @@ const ImagePreview = ({ item, onRemove, onMoveLeft, onMoveRight, showArrows }) =
           </div>
         )}
       </div>
-      <div className="flex flex-col items-center max-w-[96px]">
+      <div className="flex flex-col items-center max-w-24">
         <span className="text-[10px] text-gray-500 truncate w-full text-center font-medium" title={`${fileName} ${fileSize ? `(${fileSize})` : ""}`}>
           {fileName}
         </span>
@@ -113,6 +113,7 @@ const DynamicForm = ({
   control = null,
   className = "",
 }) => {
+  console.log("FormData coming into dynamic form: ", formData);
   const handleChange = (key, valueOrUpdater) => {
     setFormData((prev) => {
       const nextValue = typeof valueOrUpdater === "function" ? valueOrUpdater(prev[key]) : valueOrUpdater;
@@ -366,6 +367,7 @@ const DynamicForm = ({
 
                 {/* Generic Image Previews */}
                 {(() => {
+                  console.log("formData at line 369 of dynamic form", formData);
                   const items = formData[field.key] || formData.currentImage;
                   const displayItems = Array.isArray(items) ? items : items ? [items] : [];
 

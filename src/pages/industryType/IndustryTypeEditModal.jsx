@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import EditModalLayout from "../../components/EditModalLayout";
+import { useState } from "react";
 import DynamicForm from "../../components/DynamicForm";
+import EditModalLayout from "../../components/EditModalLayout";
 import toBase64 from "../../utils/toBase64";
 
 const IndustryTypeEditModal = ({
@@ -11,7 +11,6 @@ const IndustryTypeEditModal = ({
 }) => {
   const [formData, setLocalFormData] = useState({});
   const [imageFile, setImageFile] = useState(null);
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();

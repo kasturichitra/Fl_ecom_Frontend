@@ -10,35 +10,37 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
   const { mutateAsync: updateBrand, isPending: isUpdatingBrand } = useUpdateBrand();
   const { data: categoriesData } = useGetAllCategories({});
 
+  console.log("Brand", brand);
+
   const [form, setForm] = useState({
-    categories: [],
-    brand_name: "",
-    brand_unique_id: "",
-    brand_description: "",
-    brand_image: null,
-    currentImage: null,
-    is_active: true,
+    categories: brand?.categories || [],
+    brand_name: brand?.brand_name || "",
+    brand_unique_id: brand?.brand_unique_id || "",
+    brand_description: brand?.brand_description || "",
+    brand_image: brand?.brand_image?.low || null,
+    currentImage: brand?.brand_image?.low || brand?.brand_image?.medium || brand?.brand_image?.original || null,
+    is_active: brand?.is_active ?? true,
   });
 
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    if (brand) {
-      const baseUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
+    if (!brand) return;
 
-      const lowUrl = brand?.brand_image?.low || brand?.brand_image?.url || "";
+    const lowUrl = brand?.brand_image?.low || brand?.brand_image?.url || null;
 
-      setForm({
-        categories: brand?.categories || [],
-        brand_name: brand?.brand_name || "",
-        brand_unique_id: brand?.brand_unique_id || "",
-        brand_description: brand?.brand_description || "",
-        brand_image: null,
-        currentImage: lowUrl || null,
-        is_active: brand?.is_active ?? true,
-      });
-    }
+    setForm({
+      categories: brand?.categories || [],
+      brand_name: brand?.brand_name || "",
+      brand_unique_id: brand?.brand_unique_id || "",
+      brand_description: brand?.brand_description || "",
+      brand_image: lowUrl,
+      currentImage: lowUrl,
+      is_active: brand?.is_active ?? true,
+    });
   }, [brand]);
+
+  // if (!form) return null;
 
   const removeImage = () => {
     setForm((prev) => ({
@@ -71,7 +73,7 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
       categories: form?.categories,
       is_active: form?.is_active,
       ...(image_base64 && { image_base64 }),
-      ...(form.brand_image === "REMOVE" && { remove_image: true }),
+      ...(form.currentImage === "REMOVE" && { remove_image: true }),
     };
 
     await updateBrand({
@@ -106,7 +108,19 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
       label: "Brand Image",
       type: "file",
       accept: "image/*",
-      onRemove: removeImage,
+      // onRemove: removeImage,
+      onChange: (file) => {
+        if (!file) return;
+
+        const previewUrl = URL.createObjectURL(file);
+
+        // setImageFile(file);
+        setForm((prev) => ({
+          ...prev,
+          brand_image: file,
+          currentImage: previewUrl,
+        }));
+      },
     },
     {
       key: "is_active",
@@ -135,7 +149,20 @@ const BrandEditModal = ({ brand, onClose, onSuccess }) => {
         {errors?.categories && <p className="text-red-500 text-sm mt-2">{errors?.categories}</p>}
       </div>
 
-      <DynamicForm fields={fields} formData={form} setFormData={setForm} />
+      <DynamicForm
+        fields={fields}
+        formData={{
+          ...form,
+          // currentImage:
+          //   form?.currentImage ||
+          //   brand?.brand_image?.low ||
+          //   brand?.brand_image?.medium ||
+          //   brand?.brand_image?.high ||
+          //   brand?.brand_image?.url ||
+          //   "",
+        }}
+        setFormData={setForm}
+      />
     </EditModalLayout>
   );
 };

@@ -6,7 +6,7 @@ import DynamicForm from "../../components/DynamicForm";
 
 /**
  * ProductForm - React Hook Form wrapper for the product form
- * 
+ *
  * @param {Object} props
  * @param {Array} props.fields - Array of field configurations
  * @param {Function} props.onSubmit - Submit handler that receives validated form data
@@ -52,16 +52,26 @@ const ProductForm = ({
       const val1 = newData[key];
       const val2 = currentValues[key];
 
-      // Handle comparison of files/arrays/primitives
-      const isDifferent = Array.isArray(val1)
-        ? JSON.stringify(val1) !== JSON.stringify(val2)
-        : val1 !== val2;
+      let isDifferent = false;
+      if (Array.isArray(val1)) {
+        // Deep compare arrays (simple version for this use case)
+        isDifferent = JSON.stringify(val1) !== JSON.stringify(val2);
+
+        // If they look same by stringify but one might have Files, check them
+        if (!isDifferent && val1.some((v) => v instanceof File)) {
+          isDifferent = val1.length !== val2.length || val1.some((v, i) => v !== val2[i]);
+        }
+      } else if (val1 instanceof File || val2 instanceof File) {
+        isDifferent = val1 !== val2;
+      } else {
+        isDifferent = val1 !== val2;
+      }
 
       if (isDifferent) {
         setValue(key, val1, {
           shouldValidate: true,
           shouldDirty: true,
-          shouldTouch: true
+          shouldTouch: true,
         });
       }
     });

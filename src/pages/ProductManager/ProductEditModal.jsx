@@ -40,9 +40,8 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
 
   const attributesRef = useRef([]);
 
-
-  console.log("product", product)
-  console.log("product_image", product?.product_image?.["low"])
+  console.log("product", product);
+  console.log("product_image", product?.product_image?.["low"]);
 
   // Map product.product_attributes to the AttributeRepeater 'predefined' format
   const productDbAttributes = useMemo(
@@ -92,10 +91,13 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
     const heroUrl = getFullUrl(heroSource);
 
     // Map gallery images
-    const gallerySource = product?.product_images || product?.Product_Images || product?.product_gallery || product?.images || [];
+    const gallerySource =
+      product?.product_images || product?.Product_Images || product?.product_gallery || product?.images || [];
     const sourceArray = Array.isArray(gallerySource)
       ? gallerySource
-      : (typeof gallerySource === "string" && gallerySource.length > 0 ? gallerySource.split(",").map(s => s.trim()) : []);
+      : typeof gallerySource === "string" && gallerySource.length > 0
+      ? gallerySource.split(",").map((s) => s.trim())
+      : [];
 
     const existingGalleryUrls = sourceArray?.map(getFullUrl).filter(Boolean);
 
@@ -120,7 +122,7 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
       gender: product?.gender ?? "",
       product_attributes: attributesRef?.current,
     });
-  }, [product?.product_unique_id || product]);
+  }, [product?.product_unique_id]);
 
   const removeImage = () => {
     setForm((prev) => ({
@@ -236,7 +238,20 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
         return {
           ...field,
           required: false,
-          onRemove: removeImage
+          onRemove: removeImage,
+        };
+      }
+
+      // gallery removal
+      if (field.key === "product_images") {
+        return {
+          ...field,
+          onRemove: (index) => {
+            setForm((prev) => ({
+              ...prev,
+              product_images: prev.product_images.filter((_, i) => i !== index),
+            }));
+          },
         };
       }
 
