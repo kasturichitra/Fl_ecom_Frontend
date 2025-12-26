@@ -66,7 +66,7 @@ const OrderListManager = () => {
       cellClassName: "px-6 py-4 text-left text-sm font-medium tracking-wider text-gray-700 font-mono",
       renderCell: (params) => (
         <span className="font-mono text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded-full">
-          {params?.value ?? ""}
+          {params?.value ?? "-"}
         </span>
       ),
     },
@@ -81,7 +81,7 @@ const OrderListManager = () => {
       cellClassName: "px-6 py-4 text-left text-sm tracking-wider text-gray-700 font-medium",
       renderCell: (params) => (
         <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
-          {params?.value ?? ""}
+          {params?.value ?? "-"}
         </span>
       ),
     },
@@ -125,7 +125,7 @@ const OrderListManager = () => {
       hideable: false,
       disableColumnMenu: true,
       cellClassName: "px-6 py-4 text-left text-sm tracking-wider text-gray-700 capitalize",
-      renderCell: (params) => <span className="font-semibold text-gray-800">{params?.value ?? ""}</span>,
+      renderCell: (params) => <span className="font-semibold text-gray-800">{params?.value ?? "-"}</span>,
     },
     {
       field: "order_type",
@@ -135,7 +135,7 @@ const OrderListManager = () => {
       hideable: false,
       disableColumnMenu: true,
       cellClassName: "px-6 py-4 text-left text-sm tracking-wider text-gray-700 capitalize",
-      renderCell: (params) => <span className="font-semibold text-gray-800">{params?.value ?? ""}</span>,
+      renderCell: (params) => <span className="font-semibold text-gray-800">{params?.value ?? "-"}</span>,
     },
 
     {

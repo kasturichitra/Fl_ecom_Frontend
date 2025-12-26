@@ -127,19 +127,32 @@ export default function OrderProductsDetailes() {
             </div>
           </InfoCard>
 
-          <InfoCard icon={MapPin} title="Delivery Address" bgColor="bg-purple-100 text-purple-600">
-            <div className="space-y-2 text-gray-700">
-              <p className="font-semibold">
-                {orderData?.address?.house_number}, {orderData?.address?.street}
-              </p>
-              <p>
-                {orderData?.address?.city}, {orderData?.address?.district}
-              </p>
-              <p>
-                {orderData?.address?.state} - {orderData?.address?.postal_code}
-              </p>
-              <p className="font-medium">{orderData?.address?.country}</p>
-            </div>
+          <InfoCard icon={MapPin} title={`${orderData?.order_type === "Offline" ? "Address" : "Delivery Address"}`} bgColor="bg-purple-100 text-purple-600">
+            {orderData?.order_type === "Offline" ? (
+              <div className="space-y-2 text-gray-700">
+                <p className="font-semibold">{orderData?.offline_address || "N/A"}</p>
+                {/* {orderData?.customer_name && (
+                  <p className="text-sm text-gray-600">
+                    {orderData?.customer_name} {orderData?.mobile_number ? `• ${orderData.mobile_number}` : ""}
+                  </p>
+                )} */}
+              </div>
+            ) : (
+              <div className="space-y-2 text-gray-700">
+                <p className="font-semibold">
+                  {orderData?.address?.house_number || ""}
+                  {orderData?.address?.street ? `, ${orderData.address.street}` : ""}
+                </p>
+                <p>
+                  {orderData?.address?.city || ""}
+                  {orderData?.address?.district ? `, ${orderData.address.district}` : ""}
+                </p>
+                <p>
+                  {orderData?.address?.state || ""} {orderData?.address?.postal_code ? `- ${orderData.address.postal_code}` : ""}
+                </p>
+                <p className="font-medium">{orderData?.address?.country || ""}</p>
+              </div>
+            )}
           </InfoCard>
         </div>
 
