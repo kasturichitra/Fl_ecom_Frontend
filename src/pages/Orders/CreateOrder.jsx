@@ -240,86 +240,86 @@ const CreateOrder = () => {
   };
 
   const handleHoldOrder = () => {
-  try {
-    const HELD_ORDERS_KEY = "heldOrders";
+    try {
+      const HELD_ORDERS_KEY = "heldOrders";
 
-    const existing = JSON.parse(localStorage.getItem(HELD_ORDERS_KEY)) || [];
+      const existing = JSON.parse(localStorage.getItem(HELD_ORDERS_KEY)) || [];
 
-    // Helper to merge product lists (sum quantities if product exists)
-    const mergeProducts = (existingProducts = [], newProducts = []) => {
-      const map = {};
-      existingProducts.forEach((p) => {
-        map[p.product_unique_id] = { ...p };
-      });
-      newProducts.forEach((p) => {
-        const id = p.product_unique_id;
-        if (map[id]) {
-          const existingQty = Number(map[id].quantity || 0);
-          const newQty = Number(p.quantity || 0);
-          map[id] = { ...map[id], ...p, quantity: existingQty + newQty };
-        } else {
-          map[id] = { ...p };
+      // Helper to merge product lists (sum quantities if product exists)
+      const mergeProducts = (existingProducts = [], newProducts = []) => {
+        const map = {};
+        existingProducts.forEach((p) => {
+          map[p.product_unique_id] = { ...p };
+        });
+        newProducts.forEach((p) => {
+          const id = p.product_unique_id;
+          if (map[id]) {
+            const existingQty = Number(map[id].quantity || 0);
+            const newQty = Number(p.quantity || 0);
+            map[id] = { ...map[id], ...p, quantity: existingQty + newQty };
+          } else {
+            map[id] = { ...p };
+          }
+        });
+        return Object.values(map);
+      };
+
+      // If editing an existing held order, update that entry
+      if (editingHeldId) {
+        const idx = existing.findIndex((h) => h.id === editingHeldId);
+        if (idx !== -1) {
+          // When editing an existing held order we should REPLACE the products
+          // with the current selectedProducts (so removed items are removed).
+          const updated = {
+            ...existing[idx],
+            customerForm: { ...customerForm },
+            selectedProducts: (selectedProducts || []).map((p) => ({ ...p })),
+            orderDiscount,
+            modifiedAt: new Date().toISOString(),
+          };
+          const newList = [...existing];
+          newList[idx] = updated;
+          localStorage.setItem(HELD_ORDERS_KEY, JSON.stringify(newList));
+          setHeldOrders(newList);
+          setEditingHeldId(null);
+          // Reset form
+          setCustomerForm({ customerName: "", mobileNumber: "", address: "" });
+          setSelectedProducts([]);
+          setOrderDiscount(0);
+          toast.success("Held order updated");
+          return;
         }
-      });
-      return Object.values(map);
-    };
-
-    // If editing an existing held order, update that entry
-    if (editingHeldId) {
-      const idx = existing.findIndex((h) => h.id === editingHeldId);
-      if (idx !== -1) {
-        // When editing an existing held order we should REPLACE the products
-        // with the current selectedProducts (so removed items are removed).
-        const updated = {
-          ...existing[idx],
-          customerForm: { ...customerForm },
-          selectedProducts: (selectedProducts || []).map((p) => ({ ...p })),
-          orderDiscount,
-          modifiedAt: new Date().toISOString(),
-        };
-        const newList = [...existing];
-        newList[idx] = updated;
-        localStorage.setItem(HELD_ORDERS_KEY, JSON.stringify(newList));
-        setHeldOrders(newList);
-        setEditingHeldId(null);
-        // Reset form
-        setCustomerForm({ customerName: "", mobileNumber: "", address: "" });
-        setSelectedProducts([]);
-        setOrderDiscount(0);
-        toast.success("Held order updated");
-        return;
       }
+
+      // Note: we no longer auto-merge by mobile. Creating a held order will
+      // always create a new entry (unless editing an existing held order).
+
+      // No existing entry — create a new held order
+      const held = {
+        id: Date.now(),
+        createdAt: new Date().toISOString(),
+        customerForm: { ...customerForm },
+        selectedProducts: selectedProducts.map((p) => ({ ...p })),
+        orderDiscount,
+      };
+
+      const newList = [...existing, held];
+      localStorage.setItem(HELD_ORDERS_KEY, JSON.stringify(newList));
+
+      // update local state so table refreshes immediately
+      setHeldOrders(newList);
+
+      // Reset local state similar to successful create
+      setCustomerForm({ customerName: "", mobileNumber: "", address: "" });
+      setSelectedProducts([]);
+      setOrderDiscount(0);
+
+      toast.success("Order held successfully");
+    } catch (err) {
+      console.error("Hold order error:", err);
+      toast.error("Failed to hold order. Please try again.");
     }
-
-    // Note: we no longer auto-merge by mobile. Creating a held order will
-    // always create a new entry (unless editing an existing held order).
-
-    // No existing entry — create a new held order
-    const held = {
-      id: Date.now(),
-      createdAt: new Date().toISOString(),
-      customerForm: { ...customerForm },
-      selectedProducts: selectedProducts.map((p) => ({ ...p })),
-      orderDiscount,
-    };
-
-    const newList = [...existing, held];
-    localStorage.setItem(HELD_ORDERS_KEY, JSON.stringify(newList));
-
-    // update local state so table refreshes immediately
-    setHeldOrders(newList);
-
-    // Reset local state similar to successful create
-    setCustomerForm({ customerName: "", mobileNumber: "", address: "" });
-    setSelectedProducts([]);
-    setOrderDiscount(0);
-
-    toast.success("Order held successfully");
-  } catch (err) {
-    console.error("Hold order error:", err);
-    toast.error("Failed to hold order. Please try again.");
-  }
-};
+  };
 
   // Load held orders from localStorage
   const loadHeldOrders = () => {
@@ -383,16 +383,16 @@ const CreateOrder = () => {
     customerForm?.customerName.trim() && customerForm?.mobileNumber.trim() && selectedProducts?.length > 0;
 
   const columns = [
-    { field: "id", headerName: "ID", width: 120 },
-    { field: "customerName", headerName: "Customer", width: 220 },
-    { field: "mobile", headerName: "Mobile", width: 150 },
-    { field: "items", headerName: "Items", width: 100 },
-    { field: "createdAt", headerName: "Created At", width: 200 },
-    { field: "total", headerName: "Total (₹)", width: 140 },
+    { field: "id", headerName: "ID", flex: 1, },
+    { field: "customerName", headerName: "Customer", flex: 1, },
+    { field: "mobile", headerName: "Mobile", flex: 1, },
+    { field: "items", headerName: "Items", flex: 1, },
+    { field: "createdAt", headerName: "Created At", flex: 1, },
+    { field: "total", headerName: "Total (₹)", flex: 1, },
     {
       field: "actions",
       headerName: "Actions",
-      width: 180,
+      flex: 1,
       sortable: false,
       renderCell: (params) => {
         return (
@@ -596,7 +596,7 @@ const CreateOrder = () => {
                           {product?.product_name.charAt(0)}
                         </div> */}
 
-                        <img 
+                        <img
                           src={product?.product_image?.low || "https://placehold.co/400x400/indigo/white?text=Product"}
                           className="object-cover size-12 rounded-md"
                           alt={product?.product_name}
@@ -697,11 +697,10 @@ const CreateOrder = () => {
                   <button
                     onClick={handleHoldOrder}
                     disabled={!isFormValid || isCreatingOrder}
-                    className={`w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transition-all flex items-center justify-center gap-3 ${
-                      !isFormValid || isCreatingOrder
+                    className={`w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transition-all flex items-center justify-center gap-3 ${!isFormValid || isCreatingOrder
                         ? "bg-gray-400 cursor-not-allowed"
                         : "bg-blue-600 hover:bg-blue-700 hover:shadow-blue-200 hover:-translate-y-1"
-                    }`}
+                      }`}
                   >
                     {isCreatingOrder ? (
                       <>Processing...</>
@@ -714,11 +713,10 @@ const CreateOrder = () => {
                   <button
                     onClick={handleSubmitOrder}
                     disabled={!isFormValid || isCreatingOrder}
-                    className={`w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transition-all flex items-center justify-center gap-3 ${
-                      !isFormValid || isCreatingOrder
+                    className={`w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transition-all flex items-center justify-center gap-3 ${!isFormValid || isCreatingOrder
                         ? "bg-gray-400 cursor-not-allowed"
                         : "bg-blue-600 hover:bg-blue-700 hover:shadow-blue-200 hover:-translate-y-1"
-                    }`}
+                      }`}
                   >
                     {isCreatingOrder ? (
                       <>Processing...</>
@@ -792,7 +790,7 @@ const CreateOrder = () => {
                 </button>
               )}
             </div>
-          </div>  
+          </div>
 
           <DataTable
             rows={rows}
