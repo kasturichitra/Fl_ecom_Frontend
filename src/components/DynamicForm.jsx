@@ -210,9 +210,10 @@ const DynamicForm = ({
     console.log("Field onChange exists?", !!field.onChange);
     console.log("Field onChange type:", typeof field.onChange);
     console.log("Field onChange value:", field.onChange);
-
+    
+    console.log("Field coming into the process files", field);
     // Update State - check explicitly for function type
-    if (field.onChange && typeof field.onChange === "function") {
+    if (field.onChange) {
       console.log("Field onchange is triggered", files);
       field.onChange(files);
     } else {
