@@ -1,6 +1,9 @@
-import { useEffect, useState, useMemo, useRef } from "react";
-import EditModalLayout from "../../components/EditModalLayout";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import AttributeRepeater from "../../components/AttributeRepeater";
 import DynamicForm from "../../components/DynamicForm";
+import EditModalLayout from "../../components/EditModalLayout";
+import { PRODUCT_STATIC_FIELDS, PRODUCT_UPDATE_STATIC_FIELDS } from "../../constants/productFields";
+import { useGetAllBrands } from "../../hooks/useBrand";
 import { useGetAllCategories } from "../../hooks/useCategory";
 import { useGetAllBrands } from "../../hooks/useBrand";
 import { useUpdateProduct } from "../../hooks/useProduct";
@@ -29,6 +32,8 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
     gender: "",
     product_attributes: [],
   });
+
+  const [imageFile, setImageFile] = useState(null);
 
   const [categorySearchTerm, setCategorySearchTerm] = useState("");
   const [brandSearchTerm, setBrandSearchTerm] = useState("");
@@ -62,7 +67,43 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
 
   useEffect(() => {
     if (!product) return;
-    // Only set once to prevent extra rerenders
+    const baseUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
+
+    // Path resolution helper supporting nested .low property
+    const getFullUrl = (img) => {
+      if (!img) return null;
+      let imgStr = "";
+      if (typeof img === "string") {
+        imgStr = img;
+      } else if (typeof img === "object") {
+        // Prioritize the 'low' property as per user information, then fallbacks
+        imgStr =
+          img.low || img.high || img.original || img.url || img.image_url || img.path || img.image || img.file || "";
+      }
+
+      if (!imgStr || typeof imgStr !== "string") return null;
+      if (imgStr.startsWith("http")) return imgStr;
+
+      const path = imgStr.replace(/\\/g, "/").replace(/^\//, "");
+      return `${baseUrl}/${path}`;
+    };
+
+    // Map hero image
+    const heroSource = product?.product_image || product?.Product_Image || product?.image || product?.Image;
+    const heroUrl = getFullUrl(heroSource);
+
+    // Map gallery images
+    const gallerySource =
+      product?.product_images || product?.Product_Images || product?.product_gallery || product?.images || [];
+
+    const sourceArray = Array.isArray(gallerySource)
+      ? gallerySource
+      : typeof gallerySource === "string" && gallerySource.length > 0
+      ? gallerySource.split(",").map((s) => s.trim())
+      : [];
+
+    const existingGalleryUrls = sourceArray?.map((s) => s.low || s.medium || s.original).filter(Boolean);
+
     setForm({
       category_unique_id: product?.category_unique_id ?? "",
       brand_unique_id: product?.brand_unique_id ?? "",
@@ -71,19 +112,21 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
       product_description: product?.product_description ?? "",
       product_color: product?.product_color ?? "",
       product_size: product?.product_size ?? "",
-      product_image: null,
-      currentImage: product?.product_images?.[0] ? `${import.meta.env.VITE_API_URL}/${product.product_images[0]}` : null,
-      price: product?.price ?? "",
-      discount_percentage: product?.discount_percentage ?? "",
-      cgst: product?.cgst ?? "",
-      sgst: product?.sgst ?? "",
-      igst: product?.igst ?? "",
+      product_image: heroUrl,
+      product_images: existingGalleryUrls,
+      currentImage: heroUrl,
+      base_price: product?.base_price ?? product?.price ?? "",
+      discount_percentage: product?.discount_percentage ?? 0,
+      cgst: product?.cgst ?? 0,
+      sgst: product?.sgst ?? 0,
+      igst: product?.igst ?? 0,
       stock_quantity: product?.stock_quantity ?? "",
       min_order_limit: product?.min_order_limit ?? "",
       gender: product?.gender ?? "",
       product_attributes: attributesRef?.current,
     });
-  }, [product]);
+    setImageFile(null);
+  }, [product?.product_unique_id]);
 
   // format dropdowns
   const formattedCategories = categories?.data?.map((c) => ({ value: c?.category_unique_id, label: c?.category_name }));
@@ -91,10 +134,40 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
 
   const { mutateAsync: updateProduct, isPending: isUpdating } = useUpdateProduct();
 
+  // Stable onChange handler for product_images
+  const handleProductImagesChange = useCallback((files) => {
+    if (!files || (Array.isArray(files) && files.length === 0)) return;
+
+    // files is already an array from DynamicForm when multiple is true
+    const newFiles = Array.isArray(files) ? files : [files];
+
+    setForm((prev) => {
+      const existingImages = Array.isArray(prev.product_images) ? prev.product_images : [];
+      // Merge existing images (URLs or Files) with new Files
+      return {
+        ...prev,
+        product_images: [...existingImages, ...newFiles],
+      };
+    });
+  }, []);
+
+  // Stable onRemove handler for product_images
+  const handleProductImagesRemove = useCallback((index) => {
+    setForm((prev) => ({
+      ...prev,
+      product_images: prev.product_images.filter((_, i) => i !== index),
+    }));
+  }, []);
+
   const handleSubmit = async (e) => {
     e?.preventDefault?.();
-    // No validation here
-    const { product_image, product_attributes, ...rest } = form;
+    const { product_image, product_images, product_attributes, image, currentImage, ...rest } = form;
+
+    // Helper to strip base64 prefix
+    const cleanBase64 = (b64) => {
+      if (typeof b64 !== "string") return b64;
+      return b64.includes(";base64,") ? b64.split(";base64,")[1] : b64;
+    };
 
     // Use attributesRef for the latest repeater values
     const currentAttributes = attributesRef?.current || [];
@@ -105,64 +178,128 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
         value: attr?.value,
       }));
 
-    const formData = objectToFormData(rest);
-    if (product_image) formData?.append("product_image", product_image);
-    if (validAttributes.length) formData?.append("product_attributes", JSON.stringify(validAttributes));
+    // Process Hero Image: Convert imageFile to base64
+    let productImageBase64 = null;
+    if (imageFile instanceof File) {
+      const b64 = await toBase64(imageFile);
+      productImageBase64 = cleanBase64(b64);
+    }
 
-    await updateProduct({ uniqueId: product?.product_unique_id, payload: formData });
+    // Check if hero image should be removed
+    const hadInitialHeroImage = !!(
+      product?.product_image?.low ||
+      product?.product_image?.medium ||
+      product?.product_image?.original ||
+      product?.product_image?.url ||
+      (typeof product?.product_image === "string" && product?.product_image)
+    );
+    const shouldRemoveHeroImage = hadInitialHeroImage && !imageFile && !form?.currentImage;
 
-    // if (onSuccess) onSuccess();
+    // Process Gallery Images: Only send File objects (new images)
+    let productImagesBase64 = [];
+    if (Array.isArray(product_images)) {
+      productImagesBase64 = await Promise.all(
+        product_images.map(async (item) => {
+          if (item instanceof File) {
+            const b64 = await toBase64(item);
+            return cleanBase64(b64);
+          }
+          return null; // Don't send existing URLs back as images
+        })
+      );
+    }
+
+    // Final Payload Structure
+    const newGalleryImages = productImagesBase64.filter(Boolean);
+    const payload = {
+      ...rest,
+      product_attributes: JSON.stringify(validAttributes),
+      ...(productImageBase64 && { product_image: productImageBase64 }),
+      ...(shouldRemoveHeroImage && { remove_image: true }),
+      ...(newGalleryImages.length > 0 && { product_images: newGalleryImages }),
+    };
+
+    await updateProduct({ uniqueId: product?.product_unique_id, payload });
     closeModal();
   };
 
-  const productFields = [
-    {
-      key: "category_unique_id",
-      label: "Category Unique ID",
-      type: "search",
-      onSearch: (s) => {
-        setCategorySearchTerm(s);
-        setShowDropdown(true);
+  const productFields = useMemo(() => {
+    const fields = [
+      {
+        key: "category_unique_id",
+        label: "Category Unique ID",
+        type: "search",
+        onSearch: (s) => {
+          setCategorySearchTerm(s);
+          setShowDropdown(true);
+        },
+        results: showDropdown ? formattedCategories : [],
+        clearResults: () => {
+          setCategorySearchTerm("");
+          setShowDropdown(false);
+        },
+        onSelect: (value) => setForm((prev) => ({ ...prev, category_unique_id: value.value })),
+        placeholder: "e.g., HF1",
       },
-      results: showDropdown ? formattedCategories : [],
-      clearResults: () => {
-        setCategorySearchTerm("");
-        setShowDropdown(false);
+      {
+        key: "brand_unique_id",
+        label: "Brand Unique ID",
+        type: "search",
+        onSearch: (s) => {
+          setBrandSearchTerm(s);
+          setShowDropdown(true);
+        },
+        results: showDropdown ? formattedBrands : [],
+        clearResults: () => {
+          setBrandSearchTerm("");
+          setShowDropdown(false);
+        },
+        onSelect: (value) => setForm((prev) => ({ ...prev, brand_unique_id: value?.value })),
+        placeholder: "e.g., apple1",
       },
-      onSelect: (value) => setForm((prev) => ({ ...prev, category_unique_id: value.value })),
-      placeholder: "e.g., HF1",
-    },
-    {
-      key: "brand_unique_id",
-      label: "Brand Unique ID",
-      type: "search",
-      onSearch: (s) => {
-        setBrandSearchTerm(s);
-        setShowDropdown(true);
-      },
-      results: showDropdown ? formattedBrands : [],
-      clearResults: () => {
-        setBrandSearchTerm("");
-        setShowDropdown(false);
-      },
-      onSelect: (value) => setForm((prev) => ({ ...prev, brand_unique_id: value?.value })),
-      placeholder: "e.g., apple1",
-    },
-    // use the shared static fields, with a small override for edit mode
-    ...PRODUCT_STATIC_FIELDS?.map((field) => {
-      // enable field but disable user editing
-      if (field?.key === "product_unique_id") {
-        return { ...field, disabled: true, required: false };
-      }
+      // use the shared static fields, with a small override for edit mode
+      ...PRODUCT_UPDATE_STATIC_FIELDS?.map((field) => {
+        // enable field but disable user editing
+        if (field?.key === "product_unique_id") {
+          return { ...field, disabled: true, required: false };
+        }
 
-      // image not required on edit
-      if (field.key === "product_image") {
-        return { ...field, required: false };
-      }
+        // image not required on edit - change key to "image" to match pattern
+        if (field.key === "product_image") {
+          return {
+            ...field,
+            key: "image", // Change key to match IndustryType/Brand pattern
+            required: false,
+            onChange: (file) => {
+              if (!file) return;
 
-      return field;
-    }),
-  ];
+              const previewUrl = URL.createObjectURL(file);
+
+              setImageFile(file);
+              setForm((prev) => ({
+                ...prev,
+                currentImage: previewUrl,
+              }));
+            },
+          };
+        }
+
+        return field;
+      }),
+      {
+        key: "product_images",
+        label: "Product Images",
+        type: "file",
+        accept: "image/*",
+        multiple: true,
+        maxCount: 5,
+        onChange: handleProductImagesChange,
+        onRemove: handleProductImagesRemove,
+      },
+    ].filter(Boolean); // Filter out any null values from the IIFE
+
+    return fields;
+  }, [showDropdown, formattedCategories, formattedBrands, handleProductImagesChange, handleProductImagesRemove]);
 
   // callback from AttributeRepeater to update product_attributes on the form
   const handleAttributesChange = (items) => {

@@ -446,7 +446,7 @@ const ProductList = () => {
       </div>
 
       {/* {showAddModal && ( */}
-      <Activity mode={showAddModal ? "visible" : "hidden"}>
+      {showAddModal && (
         <div className="fixed inset-0 bg-white/30 backdrop-blur-lg border border-white/20 shadow-xl flex items-center justify-center z-50">
           <div className="relative">
             <button
@@ -458,7 +458,7 @@ const ProductList = () => {
             <ProductManager onCancel={handleCloseAdd} />
           </div>
         </div>
-      </Activity>
+      )}
 
       <Activity mode={editingProduct ? "visible" : "hidden"}>
         <div className="fixed inset-0 z-50 flex items-center justify-center">
