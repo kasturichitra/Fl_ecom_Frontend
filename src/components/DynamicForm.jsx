@@ -210,7 +210,7 @@ const DynamicForm = ({
     console.log("Field onChange exists?", !!field.onChange);
     console.log("Field onChange type:", typeof field.onChange);
     console.log("Field onChange value:", field.onChange);
-    
+
     console.log("Field coming into the process files", field);
     // Update State - check explicitly for function type
     if (field.onChange) {
@@ -271,7 +271,7 @@ const DynamicForm = ({
 
         return (
           <div
-            key={field.key}
+            key={fieldIndex}
             className="flex flex-col gap-2"
             style={{ width: field.width ? `${field.width}px` : "100%" }} // <-- width applied here
           >
@@ -495,8 +495,8 @@ const DynamicForm = ({
                   }
                 >
                   <option value="">Select</option>
-                  {field.options?.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
+                  {field.options?.map((opt, index) => (
+                    <option key={index} value={opt.value}>
                       {opt.label}
                     </option>
                   ))}
