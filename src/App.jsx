@@ -20,7 +20,6 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ForgotOtp from "./pages/ForgotOtp";
 import ResetPassword from "./pages/ResetPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
-import PublicRoute from "./components/PublicRoute";
 import ContactInfoManager from "./pages/ContactInfo/ContactInfoManager";
 
 // Lazy-loaded pages
@@ -79,61 +78,59 @@ const App = () => {
 
       <Routes>
         {/* Auth Routes - No Sidebar/Navbar */}
-        <Route element={<PublicRoute />}>
-          <Route
-            path="/login"
-            element={
-              <AuthLayout>
-                <Login />
-              </AuthLayout>
-            }
-          />
+        <Route
+          path="/login"
+          element={
+            <AuthLayout>
+              <Login />
+            </AuthLayout>
+          }
+        />
 
-          <Route
-            path="/verify-otp"
-            element={
-              <AuthLayout>
-                <VerifyOtp />
-              </AuthLayout>
-            }
-          />
+        <Route
+          path="/verify-otp"
+          element={
+            <AuthLayout>
+              <VerifyOtp />
+            </AuthLayout>
+          }
+        />
 
-          <Route
-            path="/forgot-password"
-            element={
-              <AuthLayout>
-                <ForgotPassword />
-              </AuthLayout>
-            }
-          />
+        <Route
+          path="/forgot-password"
+          element={
+            <AuthLayout>
+              <ForgotPassword />
+            </AuthLayout>
+          }
+        />
 
-          <Route
-            path="/verify-forgot-otp"
-            element={
-              <AuthLayout>
-                <ForgotOtp />
-              </AuthLayout>
-            }
-          />
+        <Route
+          path="/verify-forgot-otp"
+          element={
+            <AuthLayout>
+              <ForgotOtp />
+            </AuthLayout>
+          }
+        />
 
-          <Route
-            path="/reset-password"
-            element={
-              <AuthLayout>
-                <ResetPassword />
-              </AuthLayout>
-            }
-          />
+        <Route
+          path="/reset-password"
+          element={
+            <AuthLayout>
+              <ResetPassword />
+            </AuthLayout>
+          }
+        />
 
-          <Route
-            path="/signup"
-            element={
-              <AuthLayout>
-                <Signup />
-              </AuthLayout>
-            }
-          />
-        </Route>
+        <Route
+          path="/signup"
+          element={
+            <AuthLayout>
+              <Signup />
+            </AuthLayout>
+          }
+        />
 
         {/* Main Routes - With Sidebar/Navbar */}
         <Route element={<ProtectedRoute />}>
@@ -192,3 +189,4 @@ const App = () => {
 };
 
 export default App;
+   

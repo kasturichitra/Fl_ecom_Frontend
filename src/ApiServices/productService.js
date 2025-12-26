@@ -8,14 +8,22 @@ export const getAllProductsApi = (params = {}) => {
   return axiosInstance.get(`${BASE_URL}${queryString ? `?${queryString}` : ""}`);
 };
 
-// =========================== CREATE (JSON Body with Base64) ===========================
+// =========================== CREATE (JSON Body) ===========================
 export const createProductApi = (data) => {
-  return axiosInstance.post(`${BASE_URL}`, data);
+  return axiosInstance.post(`${BASE_URL}`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
-// =========================== UPDATE (JSON Body with Base64) ===========================
+// =========================== UPDATE (multipart/form-data) ===========================
 export const updateProductApi = (id, data) => {
-  return axiosInstance.put(`${BASE_URL}/${id}`, data);
+  return axiosInstance.put(`${BASE_URL}/${id}`, data, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
 // =========================== DELETE ===========================

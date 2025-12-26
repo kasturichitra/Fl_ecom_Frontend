@@ -1,4 +1,3 @@
-import { useState, useEffect, useRef } from "react";
 import { Controller } from "react-hook-form";
 import cn from "../utils/tailwind-cn";
 import SearchDropdown from "./SearchDropdown";
@@ -378,18 +377,15 @@ const DynamicForm = ({
                 </label>
 
                 <input
-                  id={field.key}
                   type="file"
-                  {...(isUsingRHF ? register(field.key) : {})}
-                  accept={field.accept}
-                  multiple={field.multiple}
-                  className="hidden"
+                  accept={field?.accept}
                   onChange={(e) => {
                     processFiles(field.key, e.target.files);
                     if (isUsingRHF) {
                       register(field.key).onChange(e);
                     }
                   }}
+                  className={cn(hasError && "border-red-500")}
                 />
 
                 {/* Generic Image Previews */}

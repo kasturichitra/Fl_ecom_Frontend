@@ -15,7 +15,11 @@ export const getAllCategoryApi = async (params = {}) => {
  * -----------------------------------------
  */
 export const createCategoryApi = async (formData) => {
-  return await axiosInstance.post(`${BASE_URL}`, formData);
+  return await axiosInstance.post(`${BASE_URL}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    }
+  });
 };
 
 export const getCategoryByUniqueIdApi = async (uniqueId) => {

@@ -11,7 +11,7 @@ export const PRODUCT_STATIC_FIELDS = [
     key: "product_name",
     label: "Product Name *",
     type: "text",
-
+    
     placeholder: "e.g., Premium Cotton Bedsheet",
   },
   {
@@ -30,7 +30,7 @@ export const PRODUCT_STATIC_FIELDS = [
     key: "base_price",
     label: "base_price*",
     type: "number",
-
+    
     min: 0,
   },
   {
@@ -62,28 +62,28 @@ export const PRODUCT_STATIC_FIELDS = [
     key: "stock_quantity",
     label: "Stock Quantity *",
     type: "number",
-
+    
     min: 0,
   },
   {
     key: "min_order_limit",
     label: "Minimum Order Limit *",
     type: "number",
-
+    
     min: 1,
   },
   {
     key: "gender",
     label: "Gender *",
     type: "select",
-
+    
     options: [
       { label: "Unisex", value: "Unisex" },
       { label: "Men", value: "Men" },
       { label: "Women", value: "Women" },
     ],
   },
-  {
+    {
     key: "product_description",
     label: "Product Description",
     type: "textarea",
@@ -91,17 +91,10 @@ export const PRODUCT_STATIC_FIELDS = [
   },
   {
     key: "product_image",
-    label: "Hero Image *",
+    label: "Product Image *",
     type: "file",
+    
     accept: "image/*",
-  },
-  {
-    key: "product_images",
-    label: "Product Images",
-    type: "file",
-    accept: "image/*",
-    multiple: true,
-    maxCount: 5,
   },
 ];
 

@@ -1,6 +1,6 @@
-import { useState } from "react";
-import DynamicForm from "../../components/DynamicForm";
+import React, { useState } from "react";
 import EditModalLayout from "../../components/EditModalLayout";
+import DynamicForm from "../../components/DynamicForm";
 import toBase64 from "../../utils/toBase64";
 
 const IndustryTypeEditModal = ({
@@ -9,10 +9,10 @@ const IndustryTypeEditModal = ({
   onSubmit,
   isSubmitting,
 }) => {
-  const [formData, setLocalFormData] = useState({
-    currentImage: initialData?.image_url?.low || null,
-  });
+  const [formData, setLocalFormData] = useState({});
   const [imageFile, setImageFile] = useState(null);
+
+  console.log("initail Data", initialData)
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -90,6 +90,12 @@ const IndustryTypeEditModal = ({
         formData={{
           ...initialData,
           ...formData,
+          currentImage:
+            formData.currentImage ||
+            initialData?.image_url?.low ||
+            initialData?.image_url?.medium ||
+            initialData?.image_url?.original ||
+            (typeof initialData?.image_url === "string" ? initialData.image_url : ""),
         }}
         setFormData={setLocalFormData}
       />
