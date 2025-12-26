@@ -1,16 +1,30 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useCreateBrand } from "../../hooks/useBrand";
 import BrandForm from "../../form/brands/brandsForm";
 import { useGetAllCategories } from "../../hooks/useCategory";
 import { brandFormDefaults } from "../../form/brands/brands.defaults.js";
 import FormActionButtons from "../../components/FormActionButtons";
 import ScrollWrapper from "../../components/ui/ScrollWrapper";
-import toBase64 from "../../utils/toBase64";
+
+const objectToFormData = (obj) => {
+  const formData = new FormData();
+  Object?.entries(obj)?.forEach(([key, value]) => {
+    if (value === undefined || value === null) return;
+    if (Array?.isArray(value)) {
+      value?.forEach((item) => formData?.append(`${key}[]`, item));
+    } else {
+      formData?.append(key, value);
+    }
+  });
+  return formData;
+};
 
 const BrandManager = ({ setShowAddModal, onCancel }) => {
+  const [imagePreview, setImagePreview] = useState([]);
   const { mutateAsync: createBrand, isPending: isCreatingBrand } = useCreateBrand({
     onSuccess: () => {
       setShowAddModal(false);
+      setImagePreview([]);
     },
   });
   const { data: categoriesData } = useGetAllCategories();
@@ -20,13 +34,14 @@ const BrandManager = ({ setShowAddModal, onCancel }) => {
     if (setShowAddModal) setShowAddModal(false);
   };
 
-  const formFields = useMemo(() => [
+  const formFields = [
     {
       key: "brand_name",
       label: "Brand Name *",
       type: "text",
       placeholder: "Nike, Samsung...",
     },
+    // { key: "brand_unique_id", label: "Brand Unique ID", type: "text", placeholder: "BR-001" },
     {
       key: "brand_description",
       label: "Brand Description",
@@ -44,37 +59,16 @@ const BrandManager = ({ setShowAddModal, onCancel }) => {
       label: "Active",
       type: "checkbox",
     },
-  ], []);
+  ];
 
-  const handleCreateBrand = async (formData) => {
-    try {
-      let image_base64 = null;
-      if (formData?.brand_image instanceof File) {
-        image_base64 = await toBase64(formData.brand_image);
-      }
+  const handleCreateBrand = async (data) => {
+    const { categories, brand_image, ...rest } = data;
+    const formData = objectToFormData(rest);
+    if (brand_image) formData.append("brand_image", brand_image);
+    // Properly format categories as expected by backend or keep strict array
+    formData.append("categories", `[${categories?.map((id) => `"${id}"`).join(", ")}]`);
 
-      const payload = {
-        brand_name: formData?.brand_name,
-        brand_description: formData?.brand_description,
-        categories: formData?.categories,
-        is_active: formData?.is_active,
-        // created_by: "Admin",
-        // updated_by: "Admin",
-        ...(image_base64 && { image_base64 }),
-      };
-
-      console.log("payload", payload);
-
-      await createBrand(payload);
-
-      // Close the modal after successful creation
-      if (setShowAddModal) {
-        setShowAddModal(false);
-      }
-    } catch (error) {
-      console.error("Error creating brand:", error);
-      // Error will be handled by the mutation hook
-    }
+    await createBrand(formData);
   };
 
   const defaultValues = brandFormDefaults();
@@ -117,7 +111,6 @@ const BrandManager = ({ setShowAddModal, onCancel }) => {
           onCancel={handleCancel}
           defaultValues={defaultValues}
           isSubmitting={isCreatingBrand}
-          shouldReset={true}
           className="grid grid-cols-1 gap-4"
           additionalContent={
             <>
@@ -129,6 +122,15 @@ const BrandManager = ({ setShowAddModal, onCancel }) => {
             </>
           }
         />
+
+        {/* Existing Image Preview Logic (if used) */}
+        {imagePreview.length > 0 && (
+          <div className="mt-4 flex space-x-2">
+            {imagePreview.map((src, index) => (
+              <img key={index} src={src} className="w-28 h-28 rounded-md border object-cover" alt="Preview" />
+            ))}
+          </div>
+        )}
       </ScrollWrapper>
     </div>
   );

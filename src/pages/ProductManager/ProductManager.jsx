@@ -1,13 +1,13 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AttributeRepeater from "../../components/AttributeRepeater";
 import FormActionButtons from "../../components/FormActionButtons";
 import ScrollWrapper from "../../components/ui/ScrollWrapper";
 import { PRODUCT_STATIC_FIELDS } from "../../constants/productFields";
-import ProductForm from "../../form/products/productForm";
 import { useGetAllBrands } from "../../hooks/useBrand";
 import { useGetAllCategories, useGetCategoryByUniqueId } from "../../hooks/useCategory";
 import { useCreateProduct } from "../../hooks/useProduct";
-import toBase64 from "../../utils/toBase64";
+import { objectToFormData } from "../../utils/ObjectToFormData";
+import ProductForm from "../../form/products/productForm";
 
 const ProductManager = ({ onCancel }) => {
   // Ref to get attributes from AttributeRepeater
@@ -66,7 +66,7 @@ const ProductManager = ({ onCancel }) => {
   // --------------------------
   // PRODUCT FIELD LIST
   // --------------------------
-  const productFields = useMemo(() => [
+  const productFields = [
     {
       key: "category_unique_id",
       label: "Category Unique ID *",
@@ -99,14 +99,14 @@ const ProductManager = ({ onCancel }) => {
         setShowBrandDropdown(false);
       },
       onSelect: (value) => {
-        // No additional action needed, react-hook-form handles the value
+        // No additional action needed, react-hook-form handles the valu
         setBrandSearchTerm("");
         setShowBrandDropdown(false);
       },
       placeholder: "e.g., apple1",
     },
-    ...PRODUCT_STATIC_FIELDS?.filter((field) => !field?.isEditOnly),
-  ], [showCategoryDropdown, formattedCategories, showBrandDropdown, formattedBrands]);
+     ...PRODUCT_STATIC_FIELDS?.filter(field => !field?.isEditOnly),
+  ];
 
   // CALLBACK: Update attributes ref
   const handleAttributesChange = (attributes) => {
@@ -115,6 +115,7 @@ const ProductManager = ({ onCancel }) => {
 
   // FORM SUBMIT
   const handleSubmit = async (formData) => {
+    console.log("formData", formData);
     // Get current attributes from the ref
     const currentAttributes = attributesRef.current;
 
@@ -126,45 +127,13 @@ const ProductManager = ({ onCancel }) => {
         value: attr?.value,
       }));
 
-    const { product_image, product_images, currentImage, ...rest } = formData;
+    const { product_image, product_attributes, ...rest } = formData;
 
-    // Helper to strip base64 prefix
-    const cleanBase64 = (b64) => {
-      if (typeof b64 !== "string") return b64;
-      return b64.includes(";base64,") ? b64.split(";base64,")[1] : b64;
-    };
-
-    // Convert hero image to base64
-    let heroImageBase64 = null;
-    if (product_image instanceof File) {
-      const b64 = await toBase64(product_image);
-      heroImageBase64 = cleanBase64(b64);
-    }
-
-    // Convert multiple product images to base64
-    let productImagesBase64 = [];
-    if (Array.isArray(product_images)) {
-      productImagesBase64 = await Promise.all(
-        product_images.map(async (file) => {
-          if (file instanceof File) {
-            const b64 = await toBase64(file);
-            return cleanBase64(b64);
-          }
-          return null; // Skip non-files
-        })
-      );
-    }
-
-    const payload = {
-      ...rest,
-      product_attributes: JSON.stringify(validAttributes),
-      ...(heroImageBase64 && { product_image: heroImageBase64 }),
-      ...(productImagesBase64.filter(Boolean).length > 0 && {
-        product_images: productImagesBase64.filter(Boolean)
-      }),
-    };
-
-    await createProduct(payload);
+    const formDataToSend = objectToFormData(rest);
+    formDataToSend.append("product_image", product_image);
+    formDataToSend.append("product_attributes", JSON.stringify(validAttributes));
+    
+    await createProduct(formDataToSend);
   };
 
   return (
@@ -184,10 +153,10 @@ const ProductManager = ({ onCancel }) => {
           additionalContent={
             <>
               {/* Attribute Repeater - automatically shows DB attributes + allows custom ones */}
-              <AttributeRepeater
-                label="Product Attributes"
-                predefined={dbAttributes}
-                onChange={handleAttributesChange}
+              <AttributeRepeater 
+                label="Product Attributes" 
+                predefined={dbAttributes} 
+                onChange={handleAttributesChange} 
               />
 
               {/* Form Action Buttons */}

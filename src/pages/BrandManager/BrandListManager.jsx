@@ -84,60 +84,6 @@ const BrandListManager = () => {
 
   const columns = [
     {
-      field: "brand_image",
-      headerName: "IMAGE",
-      width: 80,
-      sortable: false,
-      renderCell: (params) => {
-        const img = params?.value;
-        const baseUrl = import.meta.env.VITE_API_URL?.replace(/\/$/, "");
-
-        const getFullUrl = (imgSrc) => {
-          if (!imgSrc) return null;
-          if (typeof imgSrc === "string" && imgSrc.startsWith("http")) return imgSrc;
-
-          let path = "";
-          if (typeof imgSrc === "string") {
-            path = imgSrc;
-          } else if (typeof imgSrc === "object") {
-            path = imgSrc.low || imgSrc.url || imgSrc.path || "";
-          }
-
-          if (!path) return null;
-          if (path.startsWith("http")) return path;
-          return `${baseUrl}/${path.replace(/^\//, "")}`;
-        };
-
-        const finalUrl = getFullUrl(img);
-
-        return (
-          <div className="flex items-center justify-center h-full">
-            {finalUrl ? (
-              <img
-                src={finalUrl}
-                alt="Brand"
-                className="w-10 h-10 rounded-lg object-cover border border-gray-200 shadow-sm"
-                onError={(e) => {
-                  e.target.src = "/placeholder.png";
-                }}
-              />
-            ) : (
-              <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-              </div>
-            )}
-          </div>
-        );
-      },
-    },
-    {
       field: "brand_unique_id",
       headerName: "BRAND ID",
       flex: 1,
@@ -167,9 +113,8 @@ const BrandListManager = () => {
       valueGetter: (params) => (params.value ? "Active" : "Inactive"), // Convert boolean → string
       renderCell: (params) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${
-            params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            }`}
         >
           {params.row?.is_active ? "Active" : "Inactive"}
         </span>
@@ -302,13 +247,11 @@ const BrandListManager = () => {
       </Activity>
 
       {/* EDIT BRAND MODAL */}
-      <Activity mode={editingBrand ? "visible" : "hidden"}>
-        {/* {editingBrand && ( */}
+      {editingBrand && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
           <BrandEditModal brand={editingBrand} onClose={handleCloseEditModal} setEditingBrand={setEditingBrand} />
         </div>
-      </Activity>
-      {/* )} */}
+      )}
     </div>
   );
 };

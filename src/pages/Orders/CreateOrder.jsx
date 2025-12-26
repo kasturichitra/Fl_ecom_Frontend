@@ -8,6 +8,7 @@ import {
   FiMaximize,
   FiX,
   FiTrash2,
+  FiEdit,
   FiUser,
   FiSmartphone,
   FiMapPin,
@@ -17,6 +18,7 @@ import {
 } from "react-icons/fi";
 import toast from "react-hot-toast";
 import PageHeader from "../../components/PageHeader";
+import DataTable from "../../components/Table";
 
 const CreateOrder = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -37,6 +39,14 @@ const CreateOrder = () => {
 
   // Global Order Discount
   const [orderDiscount, setOrderDiscount] = useState(0);
+  // Held orders from localStorage
+  const [heldOrders, setHeldOrders] = useState([]);
+  const [editingHeldId, setEditingHeldId] = useState(null);
+
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [sort, setSort] = useState(null);
+  const [heldSearch, setHeldSearch] = useState("");
 
   const { data: productsResponse, isLoading, isError } = useGetAllProducts({ searchTerm });
 
@@ -45,7 +55,20 @@ const CreateOrder = () => {
       setCustomerForm({ customerName: "", mobileNumber: "", address: "" });
       setSelectedProducts([]);
       setOrderDiscount(0);
-      // toast.success("Order created successfully!");
+
+      // If we were editing a held order, remove it from storage
+      if (editingHeldId) {
+        try {
+          const HELD_ORDERS_KEY = "heldOrders";
+          const existing = JSON.parse(localStorage.getItem(HELD_ORDERS_KEY)) || [];
+          const filtered = existing.filter((h) => h.id !== editingHeldId);
+          localStorage.setItem(HELD_ORDERS_KEY, JSON.stringify(filtered));
+          setHeldOrders(filtered);
+          setEditingHeldId(null);
+        } catch (err) {
+          console.error("Error removing held order after create:", err);
+        }
+      }
     },
   });
 
@@ -146,6 +169,7 @@ const CreateOrder = () => {
     const orderData = {
       customer_name: customerForm?.customerName.trim(),
       mobile_number: customerForm?.mobileNumber.trim(),
+      offline_address: customerForm?.address.trim(),
       order_type: "Offline",
       payment_method: "UPI",
       payment_status: "Paid",
@@ -215,6 +239,139 @@ const CreateOrder = () => {
     }
   };
 
+  const handleHoldOrder = () => {
+  try {
+    const HELD_ORDERS_KEY = "heldOrders";
+
+    const existing = JSON.parse(localStorage.getItem(HELD_ORDERS_KEY)) || [];
+
+    // Helper to merge product lists (sum quantities if product exists)
+    const mergeProducts = (existingProducts = [], newProducts = []) => {
+      const map = {};
+      existingProducts.forEach((p) => {
+        map[p.product_unique_id] = { ...p };
+      });
+      newProducts.forEach((p) => {
+        const id = p.product_unique_id;
+        if (map[id]) {
+          const existingQty = Number(map[id].quantity || 0);
+          const newQty = Number(p.quantity || 0);
+          map[id] = { ...map[id], ...p, quantity: existingQty + newQty };
+        } else {
+          map[id] = { ...p };
+        }
+      });
+      return Object.values(map);
+    };
+
+    // If editing an existing held order, update that entry
+    if (editingHeldId) {
+      const idx = existing.findIndex((h) => h.id === editingHeldId);
+      if (idx !== -1) {
+        // When editing an existing held order we should REPLACE the products
+        // with the current selectedProducts (so removed items are removed).
+        const updated = {
+          ...existing[idx],
+          customerForm: { ...customerForm },
+          selectedProducts: (selectedProducts || []).map((p) => ({ ...p })),
+          orderDiscount,
+          modifiedAt: new Date().toISOString(),
+        };
+        const newList = [...existing];
+        newList[idx] = updated;
+        localStorage.setItem(HELD_ORDERS_KEY, JSON.stringify(newList));
+        setHeldOrders(newList);
+        setEditingHeldId(null);
+        // Reset form
+        setCustomerForm({ customerName: "", mobileNumber: "", address: "" });
+        setSelectedProducts([]);
+        setOrderDiscount(0);
+        toast.success("Held order updated");
+        return;
+      }
+    }
+
+    // Note: we no longer auto-merge by mobile. Creating a held order will
+    // always create a new entry (unless editing an existing held order).
+
+    // No existing entry — create a new held order
+    const held = {
+      id: Date.now(),
+      createdAt: new Date().toISOString(),
+      customerForm: { ...customerForm },
+      selectedProducts: selectedProducts.map((p) => ({ ...p })),
+      orderDiscount,
+    };
+
+    const newList = [...existing, held];
+    localStorage.setItem(HELD_ORDERS_KEY, JSON.stringify(newList));
+
+    // update local state so table refreshes immediately
+    setHeldOrders(newList);
+
+    // Reset local state similar to successful create
+    setCustomerForm({ customerName: "", mobileNumber: "", address: "" });
+    setSelectedProducts([]);
+    setOrderDiscount(0);
+
+    toast.success("Order held successfully");
+  } catch (err) {
+    console.error("Hold order error:", err);
+    toast.error("Failed to hold order. Please try again.");
+  }
+};
+
+  // Load held orders from localStorage
+  const loadHeldOrders = () => {
+    try {
+      const existing = JSON.parse(localStorage.getItem("heldOrders")) || [];
+      setHeldOrders(existing);
+    } catch (err) {
+      console.error("Failed to load held orders:", err);
+      setHeldOrders([]);
+    }
+  };
+
+  useEffect(() => {
+    loadHeldOrders();
+
+    const onStorage = (e) => {
+      if (e.key === "heldOrders") loadHeldOrders();
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  const handleDeleteHeld = (id) => {
+    try {
+      const existing = JSON.parse(localStorage.getItem("heldOrders")) || [];
+      const filtered = existing.filter((h) => h.id !== id);
+      localStorage.setItem("heldOrders", JSON.stringify(filtered));
+      setHeldOrders(filtered);
+      toast.success("Held order deleted");
+    } catch (err) {
+      console.error("Delete held order error:", err);
+      toast.error("Failed to delete held order");
+    }
+  };
+
+  const handleEditHeld = (id) => {
+    const held = heldOrders.find((h) => h.id === id);
+    if (!held) {
+      toast.error("Held order not found");
+      return;
+    }
+
+    // Load into form
+    setCustomerForm({ ...held.customerForm });
+    setSelectedProducts(held.selectedProducts.map((p) => ({ ...p })));
+    setOrderDiscount(held.orderDiscount || 0);
+    setEditingHeldId(id);
+    // Scroll to top so user can see the form
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    toast.success("Held order loaded. You can edit and create it now.");
+  };
+
   // Calculations
   const subTotal = selectedProducts.reduce(
     (sum, p) => sum + (p?.post_discount_final_price || p?.final_price) * p?.quantity,
@@ -225,6 +382,63 @@ const CreateOrder = () => {
   const isFormValid =
     customerForm?.customerName.trim() && customerForm?.mobileNumber.trim() && selectedProducts?.length > 0;
 
+  const columns = [
+    { field: "id", headerName: "ID", width: 120 },
+    { field: "customerName", headerName: "Customer", width: 220 },
+    { field: "mobile", headerName: "Mobile", width: 150 },
+    { field: "items", headerName: "Items", width: 100 },
+    { field: "createdAt", headerName: "Created At", width: 200 },
+    { field: "total", headerName: "Total (₹)", width: 140 },
+    {
+      field: "actions",
+      headerName: "Actions",
+      width: 180,
+      sortable: false,
+      renderCell: (params) => {
+        return (
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleEditHeld(params.row.id)}
+              className="px-3 py-1 bg-blue-600 text-white rounded text-sm flex items-center gap-2"
+            >
+              <FiEdit /> Edit
+            </button>
+            <button
+              onClick={() => handleDeleteHeld(params.row.id)}
+              className="px-3 py-1 bg-red-500 text-white rounded text-sm flex items-center gap-2"
+            >
+              <FiTrash2 /> Delete
+            </button>
+          </div>
+        );
+      },
+    },
+  ];
+
+  const filteredHeldOrders = heldOrders.filter((h) => {
+    const q = heldSearch?.toString().trim().toLowerCase();
+    if (!q) return true;
+    const name = (h.customerForm?.customerName || "").toString().toLowerCase();
+    const mobile = (h.customerForm?.mobileNumber || "").toString().toLowerCase();
+    return name.includes(q) || mobile.includes(q);
+  });
+
+  const rows = filteredHeldOrders.map((h) => {
+    const total = (h.selectedProducts || []).reduce(
+      (sum, p) => sum + (Number(p?.post_discount_final_price) || Number(p?.final_price) || 0) * (p?.quantity || 1),
+      0
+    );
+    const final = total * (1 - (h.orderDiscount || 0) / 100);
+    return {
+      id: h.id,
+      customerName: h.customerForm?.customerName || "-",
+      mobile: h.customerForm?.mobileNumber || "-",
+      items: (h.selectedProducts || []).length,
+      createdAt: h.createdAt || "-",
+      total: final.toFixed(2),
+    };
+  });
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 lg:p-6 font-sans text-gray-800">
       <div className="max-w-[1600px] mx-auto">
@@ -233,12 +447,7 @@ const CreateOrder = () => {
             title="Create New Offline Order"
             subtitle="Manage all your store orders from here"
             createPermission="order:create"
-            // We are hiding the default action button from PageHeader or keeping it if needed,
-            // but the user has a Scan button below.
-            // The original had Scan QR in PageHeader. Let's restore that look if they want "previous one".
-            // But the prompt in Step 0 asked for "Scan QR button aligned to the right" of search.
-            // The user said "header shoulbe look like previous one".
-            // I will put the PageHeader back.
+
           />
         </div>
 
@@ -256,12 +465,13 @@ const CreateOrder = () => {
               <div className="space-y-5">
                 {/* Customer Name */}
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-gray-700 ml-1">Customer Name</label>
+                  <label className="text-sm font-semibold text-gray-700 ml-1">Customer Name <span className="text-red-500">*</span></label>
                   <div className="relative">
                     <FiUser className="absolute left-3 top-3 text-gray-400" />
                     <input
                       type="text"
                       placeholder="Enter full name"
+                      required
                       value={customerForm.customerName}
                       onChange={(e) => setCustomerForm({ ...customerForm, customerName: e.target.value })}
                       className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-gray-400 text-sm font-medium hover:bg-white"
@@ -271,12 +481,15 @@ const CreateOrder = () => {
 
                 {/* Customer Mobile */}
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-gray-700 ml-1">Mobile Number</label>
+                  <label className="text-sm font-semibol
+                  d text-gray-700 ml-1">Mobile Number <span className="text-red-500">*</span></label>
                   <div className="relative">
                     <FiSmartphone className="absolute left-3 top-3 text-gray-400" />
                     <input
                       type="number" // Changed to number as requested
                       placeholder="Enter mobile number"
+                      required
+                      pattern="[0-9]{10}"
                       value={customerForm.mobileNumber}
                       onChange={(e) => setCustomerForm({ ...customerForm, mobileNumber: e.target.value })}
                       className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all placeholder:text-gray-400 text-sm font-medium hover:bg-white"
@@ -319,12 +532,6 @@ const CreateOrder = () => {
                   <FiSearch size={22} />
                 </div>
                 <div className="w-full">
-                  {/* Using SearchDropdown but styling it via container and generic styling */}
-                  {/* Since SearchDropdown renders its own input, we rely on its internal styles or we might need to wrap it. 
-                        Assuming SearchDropdown is flexible or we accept its style, but let's try to simulate the look 
-                        User asked: 'Large search input labeled Search box for products'
-                        We'll overlay a label or just use placeholder.
-                    */}
                   <SearchDropdown
                     value={searchTerm}
                     placeholder="Search box for products..."
@@ -486,7 +693,24 @@ const CreateOrder = () => {
                   </div>
                 </div>
 
-                <div className="mt-6">
+                <div className="mt-6 flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={handleHoldOrder}
+                    disabled={!isFormValid || isCreatingOrder}
+                    className={`w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transition-all flex items-center justify-center gap-3 ${
+                      !isFormValid || isCreatingOrder
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700 hover:shadow-blue-200 hover:-translate-y-1"
+                    }`}
+                  >
+                    {isCreatingOrder ? (
+                      <>Processing...</>
+                    ) : (
+                      <>
+                        Hold
+                      </>
+                    )}
+                  </button>
                   <button
                     onClick={handleSubmitOrder}
                     disabled={!isFormValid || isCreatingOrder}
@@ -539,6 +763,51 @@ const CreateOrder = () => {
         onClose={() => setShowProductModal(false)}
         onAdd={handleAddScannedProduct}
       />
+
+      {/* show holding data in table below (only when there are held orders) */}
+      {heldOrders && heldOrders.length > 0 && (
+        <div className="mt-6">
+          <h3 className="mb-3 text-lg font-bold">Held Orders</h3>
+
+          <div className="mb-3">
+            <div className="relative w-full max-w-sm">
+              <input
+                type="text"
+                placeholder="Search by customer name or mobile"
+                value={heldSearch}
+                onChange={(e) => {
+                  setHeldSearch(e.target.value);
+                  setPage(0);
+                }}
+                className="w-full pl-3 pr-10 py-2 border border-gray-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {heldSearch && (
+                <button
+                  onClick={() => setHeldSearch("")}
+                  aria-label="Clear search"
+                  title="Clear"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-gray-100 rounded-md text-sm text-gray-600 hover:bg-gray-200"
+                >
+                  <FiX />
+                </button>
+              )}
+            </div>
+          </div>  
+
+          <DataTable
+            rows={rows}
+            columns={columns}
+            getRowId={(r) => r.id}
+            page={page}
+            pageSize={pageSize}
+            totalCount={rows.length}
+            setCurrentPage={setPage}
+            setPageSize={setPageSize}
+            sort={sort}
+            setSort={setSort}
+          />
+        </div>
+      )}
     </div>
   );
 };

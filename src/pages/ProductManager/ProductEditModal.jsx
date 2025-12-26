@@ -5,8 +5,11 @@ import EditModalLayout from "../../components/EditModalLayout";
 import { PRODUCT_STATIC_FIELDS, PRODUCT_UPDATE_STATIC_FIELDS } from "../../constants/productFields";
 import { useGetAllBrands } from "../../hooks/useBrand";
 import { useGetAllCategories } from "../../hooks/useCategory";
+import { useGetAllBrands } from "../../hooks/useBrand";
 import { useUpdateProduct } from "../../hooks/useProduct";
-import toBase64 from "../../utils/toBase64";
+import { PRODUCT_STATIC_FIELDS } from "../../constants/productFields";
+import { objectToFormData } from "../../utils/ObjectToFormData";
+import AttributeRepeater from "../../components/AttributeRepeater";
 
 const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
   const [form, setForm] = useState({
@@ -18,9 +21,8 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
     product_color: "",
     product_size: "",
     product_image: null,
-    product_images: [],
     currentImage: null,
-    base_price: "",
+    price: "",
     discount_percentage: "",
     cgst: "",
     sgst: "",
