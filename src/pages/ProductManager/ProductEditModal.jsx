@@ -389,7 +389,7 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
     console.warn("product_images field NOT FOUND in fieldsWithOnChange!");
   }
 
-  console.log("Fields with on change before sent to DynamicForm: ", fieldsWithOnChange);
+  console.log("Fields with on change before sent to DynamicForm:", fieldsWithOnChange);
   return (
     <EditModalLayout
       title="Edit Product"
@@ -399,6 +399,9 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
       isLoading={isUpdating}
       width="max-w-5xl"
     >
+      {
+        console.log("Fields with on change before sent to DynamicForm:", fieldsWithOnChange)
+      }
       <DynamicForm fields={fieldsWithOnChange} formData={form} setFormData={setForm} className="grid grid-cols-2" />
 
       {/* Attribute Repeater - show current DB attributes and allow adding new ones */}
