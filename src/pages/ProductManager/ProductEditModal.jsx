@@ -5,11 +5,11 @@ import EditModalLayout from "../../components/EditModalLayout";
 import { PRODUCT_STATIC_FIELDS, PRODUCT_UPDATE_STATIC_FIELDS } from "../../constants/productFields";
 import { useGetAllBrands } from "../../hooks/useBrand";
 import { useGetAllCategories } from "../../hooks/useCategory";
-import { useGetAllBrands } from "../../hooks/useBrand";
+// import { useGetAllBrands } from "../../hooks/useBrand";
 import { useUpdateProduct } from "../../hooks/useProduct";
-import { PRODUCT_STATIC_FIELDS } from "../../constants/productFields";
+// import { PRODUCT_STATIC_FIELDS } from "../../constants/productFields";
 import { objectToFormData } from "../../utils/ObjectToFormData";
-import AttributeRepeater from "../../components/AttributeRepeater";
+// import AttributeRepeater from "../../components/AttributeRepeater";
 
 const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
   const [form, setForm] = useState({
