@@ -90,12 +90,10 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
     const heroSource = product?.product_image || product?.Product_Image || product?.image || product?.Image;
     const heroUrl = getFullUrl(heroSource);
 
-    console.log("The product is ", product);
     // Map gallery images
     const gallerySource =
       product?.product_images || product?.Product_Images || product?.product_gallery || product?.images || [];
 
-    console.log("Gallery Source", gallerySource);
     const sourceArray = Array.isArray(gallerySource)
       ? gallerySource
       : typeof gallerySource === "string" && gallerySource.length > 0
@@ -103,7 +101,6 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
       : [];
 
     const existingGalleryUrls = sourceArray?.map((s) => s.low || s.medium || s.original).filter(Boolean);
-    console.log("Existing Gallery Urls", existingGalleryUrls);
 
     setForm({
       category_unique_id: product?.category_unique_id ?? "",
@@ -129,15 +126,6 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
     setImageFile(null);
   }, [product?.product_unique_id]);
 
-  const removeImage = () => {
-    setForm((prev) => ({
-      ...prev,
-      product_image: "REMOVE",
-      currentImage: null,
-    }));
-    setImageFile(null);
-  };
-
   // format dropdowns
   const formattedCategories = categories?.data?.map((c) => ({ value: c?.category_unique_id, label: c?.category_name }));
   const formattedBrands = brands?.data?.map((b) => ({ value: b?.brand_unique_id, label: b?.brand_name }));
@@ -147,8 +135,6 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
   // Stable onChange handler for product_images
   const handleProductImagesChange = useCallback((files) => {
     if (!files || (Array.isArray(files) && files.length === 0)) return;
-
-    console.log("ProductImages onChange is triggered", files);
 
     // files is already an array from DynamicForm when multiple is true
     const newFiles = Array.isArray(files) ? files : [files];
@@ -308,43 +294,7 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
         onChange: handleProductImagesChange,
         onRemove: handleProductImagesRemove,
       },
-      // // Add product_images field manually to ensure onChange is attached
-      // (() => {
-      //   const originalField = PRODUCT_STATIC_FIELDS?.find(f => f.key === "product_images");
-      //   if (!originalField) return null;
-
-      //   console.log("Creating product_images field manually, handleProductImagesChange:", handleProductImagesChange);
-      //   console.log("Original field:", originalField);
-
-      //   const productImagesField = {
-      //     key: originalField.key,
-      //     label: originalField.label,
-      //     type: originalField.type,
-      //     accept: originalField.accept,
-      //     multiple: originalField.multiple,
-      //     maxCount: originalField.maxCount,
-      //     onChange: handleProductImagesChange,
-      //     onRemove: handleProductImagesRemove,
-      //   };
-
-      //   console.log("ProductImages field created manually:", productImagesField);
-      //   console.log("Has onChange?", typeof productImagesField.onChange === "function");
-      //   console.log("onChange function:", productImagesField.onChange);
-      //   console.log("Field keys:", Object.keys(productImagesField));
-
-      //   return productImagesField;
-      // })(),
     ].filter(Boolean); // Filter out any null values from the IIFE
-
-    // Log the product_images field to verify onChange is attached
-    const productImagesField = fields.find((f) => f.key === "product_images");
-    if (productImagesField) {
-      console.log("Final product_images field in productFields array:", productImagesField);
-      console.log("onChange type:", typeof productImagesField.onChange);
-      console.log("onChange exists?", !!productImagesField.onChange);
-    } else {
-      console.warn("product_images field not found in fields array!");
-    }
 
     return fields;
   }, [showDropdown, formattedCategories, formattedBrands, handleProductImagesChange, handleProductImagesRemove]);
@@ -361,31 +311,6 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
     setForm((prev) => ({ ...prev, product_attributes: mapped }));
   };
 
-  // Ensure product_images field has onChange - modify fields array directly before passing
-  // Do this in render, not useMemo, to ensure handlers are fresh
-  const fieldsWithOnChange = productFields.map((field) => {
-    if (field.key === "product_images") {
-      console.log("=== MODIFYING product_images field in render ===");
-      console.log("Current field:", field);
-      console.log("handleProductImagesChange:", handleProductImagesChange);
-      console.log("handleProductImagesChange type:", typeof handleProductImagesChange);
-
-      const modifiedField = {
-        ...field,
-        onChange: handleProductImagesChange,
-        onRemove: handleProductImagesRemove,
-      };
-
-      console.log("Modified field:", modifiedField);
-      console.log("Modified field onChange:", modifiedField.onChange);
-      console.log("Modified field has onChange?", typeof modifiedField.onChange === "function");
-      console.log("Modified field keys:", Object.keys(modifiedField));
-
-      return modifiedField;
-    }
-    return field;
-  });
-
   return (
     <EditModalLayout
       title="Edit Product"
@@ -395,8 +320,7 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
       isLoading={isUpdating}
       width="max-w-5xl"
     >
-      {console.log("Fields with on change before sent to DynamicForm:", fieldsWithOnChange)}
-      <DynamicForm fields={fieldsWithOnChange} formData={form} setFormData={setForm} className="grid grid-cols-2" />
+      <DynamicForm fields={productFields} formData={form} setFormData={setForm} className="grid grid-cols-2" />
 
       {/* Attribute Repeater - show current DB attributes and allow adding new ones */}
       <div className="col-span-2 mt-6">

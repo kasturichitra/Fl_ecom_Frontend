@@ -123,8 +123,6 @@ const DynamicForm = ({
   control = null,
   className = "",
 }) => {
-  console.log("FormData coming into dynamic form: ", formData);
-  console.log("Fields coming into dynamic form: ", fields);
   const handleChange = (key, valueOrUpdater) => {
     setFormData((prev) => {
       const nextValue = typeof valueOrUpdater === "function" ? valueOrUpdater(prev[key]) : valueOrUpdater;
@@ -176,12 +174,10 @@ const DynamicForm = ({
     // Look up the field from the current fields array to get the latest onChange handler
     const field = fields.find((f) => f.key === fieldKey);
     if (!field) {
-      console.warn(`Field with key ${fieldKey} not found in fields array`);
       return;
     }
 
     let files = field.multiple ? Array.from(rawFiles) : rawFiles[0] || rawFiles;
-    console.log("Process files is triggered", files);
     if (!files || (Array.isArray(files) && files.length === 0)) return;
 
     // Apply Compression
@@ -205,31 +201,15 @@ const DynamicForm = ({
 
     if (files.length === 0 && field.multiple) return;
 
-    console.log("Field coming into process files", field);
-    console.log("Field key:", field.key);
-    console.log("Field onChange exists?", !!field.onChange);
-    console.log("Field onChange type:", typeof field.onChange);
-    console.log("Field onChange value:", field.onChange);
-
-    console.log("Field coming into the process files", field);
     // Update State - check explicitly for function type
     if (field.onChange) {
-      console.log("Field onchange is triggered", files);
       field.onChange(files);
     } else {
-      console.log("Generic onchange is triggered", field);
-      console.log("Why generic? onChange:", field.onChange, "type:", typeof field.onChange);
       if (field.multiple) {
         handleChange(field.key, (existing) => {
-          console.log("Field key is", field.key);
-          console.log("FormData key is", formData);
           const filesComingFromDb = Array.isArray(formData[field.key]) ? formData[field.key] : [];
-          console.log("Files Coming From DB", filesComingFromDb);
           const imageUrls = filesComingFromDb.map((file) => file.low || file.original || file.medium);
-          console.log("Image URLs", imageUrls);
           const prevList = Array.isArray(existing) ? existing : [];
-          console.log("Existing is ", existing);
-          console.log("Response from field.multiple of generic onchange", [...prevList, ...imageUrls, ...files]);
           return [...prevList, ...imageUrls, ...files];
         });
       } else {
@@ -249,23 +229,11 @@ const DynamicForm = ({
   // Debug: Log fields array when component renders
   useEffect(() => {
     const productImagesField = fields.find((f) => f.key === "product_images");
-    if (productImagesField) {
-      console.log("DynamicForm received product_images field:", productImagesField);
-      console.log("Has onChange?", typeof productImagesField.onChange === "function");
-      console.log("onChange:", productImagesField.onChange);
-    }
   }, [fields]);
 
   return (
     <div className={cn("flex flex-col gap-4", className)}>
       {fields.map((field, fieldIndex) => {
-        // Debug: Log product_images field when mapping
-        if (field.key === "product_images") {
-          console.log(`Mapping product_images field at index ${fieldIndex}:`, field);
-          console.log("onChange in map:", field.onChange);
-          console.log("onChange type:", typeof field.onChange);
-        }
-
         const fieldError = errors[field.key];
         const hasError = !!fieldError;
 
@@ -417,12 +385,6 @@ const DynamicForm = ({
                   multiple={field.multiple}
                   className="hidden"
                   onChange={(e) => {
-                    console.log("On Change is triggered", e.target.files);
-                    console.log("Field key:", field.key);
-                    // Look up field from fields array to get latest onChange
-                    const currentField = fields.find((f) => f.key === field.key);
-                    console.log("Current field from fields array:", currentField);
-                    console.log("Current field onChange:", currentField?.onChange);
                     processFiles(field.key, e.target.files);
                     if (isUsingRHF) {
                       register(field.key).onChange(e);
@@ -432,8 +394,6 @@ const DynamicForm = ({
 
                 {/* Generic Image Previews */}
                 {(() => {
-                  // console.log("formData at line 369 of dynamic form", formData);
-                  console.log("Field in display preview", field);
                   const items = formData[field.key] || formData.currentImage;
                   const displayItems = Array.isArray(items) ? items : items ? [items] : [];
 
