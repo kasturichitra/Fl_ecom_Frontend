@@ -7,7 +7,6 @@ import { FcAddImage } from "react-icons/fc";
 import { MdDelete, MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import compressImage from "../utils/compressImage";
 
-
 /**
  * ImagePreview - Internal helper for file previews
  */
@@ -66,7 +65,11 @@ const ImagePreview = ({ item, onRemove, onMoveLeft, onMoveRight, showArrows }) =
           <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
             <button
               type="button"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onMoveLeft(); }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onMoveLeft();
+              }}
               className="bg-white/90 hover:bg-white text-gray-700 rounded p-0.5 shadow-sm"
               title="Move left"
             >
@@ -74,7 +77,11 @@ const ImagePreview = ({ item, onRemove, onMoveLeft, onMoveRight, showArrows }) =
             </button>
             <button
               type="button"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); onMoveRight(); }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onMoveRight();
+              }}
               className="bg-white/90 hover:bg-white text-gray-700 rounded p-0.5 shadow-sm"
               title="Move right"
             >
@@ -84,7 +91,10 @@ const ImagePreview = ({ item, onRemove, onMoveLeft, onMoveRight, showArrows }) =
         )}
       </div>
       <div className="flex flex-col items-center max-w-24">
-        <span className="text-[10px] text-gray-500 truncate w-full text-center font-medium" title={`${fileName} ${fileSize ? `(${fileSize})` : ""}`}>
+        <span
+          className="text-[10px] text-gray-500 truncate w-full text-center font-medium"
+          title={`${fileName} ${fileSize ? `(${fileSize})` : ""}`}
+        >
           {fileName}
         </span>
       </div>
@@ -164,7 +174,7 @@ const DynamicForm = ({
 
   const processFiles = async (fieldKey, rawFiles) => {
     // Look up the field from the current fields array to get the latest onChange handler
-    const field = fields.find(f => f.key === fieldKey);
+    const field = fields.find((f) => f.key === fieldKey);
     if (!field) {
       console.warn(`Field with key ${fieldKey} not found in fields array`);
       return;
@@ -176,7 +186,7 @@ const DynamicForm = ({
 
     // Apply Compression
     if (Array.isArray(files)) {
-      files = await Promise.all(files.map(f => compressImage(f)));
+      files = await Promise.all(files.map((f) => compressImage(f)));
     } else {
       files = await compressImage(files);
     }
@@ -200,7 +210,7 @@ const DynamicForm = ({
     console.log("Field onChange exists?", !!field.onChange);
     console.log("Field onChange type:", typeof field.onChange);
     console.log("Field onChange value:", field.onChange);
-    
+
     // Update State - check explicitly for function type
     if (field.onChange && typeof field.onChange === "function") {
       console.log("Field onchange is triggered", files);
@@ -210,10 +220,16 @@ const DynamicForm = ({
       console.log("Why generic? onChange:", field.onChange, "type:", typeof field.onChange);
       if (field.multiple) {
         handleChange(field.key, (existing) => {
+          console.log("Field key is", field.key);
+          console.log("FormData key is", formData);
+          const filesComingFromDb = Array.isArray(formData[field.key]) ? formData[field.key] : [];
+          console.log("Files Coming From DB", filesComingFromDb);
+          const imageUrls = filesComingFromDb.map((file) => file.low || file.original || file.medium);
+          console.log("Image URLs", imageUrls);
           const prevList = Array.isArray(existing) ? existing : [];
           console.log("Existing is ", existing);
-          console.log("Response from field.multiple of generic onchange", [...prevList, ...files]);
-          return [...prevList, ...files];
+          console.log("Response from field.multiple of generic onchange", [...prevList, ...imageUrls, ...files]);
+          return [...prevList, ...imageUrls, ...files];
         });
       } else {
         // Clear currentImage when new file is selected and set manual preview
@@ -227,12 +243,11 @@ const DynamicForm = ({
     }
   };
 
-
   const isUsingRHF = register !== null;
 
   // Debug: Log fields array when component renders
   useEffect(() => {
-    const productImagesField = fields.find(f => f.key === "product_images");
+    const productImagesField = fields.find((f) => f.key === "product_images");
     if (productImagesField) {
       console.log("DynamicForm received product_images field:", productImagesField);
       console.log("Has onChange?", typeof productImagesField.onChange === "function");
@@ -249,7 +264,7 @@ const DynamicForm = ({
           console.log("onChange in map:", field.onChange);
           console.log("onChange type:", typeof field.onChange);
         }
-        
+
         const fieldError = errors[field.key];
         const hasError = !!fieldError;
 
@@ -347,7 +362,6 @@ const DynamicForm = ({
               </>
             )}
 
-
             {field.type === "file" && (
               <div className="flex flex-col gap-3">
                 <label
@@ -371,14 +385,20 @@ const DynamicForm = ({
                     processFiles(field.key, e.dataTransfer.files);
                   }}
                 >
-                  <FcAddImage size={56} className={cn("transition-transform duration-300", draggingField === field.key ? "scale-125" : "group-hover:scale-110")} />
+                  <FcAddImage
+                    size={56}
+                    className={cn(
+                      "transition-transform duration-300",
+                      draggingField === field.key ? "scale-125" : "group-hover:scale-110"
+                    )}
+                  />
                   <div className="flex flex-col items-center px-4 text-center">
                     <span className="text-sm font-semibold text-gray-700">
                       {draggingField === field.key ? "Drop images here" : "Click or Drag images to upload"}
                     </span>
                     <span className="text-xs text-gray-500 mt-1">
                       {field.multiple
-                        ? `Up to ${field.maxCount || 'multiple'} images (JPEG, PNG)`
+                        ? `Up to ${field.maxCount || "multiple"} images (JPEG, PNG)`
                         : "One high-quality image (JPEG, PNG)"}
                     </span>
                   </div>
@@ -398,7 +418,7 @@ const DynamicForm = ({
                     console.log("On Change is triggered", e.target.files);
                     console.log("Field key:", field.key);
                     // Look up field from fields array to get latest onChange
-                    const currentField = fields.find(f => f.key === field.key);
+                    const currentField = fields.find((f) => f.key === field.key);
                     console.log("Current field from fields array:", currentField);
                     console.log("Current field onChange:", currentField?.onChange);
                     processFiles(field.key, e.target.files);
@@ -457,11 +477,11 @@ const DynamicForm = ({
                   );
                 })()}
 
-                {hasError && <span className="text-red-500 text-xs font-medium mt-1 ml-1">⚠ {fieldError?.message}</span>}
+                {hasError && (
+                  <span className="text-red-500 text-xs font-medium mt-1 ml-1">⚠ {fieldError?.message}</span>
+                )}
               </div>
             )}
-
-
 
             {field.type === "select" && (
               <>

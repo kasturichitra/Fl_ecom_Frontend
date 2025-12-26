@@ -92,16 +92,20 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
     const heroSource = product?.product_image || product?.Product_Image || product?.image || product?.Image;
     const heroUrl = getFullUrl(heroSource);
 
+    console.log("The product is ", product);
     // Map gallery images
     const gallerySource =
       product?.product_images || product?.Product_Images || product?.product_gallery || product?.images || [];
+
+      console.log("Gallery Source", gallerySource);
     const sourceArray = Array.isArray(gallerySource)
       ? gallerySource
       : typeof gallerySource === "string" && gallerySource.length > 0
       ? gallerySource.split(",").map((s) => s.trim())
       : [];
 
-    const existingGalleryUrls = sourceArray?.map(getFullUrl).filter(Boolean);
+    const existingGalleryUrls = sourceArray?.map((s) => s.low || s.medium || s.original).filter(Boolean);
+    console.log("Existing Gallery Urls", existingGalleryUrls);
 
     setForm({
       category_unique_id: product?.category_unique_id ?? "",
