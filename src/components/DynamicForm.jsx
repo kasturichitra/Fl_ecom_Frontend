@@ -5,6 +5,7 @@ import SearchDropdown from "./SearchDropdown";
 import { FcAddImage } from "react-icons/fc";
 import { MdDelete, MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import compressImage from "../utils/compressImage";
+import { useEffect, useState } from "react";
 
 /**
  * ImagePreview - Internal helper for file previews
