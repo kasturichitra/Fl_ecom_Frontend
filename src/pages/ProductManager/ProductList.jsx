@@ -448,10 +448,10 @@ const ProductList = () => {
       {/* {showAddModal && ( */}
       {showAddModal && (
         <div className="fixed inset-0 bg-white/30 backdrop-blur-lg border border-white/20 shadow-xl flex items-center justify-center z-50">
-          <div className="relative">
+          <div className="relative mt-30">
             <button
               onClick={handleCloseAdd}
-              className="absolute right-5 top-5 text-gray-700 hover:text-red-600 text-3xl"
+              className="absolute right-10 top-5 text-gray-700 hover:text-red-600 text-6xl"
             >
               ×
             </button>
