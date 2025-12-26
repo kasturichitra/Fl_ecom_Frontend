@@ -269,9 +269,10 @@ const DynamicForm = ({
         const fieldError = errors[field.key];
         const hasError = !!fieldError;
 
+        const mappingKey = `${fieldIndex}-${field.key}`;
         return (
           <div
-            key={fieldIndex}
+            key={mappingKey}
             className="flex flex-col gap-2"
             style={{ width: field.width ? `${field.width}px` : "100%" }} // <-- width applied here
           >

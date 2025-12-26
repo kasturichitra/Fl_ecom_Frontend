@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import AttributeRepeater from "../../components/AttributeRepeater";
 import DynamicForm from "../../components/DynamicForm";
 import EditModalLayout from "../../components/EditModalLayout";
-import { PRODUCT_STATIC_FIELDS } from "../../constants/productFields";
+import { PRODUCT_STATIC_FIELDS, PRODUCT_UPDATE_STATIC_FIELDS } from "../../constants/productFields";
 import { useGetAllBrands } from "../../hooks/useBrand";
 import { useGetAllCategories } from "../../hooks/useCategory";
 import { useUpdateProduct } from "../../hooks/useProduct";
@@ -42,9 +42,6 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
 
   const attributesRef = useRef([]);
 
-  console.log("product", product);
-  console.log("product_image", product?.product_image?.["low"]);
-
   // Map product.product_attributes to the AttributeRepeater 'predefined' format
   const productDbAttributes = useMemo(
     () =>
@@ -78,7 +75,8 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
         imgStr = img;
       } else if (typeof img === "object") {
         // Prioritize the 'low' property as per user information, then fallbacks
-        imgStr = img.low || img.high || img.original || img.url || img.image_url || img.path || img.image || img.file || "";
+        imgStr =
+          img.low || img.high || img.original || img.url || img.image_url || img.path || img.image || img.file || "";
       }
 
       if (!imgStr || typeof imgStr !== "string") return null;
@@ -97,7 +95,7 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
     const gallerySource =
       product?.product_images || product?.Product_Images || product?.product_gallery || product?.images || [];
 
-      console.log("Gallery Source", gallerySource);
+    console.log("Gallery Source", gallerySource);
     const sourceArray = Array.isArray(gallerySource)
       ? gallerySource
       : typeof gallerySource === "string" && gallerySource.length > 0
@@ -151,10 +149,10 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
     if (!files || (Array.isArray(files) && files.length === 0)) return;
 
     console.log("ProductImages onChange is triggered", files);
-    
+
     // files is already an array from DynamicForm when multiple is true
     const newFiles = Array.isArray(files) ? files : [files];
-    
+
     setForm((prev) => {
       const existingImages = Array.isArray(prev.product_images) ? prev.product_images : [];
       // Merge existing images (URLs or Files) with new Files
@@ -175,7 +173,7 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e?.preventDefault?.();
-    const { product_image, product_images, product_attributes, image,  currentImage, ...rest } = form;
+    const { product_image, product_images, product_attributes, image, currentImage, ...rest } = form;
 
     // Helper to strip base64 prefix
     const cleanBase64 = (b64) => {
@@ -238,10 +236,6 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
   };
 
   const productFields = useMemo(() => {
-    console.log("=== useMemo is running ===");
-    console.log("handleProductImagesChange:", handleProductImagesChange);
-    console.log("PRODUCT_STATIC_FIELDS:", PRODUCT_STATIC_FIELDS);
-    
     const fields = [
       {
         key: "category_unique_id",
@@ -276,7 +270,7 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
         placeholder: "e.g., apple1",
       },
       // use the shared static fields, with a small override for edit mode
-      ...PRODUCT_STATIC_FIELDS?.filter((field) => field.key !== "product_images").map((field) => {
+      ...PRODUCT_UPDATE_STATIC_FIELDS?.map((field) => {
         // enable field but disable user editing
         if (field?.key === "product_unique_id") {
           return { ...field, disabled: true, required: false };
@@ -304,36 +298,46 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
 
         return field;
       }),
-      // Add product_images field manually to ensure onChange is attached
-      (() => {
-        const originalField = PRODUCT_STATIC_FIELDS?.find(f => f.key === "product_images");
-        if (!originalField) return null;
-        
-        console.log("Creating product_images field manually, handleProductImagesChange:", handleProductImagesChange);
-        console.log("Original field:", originalField);
-        
-        const productImagesField = {
-          key: originalField.key,
-          label: originalField.label,
-          type: originalField.type,
-          accept: originalField.accept,
-          multiple: originalField.multiple,
-          maxCount: originalField.maxCount,
-          onChange: handleProductImagesChange,
-          onRemove: handleProductImagesRemove,
-        };
-        
-        console.log("ProductImages field created manually:", productImagesField);
-        console.log("Has onChange?", typeof productImagesField.onChange === "function");
-        console.log("onChange function:", productImagesField.onChange);
-        console.log("Field keys:", Object.keys(productImagesField));
-        
-        return productImagesField;
-      })(),
+      {
+        key: "product_images",
+        label: "Product Images",
+        type: "file",
+        accept: "image/*",
+        multiple: true,
+        maxCount: 5,
+        onChange: handleProductImagesChange,
+        onRemove: handleProductImagesRemove,
+      },
+      // // Add product_images field manually to ensure onChange is attached
+      // (() => {
+      //   const originalField = PRODUCT_STATIC_FIELDS?.find(f => f.key === "product_images");
+      //   if (!originalField) return null;
+
+      //   console.log("Creating product_images field manually, handleProductImagesChange:", handleProductImagesChange);
+      //   console.log("Original field:", originalField);
+
+      //   const productImagesField = {
+      //     key: originalField.key,
+      //     label: originalField.label,
+      //     type: originalField.type,
+      //     accept: originalField.accept,
+      //     multiple: originalField.multiple,
+      //     maxCount: originalField.maxCount,
+      //     onChange: handleProductImagesChange,
+      //     onRemove: handleProductImagesRemove,
+      //   };
+
+      //   console.log("ProductImages field created manually:", productImagesField);
+      //   console.log("Has onChange?", typeof productImagesField.onChange === "function");
+      //   console.log("onChange function:", productImagesField.onChange);
+      //   console.log("Field keys:", Object.keys(productImagesField));
+
+      //   return productImagesField;
+      // })(),
     ].filter(Boolean); // Filter out any null values from the IIFE
-    
+
     // Log the product_images field to verify onChange is attached
-    const productImagesField = fields.find(f => f.key === "product_images");
+    const productImagesField = fields.find((f) => f.key === "product_images");
     if (productImagesField) {
       console.log("Final product_images field in productFields array:", productImagesField);
       console.log("onChange type:", typeof productImagesField.onChange);
@@ -341,7 +345,7 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
     } else {
       console.warn("product_images field not found in fields array!");
     }
-    
+
     return fields;
   }, [showDropdown, formattedCategories, formattedBrands, handleProductImagesChange, handleProductImagesRemove]);
 
@@ -365,35 +369,23 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
       console.log("Current field:", field);
       console.log("handleProductImagesChange:", handleProductImagesChange);
       console.log("handleProductImagesChange type:", typeof handleProductImagesChange);
-      
+
       const modifiedField = {
         ...field,
         onChange: handleProductImagesChange,
         onRemove: handleProductImagesRemove,
       };
-      
+
       console.log("Modified field:", modifiedField);
       console.log("Modified field onChange:", modifiedField.onChange);
       console.log("Modified field has onChange?", typeof modifiedField.onChange === "function");
       console.log("Modified field keys:", Object.keys(modifiedField));
-      
+
       return modifiedField;
     }
     return field;
   });
 
-  // Log the final field array
-  console.log("=== FINAL fieldsWithOnChange array ===");
-  const productImagesFieldFinal = fieldsWithOnChange.find(f => f.key === "product_images");
-  if (productImagesFieldFinal) {
-    console.log("Final product_images field:", productImagesFieldFinal);
-    console.log("Final onChange:", productImagesFieldFinal.onChange);
-    console.log("Final onChange type:", typeof productImagesFieldFinal.onChange);
-  } else {
-    console.warn("product_images field NOT FOUND in fieldsWithOnChange!");
-  }
-
-  console.log("Fields with on change before sent to DynamicForm:", fieldsWithOnChange);
   return (
     <EditModalLayout
       title="Edit Product"
@@ -403,9 +395,7 @@ const ProductEditModal = ({ formData: product, closeModal, onSuccess }) => {
       isLoading={isUpdating}
       width="max-w-5xl"
     >
-      {
-        console.log("Fields with on change before sent to DynamicForm:", fieldsWithOnChange)
-      }
+      {console.log("Fields with on change before sent to DynamicForm:", fieldsWithOnChange)}
       <DynamicForm fields={fieldsWithOnChange} formData={form} setFormData={setForm} className="grid grid-cols-2" />
 
       {/* Attribute Repeater - show current DB attributes and allow adding new ones */}
