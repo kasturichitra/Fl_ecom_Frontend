@@ -1,90 +1,106 @@
 import { Activity, useCallback, useEffect, useRef, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import { FiRefreshCcw } from "react-icons/fi";
+
 import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector.jsx";
 import { DropdownFilter } from "../../components/DropdownFilter.jsx";
 import PageHeader from "../../components/PageHeader.jsx";
 import SearchBar from "../../components/SearchBar.jsx";
 import DataTable from "../../components/Table.jsx";
-import { useDeleteIndustry, useGetAllIndustries, useUpdateIndustry } from "../../hooks/useIndustry";
+
+import {
+  useDeleteIndustry,
+  useGetAllIndustries,
+  useUpdateIndustry,
+} from "../../hooks/useIndustry";
+
 import { DEBOUNCED_DELAY, statusOptions } from "../../lib/constants.js";
 import { useIndustryTableHeadersStore } from "../../stores/IndustryTableHeadersStore.js";
+import { useIndustryFiltersStore } from "../../stores/industryFiltersStore.js";
+
 import IndustryTypeEditModal from "./IndustryTypeEditModal";
 import IndustryTypeManager from "./IndustryTypeManager";
+
 import useDebounce from "../../hooks/useDebounce.js";
 import useCheckPermission from "../../hooks/useCheckPermission.js";
-import { industryTypeColumns } from "../../lib/columns.jsx";
 import VerifyPermission from "../../middleware/verifyPermission.js";
 
 const IndustryTypeList = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  // const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
-  const [pageSize, setPageSize] = useState(10);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [sort, setSort] = useState("createdAt:desc");
-  const { industryHeaders, updateTableHeaders } = useIndustryTableHeadersStore();
-  const [activeStatus, setActiveStatus] = useState("");
+  /* -------------------- ZUSTAND -------------------- */
+  const { industryHeaders, updateTableHeaders } =
+    useIndustryTableHeadersStore();
 
+  const {
+    filters,
+    setFilter,
+    setFilters,
+    resetFilters,
+  } = useIndustryFiltersStore();
+
+  /* -------------------- LOCAL UI STATE (NON-FILTER) -------------------- */
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editingIndustry, setEditingIndustry] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   const canUpdate = useCheckPermission("industry:update");
   const canDelete = useCheckPermission("industry:delete");
 
+  /* -------------------- DEBOUNCE SEARCH -------------------- */
+  const debouncedSearchTerm = useDebounce(
+    filters.search,
+    DEBOUNCED_DELAY
+  );
+
+  /* -------------------- CLICK OUTSIDE -------------------- */
   const handleClickOutside = useCallback((event) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+    if (
+      dropdownRef.current &&
+      !dropdownRef.current.contains(event.target)
+    ) {
       setIsDropdownOpen(false);
     }
   }, []);
 
-  const debouncedSearchTerm = useDebounce(searchTerm, DEBOUNCED_DELAY);
-
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, [handleClickOutside]);
 
-  const statusFun = () => {
-    if (activeStatus === "active") return true;
-    if (activeStatus === "inactive") return false;
-    return undefined;
-  };
-
+  /* -------------------- DATA FETCH -------------------- */
   const {
     data: industryTypes,
     isLoading: loading,
     isError: error,
   } = useGetAllIndustries({
     search: debouncedSearchTerm,
-    page: currentPage + 1,
-    limit: pageSize,
-    sort,
-    is_active: statusFun(),
+    page: filters.page + 1,
+    limit: filters.limit,
+    sort: filters.sort,
+    is_active:
+      filters.status === "active"
+        ? true
+        : filters.status === "inactive"
+        ? false
+        : "",
   });
 
-  const { mutateAsync: updateIndustry, isPending: isUpdatingIndustry } = useUpdateIndustry({
-    onSettled: () => setEditingIndustry(false),
-  });
+  /* -------------------- MUTATIONS -------------------- */
+  const { mutateAsync: updateIndustry, isPending: isUpdatingIndustry } =
+    useUpdateIndustry({
+      onSettled: () => setEditingIndustry(null),
+    });
 
-  const { mutateAsync: deleteIndustry, isPending: isDeletingIndustry } = useDeleteIndustry();
+  const { mutateAsync: deleteIndustry, isPending: isDeletingIndustry } =
+    useDeleteIndustry();
 
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editingIndustry, setEditingIndustry] = useState(null);
-
-  // Debounce search
-  // useEffect(() => {
-  //   const handler = setTimeout(() => {
-  //     setDebouncedSearchTerm(searchTerm);
-  //     setCurrentPage(0);
-  //   }, 500);
-  //   return () => clearTimeout(handler);
-  // }, [searchTerm]);
-
+  /* -------------------- HANDLERS -------------------- */
   const handleUpdate = async (payload) => {
     if (!editingIndustry) return;
-    // console.log("Input data coming into API  call:", payload);
     await updateIndustry({
-      id: editingIndustry?.industry_unique_id,
+      id: editingIndustry.industry_unique_id,
       data: payload,
     });
   };
@@ -93,36 +109,50 @@ const IndustryTypeList = () => {
     setEditingIndustry(item);
   }, []);
 
-  const handleDelete = useCallback(async (item) => {
-    if (window.confirm(`Delete ${item?.industry_name}?`)) {
-      await deleteIndustry(item?.industry_unique_id);
-    }
-  }, []);
+  const handleDelete = useCallback(
+    async (item) => {
+      if (window.confirm(`Delete ${item?.industry_name}?`)) {
+        await deleteIndustry(item?.industry_unique_id);
+      }
+    },
+    [deleteIndustry]
+  );
 
+  /* -------------------- COLUMNS (UNCHANGED) -------------------- */
   const columns = [
     {
       field: "industry_unique_id",
       headerName: "UNIQUE ID",
       flex: 1,
       renderCell: (params) => (
-        <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">{params.value}</span>
+        <span className="font-mono text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
+          {params.value}
+        </span>
       ),
     },
     {
       field: "industry_name",
       headerName: "INDUSTRY NAME",
       flex: 1,
-      renderCell: (params) => <span className="font-semibold text-gray-800">{params.value}</span>,
+      renderCell: (params) => (
+        <span className="font-semibold text-gray-800">
+          {params.value}
+        </span>
+      ),
     },
     {
       field: "is_active",
       headerName: "STATUS",
       flex: 1,
-      valueGetter: (params) => (params?.row?.is_active ? "Active" : "Inactive"),
+      valueGetter: (params) =>
+        params?.row?.is_active ? "Active" : "Inactive",
       renderCell: (params) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${params?.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-            }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${
+            params?.row?.is_active
+              ? "bg-green-100 text-green-800"
+              : "bg-red-100 text-red-800"
+          }`}
         >
           {params?.row?.is_active ? "Active" : "Inactive"}
         </span>
@@ -144,7 +174,6 @@ const IndustryTypeList = () => {
             <button
               onClick={() => handleEdit(params?.row)}
               className="text-indigo-600 hover:text-indigo-800 transition"
-              title="Edit"
             >
               <FaEdit size={18} />
             </button>
@@ -153,8 +182,7 @@ const IndustryTypeList = () => {
             <button
               onClick={() => handleDelete(params?.row)}
               disabled={isDeletingIndustry}
-              className="text-indigo-600 hover:text-indigo-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Delete"
+              className="text-indigo-600 hover:text-indigo-800 transition disabled:opacity-50"
             >
               <MdDelete size={18} />
             </button>
@@ -164,20 +192,18 @@ const IndustryTypeList = () => {
     });
   }
 
-  // const visibleColumns = columns.filter((col) => {
-  //   const headerConfig = columns.find((h) => h.key === col.headerName);
-  //   return headerConfig ? headerConfig.value : true;
-  // });
-  const visibleColumns = columns?.filter((col) => {
-    const headerConfig = industryHeaders?.find((h) => h?.key === col?.headerName);
-    return headerConfig ? headerConfig?.value : true;
+  const visibleColumns = columns.filter((col) => {
+    const headerConfig = industryHeaders.find(
+      (h) => h.key === col.headerName
+    );
+    return headerConfig ? headerConfig.value : true;
   });
 
+  /* -------------------- UI (UNCHANGED) -------------------- */
   return (
     <div className="min-h-screen bg-gray-50 p-2">
       <div className="max-w-8xl">
         <div className="bg-white shadow-2xl rounded-2xl overflow-hidden border border-gray-200">
-          {/* Header */}
           <PageHeader
             title="Industry Types"
             subtitle="Manage all industry classifications"
@@ -186,9 +212,15 @@ const IndustryTypeList = () => {
             onAction={() => setShowAddModal(true)}
           />
 
-          {/* Filters Row */}
           <div className="p-6 flex flex-wrap items-center gap-4 bg-gray-50 border-b">
-            <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
+            <SearchBar
+              searchTerm={filters.search}
+              onSearchChange={(value) =>
+                setFilters({ search: value, page: 0 })
+              }
+              placeholder="Search industry types..."
+            />
+
             <ColumnVisibilitySelector
               headers={industryHeaders}
               updateTableHeaders={updateTableHeaders}
@@ -196,39 +228,68 @@ const IndustryTypeList = () => {
               setIsDropdownOpen={setIsDropdownOpen}
               dropdownRef={dropdownRef}
             />
-            <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} placeholder="Status" />
+
+            <DropdownFilter
+              value={filters.status}
+              onSelect={(value) =>
+                setFilters({ status: value, page: 0 })
+              }
+              data={statusOptions}
+              placeholder="Status"
+            />
+
+            {/* 🔄 Reset Filters */}
+            <button
+              onClick={resetFilters}
+              title="Reset filters"
+              className="p-2 border rounded-md bg-white hover:bg-gray-100 transition"
+            >
+              <FiRefreshCcw size={18} />
+            </button>
           </div>
 
-          {/* Table */}
           <div className="p-6 bg-white">
             {loading ? (
-              <div className="text-center py-12 text-gray-500">Loading industries...</div>
+              <div className="text-center py-12 text-gray-500">
+                Loading industries...
+              </div>
             ) : error ? (
-              <div className="text-center py-12 text-red-600">Failed to load industries</div>
+              <div className="text-center py-12 text-red-600">
+                Failed to load industries
+              </div>
             ) : !industryTypes?.data?.length ? (
-              <div className="text-center py-12 text-gray-500">No industries found</div>
+              <div className="text-center py-12 text-gray-500">
+                No industries found
+              </div>
             ) : (
               <DataTable
                 rows={industryTypes?.data || []}
                 getRowId={(row) => row?.industry_unique_id}
                 columns={visibleColumns}
-                page={currentPage}
-                pageSize={pageSize}
+                page={filters.page}
+                pageSize={filters.limit}
                 totalCount={industryTypes?.totalCount || 0}
-                setCurrentPage={setCurrentPage}
-                setPageSize={setPageSize}
-                sort={sort}
+                setCurrentPage={(page) =>
+                  setFilter("page", page)
+                }
+                setPageSize={(limit) =>
+                  setFilters({ limit, page: 0 })
+                }
+                sort={filters.sort}
                 setSort={(newSort) => {
                   const sortItem = newSort[0];
-                  setSort(sortItem ? `${sortItem?.field}:${sortItem?.sort}` : "");
+                  setFilter(
+                    "sort",
+                    sortItem
+                      ? `${sortItem.field}:${sortItem.sort}`
+                      : ""
+                  );
                 }}
               />
             )}
           </div>
         </div>
       </div>
-
-      {/* Add Modal */}
 
       <Activity mode={showAddModal ? "visible" : "hidden"}>
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -238,7 +299,6 @@ const IndustryTypeList = () => {
         </div>
       </Activity>
 
-      {/* Edit Modal */}
       {editingIndustry && (
         <IndustryTypeEditModal
           formData={editingIndustry}
@@ -247,13 +307,6 @@ const IndustryTypeList = () => {
           isSubmitting={isUpdatingIndustry}
         />
       )}
-      {/* <Activity mode={editingIndustry ? "visible" : "hidden"}>
-        <IndustryTypeEditModal
-          formData={editingIndustry}
-          onSubmit={handleUpdate}
-          closeModal={() => setEditingIndustry(null)}
-        />
-      </Activity> */}
     </div>
   );
 };

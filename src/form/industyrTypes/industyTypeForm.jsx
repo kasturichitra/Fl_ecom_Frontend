@@ -12,11 +12,17 @@ const IndustryTypeForm = ({ fields = [], onSubmit, onCancel, isSubmitting, addit
     formState: { errors },
     watch,
     setValue,
+    reset,
   } = useForm({
     resolver: yupResolver(industryTypeSchema),
     defaultValues: industryDefaultValues,
     mode: "onBlur", // Validate on blur for better UX
   });
+
+  const handleFormSubmit = async (data) => {
+    await onSubmit(data);
+    reset(industryDefaultValues); // Reset form after successful submission
+  };
 
   const formData = watch();
 
@@ -28,7 +34,7 @@ const IndustryTypeForm = ({ fields = [], onSubmit, onCancel, isSubmitting, addit
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(handleFormSubmit)}>
       <DynamicForm
         fields={fields}
         formData={formData}

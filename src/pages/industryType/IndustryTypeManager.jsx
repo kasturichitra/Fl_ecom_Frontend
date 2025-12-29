@@ -7,7 +7,7 @@ import toBase64 from "../../utils/toBase64";
 const IndustryTypeManager = ({ onCancel }) => {
   const { mutateAsync: createIndustry, isPending: isCreatingIndustry } = useCreateIndustry({
     onSuccess: () => {
-      onCancel();
+      onCancel(); // Close the modal after successful creation
     },
   });
 
