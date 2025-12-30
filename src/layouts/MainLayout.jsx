@@ -24,7 +24,7 @@ const MainLayout = ({ children }) => {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-screen w-64 lg:w-72 bg-gray-900 text-white shadow-2xl z-50 overflow-y-auto transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed top-0 left-0 h-screen w-64 lg:w-72 bg-gray-900 text-white shadow-2xl z-50 flex flex-col transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           } lg:translate-x-0`}
       >
         <div className="p-8 border-b border-gray-800 flex justify-between items-center">
@@ -55,30 +55,32 @@ const MainLayout = ({ children }) => {
           </button>
         </div>
 
-        <nav className="mt-8 space-y-3 px-6 pb-24">
-          {sidebarElements.map((item) => {
-            if (item.type === "divider") {
-              return <div key={item.id} className="h-px bg-gray-800 my-6" />;
-            }
-            const IconComponent = item.icon;
-            return (
-              <NavLink
-                key={item.id}
-                to={item.path}
-                end={item.end}
-                className={({ isActive }) =>
-                  `flex items-center gap-4 px-6 py-4 rounded-xl text-lg font-medium transition-all duration-300 ${isActive
-                    ? "bg-linear-to-r from-indigo-600 to-purple-600 shadow-xl text-white scale-105"
-                    : "text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-2"
-                  }`
-                }
-              >
-                <IconComponent className="w-6 h-6" />
-                <span>{item.label}</span>
-              </NavLink>
-            );
-          })}
-        </nav>
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          <nav className="mt-8 space-y-3 px-6 pb-24">
+            {sidebarElements.map((item) => {
+              if (item.type === "divider") {
+                return <div key={item.id} className="h-px bg-gray-800 my-6" />;
+              }
+              const IconComponent = item.icon;
+              return (
+                <NavLink
+                  key={item.id}
+                  to={item.path}
+                  end={item.end}
+                  className={({ isActive }) =>
+                    `flex items-center gap-4 px-6 py-4 rounded-xl text-lg font-medium transition-all duration-300 ${isActive
+                      ? "bg-linear-to-r from-indigo-600 to-purple-600 shadow-xl text-white scale-105"
+                      : "text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-2"
+                    }`
+                  }
+                >
+                  <IconComponent className="w-6 h-6" />
+                  <span>{item.label}</span>
+                </NavLink>
+              );
+            })}
+          </nav>
+        </div>
       </aside>
 
       {/* Navbar with Toggle */}
