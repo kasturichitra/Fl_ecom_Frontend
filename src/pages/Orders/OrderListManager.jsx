@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { FiRefreshCcw } from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router-dom";
 import PageHeader from "../../components/PageHeader";
 import SearchBar from "../../components/SearchBar";
@@ -10,22 +11,23 @@ import { toIndianCurrency } from "../../utils/toIndianCurrency";
 import { useOrderTableHeadersStore } from "../../stores/OrderTableHeaderStore";
 import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector";
 import useDebounce from "../../hooks/useDebounce.js";
+import { useOrderFiltersStore } from "../../stores/orderFiltersStore.js";
 
 const OrderListManager = () => {
-  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [pageSize, setPageSize] = useState(10);
-  const [currentPage, setCurrentPage] = useState(0); // 0-based page
 
-  const [orderStatus, setOrderStatus] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("");
-  const [orderType, setOrderType] = useState("");
+  /* -------------------- ZUSTAND -------------------- */
+  const {
+    filters,
+    setFilter,
+    setFilters,
+    resetFilters,
+  } = useOrderFiltersStore();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const { orderHeaders, updateOrderHeaders } = useOrderTableHeadersStore();
-
   const handleClickOutside = useCallback((event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       setIsDropdownOpen(false);
@@ -39,15 +41,15 @@ const OrderListManager = () => {
     };
   }, [handleClickOutside]);
 
-  const debouncedSearchTerm = useDebounce(searchTerm, DEBOUNCED_DELAY);
+  const debouncedSearchTerm = useDebounce(filters.search, DEBOUNCED_DELAY);
 
   const { data, isLoading, isError } = useGetAllOrders({
     searchTerm: debouncedSearchTerm,
-    page: currentPage + 1,
-    limit: pageSize,
-    order_status: orderStatus,
-    order_type: orderType,
-    payment_method: paymentMethod,
+    page: filters.page + 1,
+    limit: filters.limit,
+    order_status: filters.orderStatus,
+    order_type: filters.orderType,
+    payment_method: filters.paymentMethod,
   });
 
   const handleRowClick = (params) => {
@@ -164,8 +166,8 @@ const OrderListManager = () => {
         {/* SEARCH (NO GAP) */}
         <div className="p-6 bg-gray-50 border-b flex items-center gap-4">
           <SearchBar
-            searchTerm={searchTerm}
-            onSearchChange={setSearchTerm}
+            searchTerm={filters.search}
+            onSearchChange={(value) => setFilters({ search: value, page: 0 })}
             placeholder="Search orders..."
             className=" max-w-md"
           />
@@ -177,9 +179,32 @@ const OrderListManager = () => {
             dropdownRef={dropdownRef}
           />
 
-          <DropdownFilter value={orderStatus} onSelect={setOrderStatus} data={ORDER_STATUS_OPTIONS} />
-          <DropdownFilter value={paymentMethod} onSelect={setPaymentMethod} data={PAYMENT_METHOD_OPTIONS} />
-          <DropdownFilter value={orderType} onSelect={setOrderType} data={ORDER_TYPE_OPTIONS} />
+          <DropdownFilter
+            value={filters.orderStatus}
+            onSelect={(val) => setFilters({ orderStatus: val, page: 0 })}
+            data={ORDER_STATUS_OPTIONS}
+            placeholder="Order Status"
+          />
+          <DropdownFilter
+            value={filters.paymentMethod}
+            onSelect={(val) => setFilters({ paymentMethod: val, page: 0 })}
+            data={PAYMENT_METHOD_OPTIONS}
+            placeholder="Payment Method"
+          />
+          <DropdownFilter
+            value={filters.orderType}
+            onSelect={(val) => setFilters({ orderType: val, page: 0 })}
+            data={ORDER_TYPE_OPTIONS}
+            placeholder="Order Type"
+          />
+          {/* 🔄 Reset Filters */}
+          <button
+            onClick={resetFilters}
+            title="Reset filters"
+            className="p-2 border rounded-md bg-white hover:bg-gray-100 transition"
+          >
+            <FiRefreshCcw size={18} />
+          </button>
         </div>
 
         {/* TABLE - Stick to top without gap */}
@@ -191,11 +216,11 @@ const OrderListManager = () => {
               rows={data?.data || []}
               getRowId={(row) => row?._id}
               columns={visibleColumns}
-              page={currentPage}
-              pageSize={pageSize}
+              page={filters.page}
+              pageSize={filters.limit}
               totalCount={data?.totalCount || 0}
-              setCurrentPage={setCurrentPage}
-              setPageSize={setPageSize}
+              setCurrentPage={(page) => setFilter("page", page)}
+              setPageSize={(limit) => setFilters({ limit, page: 0 })}
               onRowClick={handleRowClick}
               pathname={pathname}
             />
