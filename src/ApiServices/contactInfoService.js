@@ -6,10 +6,6 @@ export const getContactInfo = () => {
   return axiosInstance.get(`${BASE_URL}`);
 };
 
-export const createContactInfo = (formData) => {
-  return axiosInstance.put(`${BASE_URL}/create`, formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+export const createContactInfo = (payload) => {
+  return axiosInstance.put(`${BASE_URL}/create`, payload);
 };

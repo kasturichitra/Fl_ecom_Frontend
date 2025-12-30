@@ -1,21 +1,13 @@
 import ContactInfoForm from "../../form/contactInfo/ContactInfoForm";
-import {
-  useCreateContactInfo,
-  useGetContactInfo,
-} from "../../hooks/useContactInfo";
-import { objectToFormData } from "../../utils/ObjectToFormData";
+import { useCreateContactInfo, useGetContactInfo } from "../../hooks/useContactInfo";
+import toBase64 from "../../utils/toBase64";
 
 const ContactInfoManager = ({ onCancel }) => {
   /* ---------- GET EXISTING CONTACT INFO ---------- */
   const { data: contactInfo, isLoading } = useGetContactInfo();
 
-  // console.log("contactInfo", contactInfo);
-
   /* ---------- PUT (CREATE / UPDATE) ---------- */
-  const {
-    mutateAsync: saveContactInfo,
-    isPending: isSavingContactInfo,
-  } = useCreateContactInfo({
+  const { mutateAsync: saveContactInfo, isPending: isSavingContactInfo } = useCreateContactInfo({
     onSuccess: () => {
       onCancel?.();
     },
@@ -23,19 +15,17 @@ const ContactInfoManager = ({ onCancel }) => {
 
   /* ---------- SUBMIT ---------- */
   const handleSaveContactInfo = async (formValues) => {
-    console.log("formValues", formValues);
-    const {logo_image, ...rest} = formValues;
-    const formData = objectToFormData(rest);
-    formData.append("logo_image", logo_image[0]);
-    await saveContactInfo(formData); // SAME PUT for create + update
+    const { logo_image, _id, __v, createdAt, updatedAt, ...rest } = formValues;
+
+    const payload = {
+      ...rest,
+      image_base64: logo_image && toBase64(logo_image),
+    };
+    await saveContactInfo(payload); // SAME PUT for create + update
   };
 
   if (isLoading) {
-    return (
-      <div className="p-8 text-center text-gray-500">
-        Loading contact information...
-      </div>
-    );
+    return <div className="p-8 text-center text-gray-500">Loading contact information...</div>;
   }
 
   return (
@@ -43,15 +33,13 @@ const ContactInfoManager = ({ onCancel }) => {
       {/* Header */}
       <div className="bg-linear-to-r from-indigo-600 to-purple-700 text-white px-8 py-10 text-center">
         <h2 className="text-4xl font-extrabold">Contact Information</h2>
-        <p className="opacity-90 mt-2">
-          Manage support details, social links, and branding
-        </p>
+        <p className="opacity-90 mt-2">Manage support details, social links, and branding</p>
       </div>
 
       {/* Form */}
       <div className="p-8 bg-gray-50">
         <ContactInfoForm
-          initialValues={contactInfo}   
+          initialValues={contactInfo}
           onSubmit={handleSaveContactInfo}
           isSubmitting={isSavingContactInfo}
           additionalContent={
