@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import { FiRefreshCcw } from "react-icons/fi";
 
 import PageHeader from "../../components/PageHeader";
 import SearchBar from "../../components/SearchBar";
@@ -12,6 +13,7 @@ import { useCategoryDelete, useGetAllCategories } from "../../hooks/useCategory.
 import { useGetAllIndustries } from "../../hooks/useIndustry.js";
 import { DEBOUNCED_DELAY, statusOptions } from "../../lib/constants.js";
 import { useCategoryTableHeadersStore } from "../../stores/CategoryTableHeaderStore.js";
+import { useCategoryFiltersStore } from "../../stores/categoryFiltersStore.js";
 
 import CategoryEditModal from "./CategoryEditModal";
 import CategoryManager from "./CategoryManager";
@@ -20,13 +22,17 @@ import useCheckPermission from "../../hooks/useCheckPermission.js";
 import VerifyPermission from "../../middleware/verifyPermission.js";
 
 const CategoryListManager = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [pageSize, setPageSize] = useState(10);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [industryId, setIndustryId] = useState("");
-  const [activeStatus, setActiveStatus] = useState("");
-  const [sort, setSort] = useState("createdAt:desc");
+  /* -------------------- ZUSTAND -------------------- */
+  const { categoryHeaders, updateCategoryTableHeaders } = useCategoryTableHeadersStore();
 
+  const {
+    filters,
+    setFilter,
+    setFilters,
+    resetFilters,
+  } = useCategoryFiltersStore();
+
+  /* -------------------- LOCAL UI STATE (NON-FILTER) -------------------- */
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
 
@@ -36,9 +42,7 @@ const CategoryListManager = () => {
   const canUpdate = useCheckPermission("category:update");
   const canDelete = useCheckPermission("category:delete");
 
-  const { categoryHeaders, updateCategoryTableHeaders } = useCategoryTableHeadersStore();
-
-  // Click outside to close column selector
+  /* -------------------- CLICK OUTSIDE -------------------- */
   const handleClickOutside = useCallback((event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       setIsDropdownOpen(false);
@@ -50,16 +54,17 @@ const CategoryListManager = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [handleClickOutside]);
 
-  const debouncedSearchTerm = useDebounce(searchTerm, DEBOUNCED_DELAY);
+  /* -------------------- DEBOUNCE SEARCH -------------------- */
+  const debouncedSearchTerm = useDebounce(filters.search, DEBOUNCED_DELAY);
 
-  // Status filter
+  /* -------------------- STATUS FILTER HELPER -------------------- */
   const getStatusFilter = () => {
-    if (activeStatus === "active") return true;
-    if (activeStatus === "inactive") return false;
+    if (filters.status === "active") return true;
+    if (filters.status === "inactive") return false;
     return undefined;
   };
 
-  // Industries dropdown
+  /* -------------------- INDUSTRIES DROPDOWN -------------------- */
   const { data: industriesData } = useGetAllIndustries();
   const formattedIndustries = [
     { label: "All Industries", value: "" },
@@ -69,22 +74,24 @@ const CategoryListManager = () => {
     })) || []),
   ];
 
-  // Fetch categories
+  /* -------------------- DATA FETCH -------------------- */
   const {
     data: categories,
     isLoading: loading,
     isError: error,
   } = useGetAllCategories({
     search: debouncedSearchTerm,
-    page: currentPage + 1,
-    limit: pageSize,
-    sort,
+    page: filters.page + 1,
+    limit: filters.limit,
+    sort: filters.sort,
     is_active: getStatusFilter(),
-    industry_unique_id: industryId || undefined,
+    industry_unique_id: filters.industryId || undefined,
   });
 
+  /* -------------------- MUTATIONS -------------------- */
   const { mutate: deleteCategory } = useCategoryDelete();
 
+  /* -------------------- HANDLERS -------------------- */
   const handleEdit = useCallback((category) => {
     setEditingCategory(category);
   }, []);
@@ -123,9 +130,8 @@ const CategoryListManager = () => {
       valueGetter: (params) => (params?.value ? "Active" : "Inactive"),
       renderCell: (params) => (
         <span
-          className={`px-3 py-1.5 rounded-full text-xs font-bold ${
-            params?.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
+          className={`px-3 py-1.5 rounded-full text-xs font-bold ${params?.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            }`}
         >
           {params?.row?.is_active ? "Active" : "Inactive"}
         </span>
@@ -187,7 +193,11 @@ const CategoryListManager = () => {
 
           {/* Filters */}
           <div className="p-6 flex flex-wrap items-center gap-4 bg-gray-50 border-b">
-            <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search categories..." />
+            <SearchBar
+              searchTerm={filters.search}
+              onSearchChange={(value) => setFilters({ search: value, page: 0 })}
+              placeholder="Search categories..."
+            />
             <ColumnVisibilitySelector
               headers={categoryHeaders}
               updateTableHeaders={updateCategoryTableHeaders}
@@ -195,13 +205,27 @@ const CategoryListManager = () => {
               setIsDropdownOpen={setIsDropdownOpen}
               dropdownRef={dropdownRef}
             />
-            <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} placeholder="Status" />
+            <DropdownFilter
+              value={filters.status}
+              onSelect={(value) => setFilters({ status: value, page: 0 })}
+              data={statusOptions}
+              placeholder="Status"
+            />
             <DropdownFilter
               data={formattedIndustries}
-              onSelect={setIndustryId}
-              value={industryId}
+              onSelect={(value) => setFilters({ industryId: value, page: 0 })}
+              value={filters.industryId}
               placeholder="Industry"
             />
+
+            {/* 🔄 Reset Filters */}
+            <button
+              onClick={resetFilters}
+              title="Reset filters"
+              className="p-2 border rounded-md bg-white hover:bg-gray-100 transition"
+            >
+              <FiRefreshCcw size={18} />
+            </button>
           </div>
 
           {/* Table */}
@@ -243,15 +267,18 @@ const CategoryListManager = () => {
                   rows={categories?.data || []}
                   getRowId={(row) => row?.category_unique_id}
                   columns={visibleColumns}
-                  page={currentPage}
-                  pageSize={pageSize}
+                  page={filters.page}
+                  pageSize={filters.limit}
                   totalCount={categories?.totalCount || 0}
-                  setCurrentPage={setCurrentPage}
-                  setPageSize={setPageSize}
-                  sort={sort}
+                  setCurrentPage={(page) => setFilter("page", page)}
+                  setPageSize={(limit) => setFilters({ limit, page: 0 })}
+                  sort={filters.sort}
                   setSort={(newSort) => {
                     const item = newSort[0];
-                    setSort(item ? `${item?.field}:${item?.sort}` : "");
+                    setFilter(
+                      "sort",
+                      item ? `${item?.field}:${item?.sort}` : ""
+                    );
                   }}
                   loading={loading}
                   // Beautiful empty state — table stays visible!
@@ -273,7 +300,7 @@ const CategoryListManager = () => {
                       </svg>
                       <p className="text-xl font-medium">No categories found</p>
                       <p className="text-sm mt-2">
-                        {searchTerm || industryId || activeStatus !== ""
+                        {filters.search || filters.industryId || filters.status !== ""
                           ? "Try changing your search or filters"
                           : "Click 'Add New Category' to create your first one"}
                       </p>

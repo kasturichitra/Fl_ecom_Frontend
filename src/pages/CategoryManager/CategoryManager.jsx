@@ -76,7 +76,7 @@ const CategoryManager = ({ onCancel }) => {
     const imageBase64 = await toBase64(formData?.image);
     //  console.log({})
     // console.log("Image base64", imageBase64);
-    const { image, ...rest } = formData
+    const { image, currentImage, ...rest } = formData;
     await createCategory({ ...rest, image_base64: imageBase64 });
   };
 

@@ -4,6 +4,7 @@ import { useDeleteBrand, useGetAllBrands } from "../../hooks/useBrand";
 
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import { FiRefreshCcw } from "react-icons/fi";
 import PageHeader from "../../components/PageHeader";
 import SearchBar from "../../components/SearchBar";
 import DataTable from "../../components/Table";
@@ -13,30 +14,34 @@ import { DropdownFilter } from "../../components/DropdownFilter";
 import { DEBOUNCED_DELAY, statusOptions } from "../../lib/constants";
 import { useGetAllCategories } from "../../hooks/useCategory";
 import { useBrandTableHeadersStore } from "../../stores/BrandTableHeaderStore";
+import { useBrandFiltersStore } from "../../stores/brandFiltersStore";
 import ColumnVisibilitySelector from "../../components/ColumnVisibilitySelector";
 import useDebounce from "../../hooks/useDebounce.js";
 import VerifyPermission from "../../middleware/verifyPermission.js";
 import useCheckPermission from "../../hooks/useCheckPermission.js";
 
 const BrandListManager = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [pageSize, setPageSize] = useState(10);
-  const [currentPage, setCurrentPage] = useState(0);
+  /* -------------------- ZUSTAND -------------------- */
+  const { brandHeaders, updateBrandTableHeaders } = useBrandTableHeadersStore();
+
+  const {
+    filters,
+    setFilter,
+    setFilters,
+    resetFilters,
+  } = useBrandFiltersStore();
+
+  /* -------------------- LOCAL UI STATE (NON-FILTER) -------------------- */
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingBrand, setEditingBrand] = useState(null);
 
   const canUpdate = useCheckPermission("brand:update");
   const canDelete = useCheckPermission("brand:delete");
-  // 0-based page
 
-  // const { mutateAsync: deleteBrandMutation } = useDeleteBrand();
-
-  const [caterogyId, setCaterogyId] = useState("");
-  const [activeStatus, setActiveStatus] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const { brandHeaders, updateBrandTableHeaders } = useBrandTableHeadersStore();
 
+  /* -------------------- CLICK OUTSIDE -------------------- */
   const handleClickOutside = useCallback((event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       setIsDropdownOpen(false);
@@ -50,15 +55,18 @@ const BrandListManager = () => {
     };
   }, [handleClickOutside]);
 
-  const debouncedSearchTerm = useDebounce(searchTerm, DEBOUNCED_DELAY);
+  /* -------------------- DEBOUNCE SEARCH -------------------- */
+  const debouncedSearchTerm = useDebounce(filters.search, DEBOUNCED_DELAY);
 
+  /* -------------------- STATUS FILTER HELPER -------------------- */
   const statusFun = () => {
-    if (activeStatus === "active") return true;
-    if (activeStatus === "inactive") return false;
+    if (filters.status === "active") return true;
+    if (filters.status === "inactive") return false;
 
     return undefined; // ⭐ FIX — remove filter
   };
 
+  /* -------------------- CATEGORIES DROPDOWN -------------------- */
   const { data: categories } = useGetAllCategories();
 
   let formattedCategories =
@@ -72,13 +80,17 @@ const BrandListManager = () => {
     value: "",
   });
 
+  /* -------------------- DATA FETCH -------------------- */
   const { data: brandsData, isError } = useGetAllBrands({
     searchTerm: debouncedSearchTerm,
-    page: currentPage + 1, // API pages are 1-based
-    limit: pageSize,
+    page: filters.page + 1, // API pages are 1-based
+    limit: filters.limit,
     is_active: statusFun(),
-    category_unique_id: caterogyId,
+    category_unique_id: filters.categoryId,
   });
+
+  /* -------------------- MUTATIONS -------------------- */
+  const { mutate: deleteBrand } = useDeleteBrand();
 
   const data = brandsData?.data || [];
 
@@ -167,9 +179,8 @@ const BrandListManager = () => {
       valueGetter: (params) => (params.value ? "Active" : "Inactive"), // Convert boolean → string
       renderCell: (params) => (
         <span
-          className={`px-3 py-1 rounded-full text-xs font-bold ${
-            params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-          }`}
+          className={`px-3 py-1 rounded-full text-xs font-bold ${params.row?.is_active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+            }`}
         >
           {params.row?.is_active ? "Active" : "Inactive"}
         </span>
@@ -218,16 +229,16 @@ const BrandListManager = () => {
     });
   }
 
+  /* -------------------- HANDLERS -------------------- */
   const handleEdit = (brand) => {
     setEditingBrand(brand);
   };
 
-  // const handleDelete = async (brand) => {
-  //   if (!window.confirm(`Delete brand "${brand.brand_name}"?`)) return;
-  //   console.log(brand.brand_unique_id ,'chacking brand data is get or not');
-
-  //   await deleteBrandMutation(brand.brand_unique_id);
-  // };
+  const handleDelete = (brand) => {
+    if (window.confirm(`Delete brand "${brand.brand_name}"?`)) {
+      deleteBrand(brand.brand_unique_id);
+    }
+  };
 
   const handleCloseAddModal = () => {
     setShowAddModal(false);
@@ -259,7 +270,11 @@ const BrandListManager = () => {
 
           {/* SEARCH BAR */}
           <div className="p-6 flex items-center gap-4 bg-gray-50 border-b">
-            <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} placeholder="Search industry types..." />
+            <SearchBar
+              searchTerm={filters.search}
+              onSearchChange={(value) => setFilters({ search: value, page: 0 })}
+              placeholder="Search brands..."
+            />
             <ColumnVisibilitySelector
               headers={brandHeaders}
               updateTableHeaders={updateBrandTableHeaders}
@@ -267,8 +282,27 @@ const BrandListManager = () => {
               isDropdownOpen={isDropdownOpen}
               dropdownRef={dropdownRef}
             />
-            <DropdownFilter value={activeStatus} onSelect={setActiveStatus} data={statusOptions} />
-            <DropdownFilter data={formattedCategories} onSelect={(id) => setCaterogyId(id)} />
+            <DropdownFilter
+              value={filters.status}
+              onSelect={(value) => setFilters({ status: value, page: 0 })}
+              data={statusOptions}
+              placeholder="Status"
+            />
+            <DropdownFilter
+              data={formattedCategories}
+              onSelect={(value) => setFilters({ categoryId: value, page: 0 })}
+              value={filters.categoryId}
+              placeholder="Category"
+            />
+
+            {/* 🔄 Reset Filters */}
+            <button
+              onClick={resetFilters}
+              title="Reset filters"
+              className="p-2 border rounded-md bg-white hover:bg-gray-100 transition"
+            >
+              <FiRefreshCcw size={18} />
+            </button>
           </div>
 
           {/* TABLE */}
@@ -280,11 +314,11 @@ const BrandListManager = () => {
                 rows={data || []}
                 getRowId={(row) => row?.brand_unique_id}
                 columns={visibleColumns}
-                page={currentPage}
-                pageSize={pageSize}
+                page={filters.page}
+                pageSize={filters.limit}
                 totalCount={brandsData?.totalCount || 0}
-                setCurrentPage={setCurrentPage}
-                setPageSize={setPageSize}
+                setCurrentPage={(page) => setFilter("page", page)}
+                setPageSize={(limit) => setFilters({ limit, page: 0 })}
               />
             )}
           </div>
