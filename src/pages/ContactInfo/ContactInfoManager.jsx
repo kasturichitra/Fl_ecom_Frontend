@@ -20,7 +20,9 @@ const ContactInfoManager = ({ onCancel }) => {
     console.log("logo_image", formValues.logo_image);
     const { logo_image, _id, __v, createdAt, updatedAt, ...rest } = formValues;
 
-    const imageBase64 = logo_image ? await toBase64(logo_image) : null;
+    console.log("Logo image", logo_image);
+    const imageBase64 = logo_image instanceof File ? await toBase64(logo_image) : null;
+
     const payload = {
       ...rest,
       ...(logo_image && { image_base64: imageBase64 }),
