@@ -27,9 +27,14 @@ const IndustryTypeForm = ({ fields = [], onSubmit, onCancel, isSubmitting, addit
   const formData = watch();
 
   const setFormData = (updater) => {
-    const newData = typeof updater === "function" ? updater(formData) : updater;
+    const currentValues = watch(); // Get the most up-to-date form values
+    const newData = typeof updater === "function" ? updater(currentValues) : updater;
+
+    // Only update values that have actually changed
     Object?.keys(newData)?.forEach((key) => {
-      setValue(key, newData[key], { shouldValidate: true });
+      if (newData[key] !== currentValues[key]) {
+        setValue(key, newData[key], { shouldValidate: true });
+      }
     });
   };
 
