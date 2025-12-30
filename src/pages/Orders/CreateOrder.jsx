@@ -184,6 +184,7 @@ const CreateOrder = () => {
         unit_discounted_price: p?.discounted_price,
         unit_tax_value: p?.tax_value || 0,
         unit_final_price: p?.final_price,
+        unit_gross_price: p?.gross_price,
         additional_discount_percentage: p?.additional_discount_percentage || 0,
         additional_discount_amount: p?.additional_discount_amount || 0,
         additional_discount_type: p?.additional_discount_type || null,
@@ -383,12 +384,12 @@ const CreateOrder = () => {
     customerForm?.customerName.trim() && customerForm?.mobileNumber.trim() && selectedProducts?.length > 0;
 
   const columns = [
-    { field: "id", headerName: "ID", flex: 1, },
-    { field: "customerName", headerName: "Customer", flex: 1, },
-    { field: "mobile", headerName: "Mobile", flex: 1, },
-    { field: "items", headerName: "Items", flex: 1, },
-    { field: "createdAt", headerName: "Created At", flex: 1, },
-    { field: "total", headerName: "Total (₹)", flex: 1, },
+    { field: "id", headerName: "ID", flex: 1 },
+    { field: "customerName", headerName: "Customer", flex: 1 },
+    { field: "mobile", headerName: "Mobile", flex: 1 },
+    { field: "items", headerName: "Items", flex: 1 },
+    { field: "createdAt", headerName: "Created At", flex: 1 },
+    { field: "total", headerName: "Total (₹)", flex: 1 },
     {
       field: "actions",
       headerName: "Actions",
@@ -447,7 +448,6 @@ const CreateOrder = () => {
             title="Create New Offline Order"
             subtitle="Manage all your store orders from here"
             createPermission="order:create"
-
           />
         </div>
 
@@ -465,7 +465,9 @@ const CreateOrder = () => {
               <div className="space-y-5">
                 {/* Customer Name */}
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibold text-gray-700 ml-1">Customer Name <span className="text-red-500">*</span></label>
+                  <label className="text-sm font-semibold text-gray-700 ml-1">
+                    Customer Name <span className="text-red-500">*</span>
+                  </label>
                   <div className="relative">
                     <FiUser className="absolute left-3 top-3 text-gray-400" />
                     <input
@@ -481,8 +483,12 @@ const CreateOrder = () => {
 
                 {/* Customer Mobile */}
                 <div className="space-y-1.5">
-                  <label className="text-sm font-semibol
-                  d text-gray-700 ml-1">Mobile Number <span className="text-red-500">*</span></label>
+                  <label
+                    className="text-sm font-semibol
+                  d text-gray-700 ml-1"
+                  >
+                    Mobile Number <span className="text-red-500">*</span>
+                  </label>
                   <div className="relative">
                     <FiSmartphone className="absolute left-3 top-3 text-gray-400" />
                     <input
@@ -697,26 +703,22 @@ const CreateOrder = () => {
                   <button
                     onClick={handleHoldOrder}
                     disabled={!isFormValid || isCreatingOrder}
-                    className={`w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transition-all flex items-center justify-center gap-3 ${!isFormValid || isCreatingOrder
+                    className={`w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transition-all flex items-center justify-center gap-3 ${
+                      !isFormValid || isCreatingOrder
                         ? "bg-gray-400 cursor-not-allowed"
                         : "bg-blue-600 hover:bg-blue-700 hover:shadow-blue-200 hover:-translate-y-1"
-                      }`}
+                    }`}
                   >
-                    {isCreatingOrder ? (
-                      <>Processing...</>
-                    ) : (
-                      <>
-                        Hold
-                      </>
-                    )}
+                    {isCreatingOrder ? <>Processing...</> : <>Hold</>}
                   </button>
                   <button
                     onClick={handleSubmitOrder}
                     disabled={!isFormValid || isCreatingOrder}
-                    className={`w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transition-all flex items-center justify-center gap-3 ${!isFormValid || isCreatingOrder
+                    className={`w-full py-4 rounded-xl font-bold text-white text-lg shadow-lg transition-all flex items-center justify-center gap-3 ${
+                      !isFormValid || isCreatingOrder
                         ? "bg-gray-400 cursor-not-allowed"
                         : "bg-blue-600 hover:bg-blue-700 hover:shadow-blue-200 hover:-translate-y-1"
-                      }`}
+                    }`}
                   >
                     {isCreatingOrder ? (
                       <>Processing...</>
@@ -811,8 +813,6 @@ const CreateOrder = () => {
 };
 
 export default CreateOrder;
-
-
 
 // import React, { useState, useEffect } from "react";
 // import { useGetAllProducts } from "../../hooks/useProduct";
@@ -1136,8 +1136,8 @@ export default CreateOrder;
 //                 </div>
 //                 <div className="w-full">
 //                   {/* Using SearchDropdown but styling it via container and generic styling */}
-//                   {/* Since SearchDropdown renders its own input, we rely on its internal styles or we might need to wrap it. 
-//                         Assuming SearchDropdown is flexible or we accept its style, but let's try to simulate the look 
+//                   {/* Since SearchDropdown renders its own input, we rely on its internal styles or we might need to wrap it.
+//                         Assuming SearchDropdown is flexible or we accept its style, but let's try to simulate the look
 //                         User asked: 'Large search input labeled Search box for products'
 //                         We'll overlay a label or just use placeholder.
 //                     */}
@@ -1205,7 +1205,7 @@ export default CreateOrder;
 //                           {product?.product_name.charAt(0)}
 //                         </div> */}
 
-//                         <img 
+//                         <img
 //                           src={product?.product_image?.low || "https://placehold.co/400x400/indigo/white?text=Product"}
 //                           className="object-cover size-12 rounded-md"
 //                           alt={product?.product_name}
