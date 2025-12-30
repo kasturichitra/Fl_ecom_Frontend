@@ -13,5 +13,8 @@ export const contactInfoDefaultValues = {
   terms_and_conditions: "",
   privacy_policy: "",
 
+  welcome_message : "",
+  business_name : "",
+
   logo_image: null, // File upload or existing URL
 };

@@ -128,6 +128,20 @@ const ContactInfoForm = ({ onSubmit, isSubmitting, additionalContent = null, ini
           {errors?.privacy_policy && <p className="text-red-500 text-xs mt-1">{errors?.privacy_policy?.message}</p>}
         </div>
 
+        {/* Welcome Message */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Welcome Message</label>
+          <textarea {...register("welcome_message")} rows={4} className="w-full p-2 border rounded" />
+          {errors?.welcome_message && <p className="text-red-500 text-xs mt-1">{errors?.welcome_message?.message}</p>}
+        </div>
+
+        {/* Business Name */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Business Name</label>
+          <input {...register("business_name")} className="w-full p-2 border rounded" />
+          {errors?.business_name && <p className="text-red-500 text-xs mt-1">{errors?.business_name?.message}</p>}
+        </div>
+
         {/* Logo */}
         {/* <div className="md:col-span-2">
           <label className="block text-sm font-medium mb-1">Upload Logo</label>

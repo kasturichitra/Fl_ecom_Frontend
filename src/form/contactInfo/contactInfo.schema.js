@@ -62,4 +62,14 @@ export const contactInfoSchema = yup.object().shape({
 //       if (typeof value === "string") return true; // existing image URL
 //       return value instanceof File && value.type.startsWith("image/");
 //     }),
+
+   welcome_message : yup
+    .string()
+    .required("Welcome Message is required")
+    .max(500, "Welcome Message cannot exceed 500 characters"),
+
+    business_name : yup
+    .string()
+    .required("Business Name is required")
+    .max(500, "Business Name cannot exceed 500 characters"),
 });
