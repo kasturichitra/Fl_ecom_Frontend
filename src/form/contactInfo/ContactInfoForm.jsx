@@ -2,19 +2,43 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { contactInfoSchema } from "./contactInfo.schema";
 import { contactInfoDefaultValues } from "./contactInfo.default";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Controller } from "react-hook-form";
+import { FcAddImage } from "react-icons/fc";
+import { MdDelete } from "react-icons/md";
+
 
 const ContactInfoForm = ({ onSubmit, isSubmitting, additionalContent = null, initialValues }) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    control,
     reset, // ✅ REQUIRED
   } = useForm({
     resolver: yupResolver(contactInfoSchema),
     defaultValues: contactInfoDefaultValues,
     mode: "onBlur",
   });
+
+  const [logoPreview, setLogoPreview] = useState(null);
+
+  console.log("initialValues", initialValues);
+  console.log("image", initialValues?.logo_image['low']);
+
+  useEffect(() => {
+    if (initialValues) {
+      reset({
+        ...contactInfoDefaultValues,
+        ...initialValues,
+      });
+
+      // 👇 show existing logo from backend
+      if (initialValues.logo_image) {
+        setLogoPreview(initialValues.logo_image['low']);
+      }
+    }
+  }, [initialValues, reset]);
 
   /* 🔥 THIS IS THE MISSING PIECE */
   useEffect(() => {
@@ -105,11 +129,81 @@ const ContactInfoForm = ({ onSubmit, isSubmitting, additionalContent = null, ini
         </div>
 
         {/* Logo */}
-        <div className="md:col-span-2">
+        {/* <div className="md:col-span-2">
           <label className="block text-sm font-medium mb-1">Upload Logo</label>
           <input type="file" {...register("logo_image")} accept="image/*" />
           {errors?.logo_image && <p className="text-red-500 text-xs mt-1">{errors?.logo_image?.message}</p>}
+        </div> */}
+        {/* Logo Upload */}
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium mb-2">Upload Logo</label>
+
+          <Controller
+            name="logo_image"
+            control={control}
+            render={({ field: { onChange } }) => (
+              <div className="flex flex-col gap-3">
+                {/* Upload Area */}
+                <label
+                  className="flex flex-col items-center justify-center gap-2
+                     w-full min-h-[120px] border-2 border-dashed rounded-xl
+                     cursor-pointer transition-all
+                     border-gray-300 bg-gray-50 hover:bg-gray-100"
+                >
+                  <FcAddImage size={48} className="opacity-80" />
+                  <span className="text-sm font-semibold text-gray-700">
+                    Click or drag logo to upload
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    PNG / JPG (recommended)
+                  </span>
+
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (!file) return;
+
+                      onChange(file); // RHF value
+                      setLogoPreview(URL.createObjectURL(file)); // preview
+                    }}
+                  />
+                </label>
+
+                {/* Preview */}
+                {logoPreview && (
+                  <div className="relative w-28 h-28">
+                    <img
+                      src={logoPreview}
+                      alt="Logo preview"
+                      className="w-full h-full object-cover rounded-xl border shadow-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onChange(null);
+                        setLogoPreview(null);
+                      }}
+                      className="absolute -top-2 -right-2 bg-red-600 text-white
+                         rounded-full p-1.5 hover:scale-110"
+                    >
+                      <MdDelete size={16} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          />
+
+          {errors?.logo_image && (
+            <p className="text-red-500 text-xs mt-1">
+              {errors.logo_image.message}
+            </p>
+          )}
         </div>
+
       </div>
 
       {/* Buttons */}

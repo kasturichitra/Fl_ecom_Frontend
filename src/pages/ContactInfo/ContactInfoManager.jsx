@@ -13,13 +13,17 @@ const ContactInfoManager = ({ onCancel }) => {
     },
   });
 
+  // console.log("contactInfo", contactInfo);
+
   /* ---------- SUBMIT ---------- */
   const handleSaveContactInfo = async (formValues) => {
+    console.log("logo_image", formValues.logo_image);
     const { logo_image, _id, __v, createdAt, updatedAt, ...rest } = formValues;
 
+    const imageBase64 = logo_image ? await toBase64(logo_image) : null;
     const payload = {
       ...rest,
-      image_base64: logo_image && toBase64(logo_image),
+      ...(logo_image && { image_base64: imageBase64 }),
     };
     await saveContactInfo(payload); // SAME PUT for create + update
   };
