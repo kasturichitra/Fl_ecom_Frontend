@@ -15,6 +15,7 @@ export const contactInfoDefaultValues = {
 
   welcome_message : "",
   business_name : "",
+  business_description : "",
 
   logo_image: null, // File upload or existing URL
 };
