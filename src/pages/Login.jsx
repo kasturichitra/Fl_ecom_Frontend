@@ -56,6 +56,7 @@ const Login = () => {
     const payload = {
       password: formData.password,
       device_name: "Web Browser",
+      is_admin: true
     };
 
     // Send as phone_number if it's a 10-digit number, else as email

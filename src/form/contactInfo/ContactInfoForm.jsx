@@ -23,8 +23,8 @@ const ContactInfoForm = ({ onSubmit, isSubmitting, additionalContent = null, ini
 
   const [logoPreview, setLogoPreview] = useState(null);
 
-  console.log("initialValues", initialValues);
-  console.log("image", initialValues?.logo_image['low']);
+  // console.log("initialValues", initialValues);
+  // console.log("image", initialValues?.logo_image['low']);
 
   useEffect(() => {
     if (initialValues) {
