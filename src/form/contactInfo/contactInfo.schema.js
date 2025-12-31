@@ -72,4 +72,9 @@ export const contactInfoSchema = yup.object().shape({
     .string()
     .required("Business Name is required")
     .max(500, "Business Name cannot exceed 500 characters"),
+
+    business_description : yup
+    .string()
+    .required("business_description is required")
+    .max(500,"business_description cannot exceed 500 characters")
 });

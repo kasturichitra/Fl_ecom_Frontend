@@ -142,6 +142,13 @@ const ContactInfoForm = ({ onSubmit, isSubmitting, additionalContent = null, ini
           {errors?.business_name && <p className="text-red-500 text-xs mt-1">{errors?.business_name?.message}</p>}
         </div>
 
+        {/* business_description */}
+        <div>
+          <label className="block text-sm font-medium mb-1">business_description</label>
+          <input {...register("business_description")} className="w-full p-2 border rounded" />
+          {errors?.business_description && <p className="text-red-500 text-xs mt-1">{errors?.business_description?.message}</p>}
+        </div>
+
         {/* Logo */}
         {/* <div className="md:col-span-2">
           <label className="block text-sm font-medium mb-1">Upload Logo</label>
