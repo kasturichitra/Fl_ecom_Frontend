@@ -10,8 +10,8 @@ import { useState } from "react";
  */
 const FAQTreeNode = ({ faq, onSelect, selectedId, level = 0 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const hasChildren = faq.children && faq.children.length > 0;
-  const isSelected = selectedId === faq.question_id;
+  const hasChildren = faq?.children && faq?.children.length > 0;
+  const isSelected = selectedId === faq?.question_id;
 
   const handleToggle = (e) => {
     e.stopPropagation();
@@ -53,7 +53,7 @@ const FAQTreeNode = ({ faq, onSelect, selectedId, level = 0 }) => {
         <div className="flex-shrink-0">
           {faq?.priority ? (
             <span className="inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-indigo-600 bg-indigo-100 rounded-full">
-              {faq.priority}
+              {faq?.priority}
             </span>
           ) : (
             <span className="inline-flex w-3 h-3 rounded-full bg-indigo-300" />
@@ -65,22 +65,22 @@ const FAQTreeNode = ({ faq, onSelect, selectedId, level = 0 }) => {
           <p
             className={`text-sm truncate ${isSelected ? "font-semibold text-indigo-900" : "font-medium text-gray-800"}`}
           >
-            {faq.question_text}
+            {faq?.question_text}
           </p>
         </div>
 
         {/* Status & Escalation Indicators */}
         <div className="flex items-center gap-2 flex-shrink-0">
           {/* Escalation Eligible */}
-          {faq.escalation_allowed && (
+          {faq?.escalation_allowed && (
             <div className="flex items-center" title="Escalation Eligible">
               <AlertCircle size={16} className="text-amber-600" />
             </div>
           )}
 
           {/* Active/Inactive Status */}
-          <div className={`flex items-center`} title={faq.is_active ? "Active" : "Inactive"}>
-            {faq.is_active ? (
+          <div className={`flex items-center`} title={faq?.is_active ? "Active" : "Inactive"}>
+            {faq?.is_active ? (
               <Power size={16} className="text-green-600" />
             ) : (
               <PowerOff size={16} className="text-red-600" />
@@ -91,12 +91,12 @@ const FAQTreeNode = ({ faq, onSelect, selectedId, level = 0 }) => {
           <span
             className={`
               px-2 py-0.5 text-xs font-semibold rounded
-              ${faq.type === "root" ? "bg-blue-100 text-blue-800" : ""}
-              ${faq.type === "followup" ? "bg-purple-100 text-purple-800" : ""}
-              ${faq.type === "leaf" ? "bg-green-100 text-green-800" : ""}
+              ${faq?.type === "root" ? "bg-blue-100 text-blue-800" : ""}
+              ${faq?.type === "followup" ? "bg-purple-100 text-purple-800" : ""}
+              ${faq?.type === "leaf" ? "bg-green-100 text-green-800" : ""}
             `}
           >
-            {faq.type}
+            {faq?.type}
           </span>
         </div>
       </div>
@@ -104,7 +104,7 @@ const FAQTreeNode = ({ faq, onSelect, selectedId, level = 0 }) => {
       {/* Children */}
       {hasChildren && isExpanded && (
         <div className="mt-1">
-          {faq.children
+          {faq?.children
             .sort((a, b) => a.priority - b.priority)
             .map((child) => (
               <FAQTreeNode
