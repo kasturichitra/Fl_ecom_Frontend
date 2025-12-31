@@ -190,7 +190,7 @@ const EmployeeList = () => {
           <div className="relative w-full max-w-4xl">
             <button
               onClick={handleCloseAdd}
-              className="absolute right-5 top-5 text-gray-700 hover:text-red-600 text-3xl z-10"
+              className="absolute right-5 top-5 text-gray-700 hover:text-red-600 text-6xl z-10 hover:cursor-pointer"
             >
               ×
             </button>
