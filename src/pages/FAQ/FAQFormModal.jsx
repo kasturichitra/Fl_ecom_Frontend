@@ -10,7 +10,14 @@ import { useGetFlatFAQList } from "../../hooks/useFAQ";
  * @param {Function} onClose - Close modal callback
  * @param {Boolean} isSubmitting - Submission loading state
  */
-const FAQFormModal = ({ initialData = null, prefilledParentId = null, onSubmit, onClose, isSubmitting = false }) => {
+const FAQFormModal = ({
+  initialData = null,
+  prefilledParentId = null,
+  onSubmit,
+  onClose,
+  isSubmitting = false,
+  issueTypes = [],
+}) => {
   const isEditMode = !!initialData;
   const [formData, setFormData] = useState({
     question_text: "",
@@ -126,14 +133,14 @@ const FAQFormModal = ({ initialData = null, prefilledParentId = null, onSubmit, 
   };
 
   // Backend issue type enum values
-  const issueTypes = [
-    { value: "order", label: "Order Issues" },
-    { value: "payment", label: "Payment Issues" },
-    { value: "delivery", label: "Delivery Issues" },
-    { value: "returns", label: "Returns & Refunds" },
-    { value: "account", label: "Account Issues" },
-    { value: "general", label: "General Inquiry" },
-  ];
+  // const issueTypes = [
+  //   { value: "order", label: "Order Issues" },
+  //   { value: "payment", label: "Payment Issues" },
+  //   { value: "delivery", label: "Delivery Issues" },
+  //   { value: "returns", label: "Returns & Refunds" },
+  //   { value: "account", label: "Account Issues" },
+  //   { value: "general", label: "General Inquiry" },
+  // ];
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">

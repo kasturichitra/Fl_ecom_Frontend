@@ -1,14 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
 import { ChevronDown, ChevronRight, HelpCircle } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import PageHeader from "../../components/PageHeader";
-import SearchBar from "../../components/SearchBar";
-import { DropdownFilter } from "../../components/DropdownFilter";
-import FAQTreeNode from "./FAQTreeNode";
+import { useCreateFAQ, useDeleteFAQ, useGetAdminFAQTree, useToggleFAQStatus, useUpdateFAQ } from "../../hooks/useFAQ";
+import { statusToBooleanConverter } from "../../lib/helperFunctions";
 import FAQDetailPanel from "./FAQDetailPanel";
 import FAQFormModal from "./FAQFormModal";
-import { useGetAdminFAQTree, useCreateFAQ, useUpdateFAQ, useDeleteFAQ, useToggleFAQStatus } from "../../hooks/useFAQ";
-import { statusOptions } from "../../lib/constants";
-import { statusToBooleanConverter } from "../../lib/helperFunctions";
+import FAQTreeNode from "./FAQTreeNode";
 
 const FAQManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -121,6 +118,12 @@ const FAQManagement = () => {
     }
   };
 
+  // These are for sending to the form modal
+  const issueTypes = Object.keys(faqRootsByIssueType).map((issue_type) => ({
+    value: issue_type,
+    label: issue_type.charAt(0).toUpperCase() + issue_type.slice(1),
+  }));
+
   /* ---------------- UI ---------------- */
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -207,6 +210,7 @@ const FAQManagement = () => {
           onSubmit={handleFormSubmit}
           onClose={() => setShowFormModal(false)}
           isSubmitting={isFormSubmitting}
+          issueTypes={issueTypes}
         />
       )}
     </div>
