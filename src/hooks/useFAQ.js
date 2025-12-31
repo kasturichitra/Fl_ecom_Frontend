@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { getAdminFAQTree } from "../ApiServices/faqService";
+import { createFAQ, getAdminFAQTree } from "../ApiServices/faqService";
 
 // Mock FAQ data structure matching backend schema
 const mockFAQData = {
@@ -333,75 +333,7 @@ export const useCreateFAQ = (options = {}) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (data) => {
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      const newFAQ = {
-        question_id: `faq_${data.issue_type}_${Date.now()}`,
-        question_text: data.question_text,
-        answer_text: data.answer_text,
-        issue_type: data.issue_type,
-        sub_category: data.sub_category || "",
-        type: data.parent_question_id ? "followup" : "root",
-        parent_question_id: data.parent_question_id || null,
-        next_questions: [],
-        escalation_allowed: data.escalation_allowed || false,
-        escalation_label: data.escalation_label || "Still need help?",
-        priority: data.priority || 1,
-        keywords: data.keywords || [],
-        created_by: "admin",
-        is_active: data.is_active !== undefined ? data.is_active : true,
-        version: 1,
-        children: [],
-      };
-
-      // Find or create issue type
-      let issueTypeObj = faqDatabase.issue_types.find((it) => it.name === data.issue_type);
-
-      if (!issueTypeObj) {
-        issueTypeObj = {
-          id: `it_${Date.now()}`,
-          name: data.issue_type,
-          display_name: data.issue_type.charAt(0).toUpperCase() + data.issue_type.slice(1),
-          faqs: [],
-        };
-        faqDatabase.issue_types.push(issueTypeObj);
-      }
-
-      // If parent_question_id exists, add to parent's children
-      if (data.parent_question_id) {
-        const addToParent = (faqs) => {
-          for (let faq of faqs) {
-            if (faq.question_id === data.parent_question_id) {
-              faq.children.push(newFAQ);
-              // Update parent type if it was leaf
-              if (faq.type === "leaf") {
-                faq.type = "followup";
-              }
-              // Add to next_questions array
-              if (!faq.next_questions.includes(newFAQ.question_id)) {
-                faq.next_questions.push(newFAQ.question_id);
-              }
-              return true;
-            }
-            if (faq.children && faq.children.length > 0) {
-              if (addToParent(faq.children)) return true;
-            }
-          }
-          return false;
-        };
-        addToParent(issueTypeObj.faqs);
-      } else {
-        // Add as root FAQ
-        issueTypeObj.faqs.push(newFAQ);
-      }
-
-      // Sort FAQs by priority
-      issueTypeObj.faqs.sort((a, b) => a.priority - b.priority);
-
-      return newFAQ;
-    },
+    mutationFn: (data) => createFAQ(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["faqs"] });
       toast.success("FAQ created successfully!");

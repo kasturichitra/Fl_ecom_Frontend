@@ -15,6 +15,8 @@ const FAQManagement = () => {
   const [editingFAQ, setEditingFAQ] = useState(null);
   const [prefilledParentQuestionId, setPrefilledParentQuestionId] = useState(null);
   const [expandedIssueTypes, setExpandedIssueTypes] = useState({});
+  const [expandedParentFaqs, setExpandedParentFaqs] = useState([]);
+
 
   /* ---------------- Fetch FAQ Tree ---------------- */
   const { data: faqResponse, isLoading } = useGetAdminFAQTree({
@@ -52,6 +54,24 @@ const FAQManagement = () => {
       setExpandedIssueTypes(expanded);
     }
   }, [faqRootsByIssueType]);
+
+  // console.log("faqRoots", faqRoots)
+  // question_text
+
+  /* --- Expand all parent FAQs by default (value/label style) --- */
+  useEffect(() => {
+    if (faqRoots.length > 0 && expandedParentFaqs.length === 0) {
+      const expanded = faqRoots.map((faq) => ({
+        value: faq.question_id,
+        label: faq.question_text,
+      }));
+
+      setExpandedParentFaqs(expanded);
+    }
+  }, [faqRoots]);
+
+
+
 
   /* ---------------- Mutations ---------------- */
   const { mutateAsync: createFAQ, isPending: isCreating } = useCreateFAQ({
@@ -114,7 +134,9 @@ const FAQManagement = () => {
         data: formData,
       });
     } else {
-      await createFAQ(formData);
+      console.log("formData", formData);
+      // const 
+      await createFAQ({...formData,type : "leaf"});
     }
   };
 
@@ -211,6 +233,7 @@ const FAQManagement = () => {
           onClose={() => setShowFormModal(false)}
           isSubmitting={isFormSubmitting}
           issueTypes={issueTypes}
+          parentFaqOptions={expandedParentFaqs}
         />
       )}
     </div>

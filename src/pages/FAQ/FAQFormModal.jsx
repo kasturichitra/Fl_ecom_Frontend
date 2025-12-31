@@ -17,6 +17,7 @@ const FAQFormModal = ({
   onClose,
   isSubmitting = false,
   issueTypes = [],
+  parentFaqOptions = [],
 }) => {
   const isEditMode = !!initialData;
   const [formData, setFormData] = useState({
@@ -31,6 +32,10 @@ const FAQFormModal = ({
     escalation_label: "Still need help?",
     keywords: [],
   });
+
+
+  // console.log("issueTypes", issueTypes)
+  // console.log("parentFaqOptions", parentFaqOptions)
 
   const [errors, setErrors] = useState({});
 
@@ -61,6 +66,8 @@ const FAQFormModal = ({
       }));
     }
   }, [initialData, prefilledParentId]);
+
+  // console.log("flatFAQList", flatFAQList)
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -128,6 +135,7 @@ const FAQFormModal = ({
     e.preventDefault();
 
     if (validateForm()) {
+      console.log("formData", formData)
       onSubmit(formData);
     }
   };
@@ -171,9 +179,8 @@ const FAQFormModal = ({
                 value={formData.question_text}
                 onChange={handleChange}
                 rows={3}
-                className={`w-full px-4 py-3 border ${
-                  errors.question_text ? "border-red-500" : "border-gray-300"
-                } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none`}
+                className={`w-full px-4 py-3 border ${errors.question_text ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none`}
                 placeholder="Enter the FAQ question..."
                 disabled={isSubmitting}
               />
@@ -191,9 +198,8 @@ const FAQFormModal = ({
                 value={formData.answer_text}
                 onChange={handleChange}
                 rows={5}
-                className={`w-full px-4 py-3 border ${
-                  errors.answer_text ? "border-red-500" : "border-gray-300"
-                } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none`}
+                className={`w-full px-4 py-3 border ${errors.answer_text ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none`}
                 placeholder="Enter the FAQ answer..."
                 disabled={isSubmitting}
               />
@@ -210,9 +216,8 @@ const FAQFormModal = ({
                 name="issue_type"
                 value={formData.issue_type}
                 onChange={handleChange}
-                className={`w-full px-4 py-3 border ${
-                  errors.issue_type ? "border-red-500" : "border-gray-300"
-                } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                className={`w-full px-4 py-3 border ${errors.issue_type ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
                 disabled={isSubmitting}
               >
                 <option value="">Select issue type...</option>
@@ -225,8 +230,9 @@ const FAQFormModal = ({
               {errors.issue_type && <p className="mt-1 text-sm text-red-500">{errors.issue_type}</p>}
             </div>
 
+
             {/* Parent FAQ */}
-            <div>
+            {/* <div>
               <label htmlFor="parent_question_id" className="block text-sm font-semibold text-gray-700 mb-2">
                 Parent FAQ
               </label>
@@ -253,7 +259,46 @@ const FAQFormModal = ({
               <p className="mt-1 text-xs text-gray-500">
                 Leave empty to create a root FAQ. Leaf FAQs cannot be selected as parents.
               </p>
+            </div> */}
+
+            {/* Parent FAQ */}
+            <div>
+              <label
+                htmlFor="parent_question_id"
+                className="block text-sm font-semibold text-gray-700 mb-2"
+              >
+                Parent FAQ
+              </label>
+
+              <select
+                id="parent_question_id"
+                name="parent_question_id"
+                value={formData.parent_question_id}
+                onChange={handleChange}
+                className={`w-full px-4 py-3 border ${errors.parent_question_id ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                disabled={isSubmitting }
+              >
+                <option value="">None (Root FAQ)</option>
+
+                {parentFaqOptions.map((faq) => (
+                  <option key={faq.value} value={faq.value}>
+                    {faq.label}
+                  </option>
+                ))}
+              </select>
+
+              {errors.parent_question_id && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.parent_question_id}
+                </p>
+              )}
+
+              <p className="mt-1 text-xs text-gray-500">
+                Select a parent FAQ to nest this question. Leave empty to create a root FAQ.
+              </p>
             </div>
+
 
             {/* Priority */}
             <div>
@@ -267,9 +312,8 @@ const FAQFormModal = ({
                 value={formData.priority}
                 onChange={handleChange}
                 min="1"
-                className={`w-full px-4 py-3 border ${
-                  errors.priority ? "border-red-500" : "border-gray-300"
-                } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                className={`w-full px-4 py-3 border ${errors.priority ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
                 placeholder="Enter priority (lower = higher priority)"
                 disabled={isSubmitting}
               />
