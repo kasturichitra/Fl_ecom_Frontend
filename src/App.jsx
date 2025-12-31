@@ -38,6 +38,7 @@ const OrderProductsDetailes = lazy(() => import("./pages/Orders/OrderProductsDet
 const ThemeManager = lazy(() => import("./pages/ThemeManager/ThemeManager"));
 const CouponsList = lazy(() => import("./pages/Coupons/CouponsList"));
 const CouponManager = lazy(() => import("./pages/Coupons/CouponManager"));
+const FAQManagement = lazy(() => import("./pages/FAQ/FAQManagement"));
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -178,6 +179,7 @@ const App = () => {
                     <Route path="/coupons/create" element={<CouponManager />} />
                     <Route path="/coupons/edit/:id" element={<CouponManager />} />
 
+                    <Route path="/faq-management" element={<FAQManagement />} />
 
                     <Route path="*" element={<PageNotFound />} />
                   </Routes>

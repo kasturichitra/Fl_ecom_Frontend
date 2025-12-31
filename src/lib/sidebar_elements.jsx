@@ -4,6 +4,7 @@ import {
   Building2,
   ClipboardPlus,
   FileText,
+  HelpCircle,
   Home,
   Layers,
   LogOut,
@@ -11,7 +12,7 @@ import {
   Palette,
   Tag,
   Users,
-  BadgePercent
+  BadgePercent,
 } from "lucide-react";
 
 /**
@@ -108,5 +109,11 @@ export const sidebarElements = [
     path: "/contactInfo",
     label: "Contact Info",
     icon: ClipboardPlus,
+  },
+  {
+    id: "faq-management",
+    path: "/faq-management",
+    label: "FAQ Management",
+    icon: HelpCircle,
   },
 ];

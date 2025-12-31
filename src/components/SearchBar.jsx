@@ -2,12 +2,7 @@
 import React from "react";
 import { Search, X } from "lucide-react"; // Make sure you have lucide-react installed
 
-const SearchBar = ({
-  searchTerm = "",
-  onSearchChange,
-  placeholder = "Search...",
-  className = "",
-}) => {
+const SearchBar = ({ searchTerm = "", onSearchChange, placeholder = "Search...", className = "" }) => {
   const hasValue = searchTerm.trim().length > 0;
 
   return (
@@ -19,7 +14,7 @@ const SearchBar = ({
       <input
         type="text"
         value={searchTerm}
-        onChange={(e) => onSearchChange(e.  target.value)}
+        onChange={(e) => onSearchChange(e.target.value)}
         placeholder={placeholder}
         className={`
           w-full pl-12 pr-12 py-3 
