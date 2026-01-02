@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { createFAQ, getAdminFAQTree, updateFAQ } from "../ApiServices/faqService";
+import { createFAQ, disableFAQ, getAdminFAQTree, updateFAQ } from "../ApiServices/faqService";
 
 // Mock FAQ data structure matching backend schema
 const mockFAQData = {
@@ -278,6 +278,31 @@ export const useGetAdminFAQTree = ({ searchTerm = "", is_active = "true" } = {})
   });
 };
 
+// import { useMutation, useQueryClient } from "@tanstack/react-query";
+// import toast from "react-hot-toast";
+// import { disableFAQ } from "../ApiServices/faqService";
+
+export const useToggleFAQStatus = (options = {}) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (question_id) => disableFAQ(question_id),
+
+    onSuccess: () => {
+      toast.success("FAQ status updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["faqs"] });
+      options?.onSuccess?.();
+    },
+
+    onError: (error) => {
+      toast.error(error?.message || "Failed to update FAQ status");
+      options?.onError?.();
+    },
+
+    onSettled: () => options?.onSettled?.(),
+  });
+};
+
 /**
  * Helper function to recursively filter FAQs by search term
  */
@@ -493,51 +518,51 @@ export const useDeleteFAQ = (options = {}) => {
 /**
  * Toggle FAQ status (enable/disable)
  */
-export const useToggleFAQStatus = (options = {}) => {
-  const queryClient = useQueryClient();
+// export const useToggleFAQStatus = (options = {}) => {
+//   const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: async (question_id) => {
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 300));
+//   return useMutation({
+//     mutationFn: async (question_id) => {
+//       // Simulate API delay
+//       await new Promise((resolve) => setTimeout(resolve, 300));
 
-      // Helper function to find and toggle FAQ status
-      const toggleStatusRecursive = (faqs) => {
-        for (let faq of faqs) {
-          if (faq.question_id === question_id) {
-            faq.is_active = !faq.is_active;
-            faq.version = faq.version + 1;
-            return faq;
-          }
-          if (faq.children && faq.children.length > 0) {
-            const result = toggleStatusRecursive(faq.children);
-            if (result) return result;
-          }
-        }
-        return null;
-      };
+//       // Helper function to find and toggle FAQ status
+//       const toggleStatusRecursive = (faqs) => {
+//         for (let faq of faqs) {
+//           if (faq.question_id === question_id) {
+//             faq.is_active = !faq.is_active;
+//             faq.version = faq.version + 1;
+//             return faq;
+//           }
+//           if (faq.children && faq.children.length > 0) {
+//             const result = toggleStatusRecursive(faq.children);
+//             if (result) return result;
+//           }
+//         }
+//         return null;
+//       };
 
-      // Search through all issue types
-      for (let issueType of faqDatabase.issue_types) {
-        const toggledFAQ = toggleStatusRecursive(issueType.faqs);
-        if (toggledFAQ) {
-          return toggledFAQ;
-        }
-      }
+//       // Search through all issue types
+//       for (let issueType of faqDatabase.issue_types) {
+//         const toggledFAQ = toggleStatusRecursive(issueType.faqs);
+//         if (toggledFAQ) {
+//           return toggledFAQ;
+//         }
+//       }
 
-      throw new Error("FAQ not found");
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["faqs"] });
-      toast.success(`FAQ ${data.is_active ? "enabled" : "disabled"} successfully!`);
-      options.onSuccess?.();
-    },
-    onError: (error) => {
-      toast.error(error.message || "Failed to toggle FAQ status");
-      options.onError?.();
-    },
-  });
-};
+//       throw new Error("FAQ not found");
+//     },
+//     onSuccess: (data) => {
+//       queryClient.invalidateQueries({ queryKey: ["faqs"] });
+//       toast.success(`FAQ ${data.is_active ? "enabled" : "disabled"} successfully!`);
+//       options.onSuccess?.();
+//     },
+//     onError: (error) => {
+//       toast.error(error.message || "Failed to toggle FAQ status");
+//       options.onError?.();
+//     },
+//   });
+// };
 
 /**
  * Helper function to get all FAQs as a flat list (for parent selection dropdown)

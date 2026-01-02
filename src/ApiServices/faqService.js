@@ -17,4 +17,9 @@ export const updateFAQ = async (uniqueId, data) => {
 };
 
 
+export const disableFAQ = async (uniqueId) => {
+  console.log(uniqueId,"uniqueId");
+  return await axiosInstance.patch(`${BASE_URL}/admin/toggle/${uniqueId}`);
+};
+
 // admin/:id
