@@ -8,7 +8,7 @@ import { useState } from "react";
  * @param {String} selectedId - Currently selected FAQ id
  * @param {Number} level - Nesting level for indentation
  */
-const FAQTreeNode = ({ faq, onSelect, selectedId, level = 0 }) => {
+const FAQTreeNode = ({ faq, onSelect,onToggleStatus ,selectedId, level = 0 }) => {
   const [isExpanded, setIsExpanded] = useState(true);
   const hasChildren = faq?.children && faq?.children.length > 0;
   const isSelected = selectedId === faq?.question_id;
@@ -79,13 +79,30 @@ const FAQTreeNode = ({ faq, onSelect, selectedId, level = 0 }) => {
           )}
 
           {/* Active/Inactive Status */}
-          <div className={`flex items-center`} title={faq?.is_active ? "Active" : "Inactive"}>
+          {/* <div className={`flex items-center`} title={faq?.is_active ? "Active" : "Inactive"}>
             {faq?.is_active ? (
               <Power size={16} className="text-green-600" />
             ) : (
               <PowerOff size={16} className="text-red-600" />
             )}
-          </div>
+          </div> */}
+
+          {/* Active/Inactive Status */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation(); // prevent selecting the node
+              onToggleStatus(faq.question_id);
+            }}
+            title={faq?.is_active ? "Disable FAQ" : "Enable FAQ"}
+            className="p-1 rounded hover:bg-gray-200 transition"
+          >
+            {faq?.is_active ? (
+              <Power size={16} className="text-green-600" />
+            ) : (
+              <PowerOff size={16} className="text-red-600" />
+            )}
+          </button>
+
 
           {/* FAQ Type Badge */}
           <span
@@ -113,6 +130,7 @@ const FAQTreeNode = ({ faq, onSelect, selectedId, level = 0 }) => {
                 onSelect={onSelect}
                 selectedId={selectedId}
                 level={level + 1}
+                onToggleStatus={onToggleStatus}
               />
             ))}
         </div>

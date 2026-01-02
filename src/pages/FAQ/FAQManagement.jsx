@@ -295,6 +295,7 @@ const FAQManagement = () => {
                             level={0}
                             selectedId={selectedFAQ?.question_id}
                             onSelect={handleSelectFAQ}
+                            onToggleStatus={handleToggleStatus}
                           />
                         ))}
                     </div>
