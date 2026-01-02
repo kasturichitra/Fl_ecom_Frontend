@@ -31,6 +31,7 @@ const FAQFormModal = ({
     escalation_allowed: false,
     escalation_label: "Still need help?",
     keywords: [],
+    type: "",
   });
 
 
@@ -100,6 +101,10 @@ const FAQFormModal = ({
       newErrors.priority = "Priority must be a positive number";
     }
 
+    if (!formData.type.trim()) {
+      newErrors.type = "FAQ Level is required";
+    }
+
     // Check for circular reference
     if (formData.parent_question_id && initialData) {
       const isCircular = checkCircularReference(formData.parent_question_id, initialData.question_id);
@@ -136,7 +141,15 @@ const FAQFormModal = ({
 
     if (validateForm()) {
       console.log("formData", formData)
-      onSubmit(formData);
+
+      const { parent_question_id, ...rest } = formData;
+
+      // const payload =
+      //   formData.type === "root"
+      //     ? rest
+      //     : { ...rest, parent_question_id };
+
+      onSubmit(rest);
     }
   };
 
@@ -149,6 +162,12 @@ const FAQFormModal = ({
   //   { value: "account", label: "Account Issues" },
   //   { value: "general", label: "General Inquiry" },
   // ];
+
+  const FAQLevel = [
+    { value: "leaf", label: "Leaf" },
+    { value: "root", label: "Root" }
+  ]
+
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -231,6 +250,31 @@ const FAQFormModal = ({
             </div>
 
 
+            {/* Faq Level */}
+
+            <div>
+              <label htmlFor="issue_type" className="block text-sm font-semibold text-gray-700 mb-2">
+                Faq Level <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="type"
+                name="type"
+                value={formData.type}
+                onChange={handleChange}
+                className={`w-full px-4 py-3 border ${errors.type ? "border-red-500" : "border-gray-300"
+                  } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                disabled={isSubmitting}
+              >
+                <option value="">Select issue type...</option>
+                {FAQLevel.map((type) => (
+                  <option key={type.value} value={type.value}>
+                    {type.label}
+                  </option>
+                ))}
+              </select>
+              {errors.type && <p className="mt-1 text-sm text-red-500">{errors.type}</p>}
+            </div>
+
             {/* Parent FAQ */}
             {/* <div>
               <label htmlFor="parent_question_id" className="block text-sm font-semibold text-gray-700 mb-2">
@@ -262,7 +306,7 @@ const FAQFormModal = ({
             </div> */}
 
             {/* Parent FAQ */}
-            <div>
+            {/* <div>
               <label
                 htmlFor="parent_question_id"
                 className="block text-sm font-semibold text-gray-700 mb-2"
@@ -277,7 +321,7 @@ const FAQFormModal = ({
                 onChange={handleChange}
                 className={`w-full px-4 py-3 border ${errors.parent_question_id ? "border-red-500" : "border-gray-300"
                   } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
-                disabled={isSubmitting }
+                disabled={isSubmitting}
               >
                 <option value="">None (Root FAQ)</option>
 
@@ -297,6 +341,79 @@ const FAQFormModal = ({
               <p className="mt-1 text-xs text-gray-500">
                 Select a parent FAQ to nest this question. Leave empty to create a root FAQ.
               </p>
+            </div> */}
+            {/* 
+            {formData.type === "leaf" && (
+              <div>
+                <label
+                  htmlFor="parent_question_id"
+                  className="block text-sm font-semibold text-gray-700 mb-2"
+                >
+                  Parent FAQ <span className="text-red-500">*</span>
+                </label>
+
+                <select
+                  id="parent_question_id"
+                  name="parent_question_id"
+                  value={formData.parent_question_id}
+                  onChange={handleChange}
+                  className={`w-full px-4 py-3 border ${errors.parent_question_id ? "border-red-500" : "border-gray-300"
+                    } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                  disabled={isSubmitting}
+                >
+                  <option value="">Select parent FAQ...</option>
+                  {parentFaqOptions.map((faq) => (
+                    <option key={faq.value} value={faq.value}>
+                      {faq.label}
+                    </option>
+                  ))}
+                </select>
+
+                {errors.parent_question_id && (
+                  <p className="mt-1 text-sm text-red-500">{errors.parent_question_id}</p>
+                )}
+              </div>
+            )} */}
+
+            <div>
+              <label
+                htmlFor="parent_question_id"
+                className="block text-sm font-semibold text-gray-700 mb-2"
+              >
+                Parent FAQ
+              </label>
+
+              <div className="relative group">
+                <select
+                  id="parent_question_id"
+                  name="parent_question_id"
+                  value={formData.parent_question_id}
+                  onChange={handleChange}
+                  disabled={formData.type === "root" || isSubmitting}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+        ${formData.type === "root"
+                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                      : "border-gray-300"
+                    }`}
+                >
+                  <option value="">Select parent FAQ...</option>
+                  {parentFaqOptions.map((faq) => (
+                    <option key={faq.value} value={faq.value}>
+                      {faq.label}
+                    </option>
+                  ))}
+                </select>
+
+                {formData.type === "root" && (
+                  <div className="absolute left-0 -top-9 hidden group-hover:block bg-gray-900 text-white text-xs px-3 py-1 rounded shadow-lg whitespace-nowrap">
+                    Root FAQs do not have a parent
+                  </div>
+                )}
+              </div>
+
+              {errors.parent_question_id && (
+                <p className="mt-1 text-sm text-red-500">{errors.parent_question_id}</p>
+              )}
             </div>
 
 

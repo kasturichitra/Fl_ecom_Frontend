@@ -16,6 +16,7 @@ const FAQManagement = () => {
   const [prefilledParentQuestionId, setPrefilledParentQuestionId] = useState(null);
   const [expandedIssueTypes, setExpandedIssueTypes] = useState({});
   const [expandedParentFaqs, setExpandedParentFaqs] = useState([]);
+  // const [faqLevel, setFaqLevel] = useState(null);
 
 
   /* ---------------- Fetch FAQ Tree ---------------- */
@@ -136,7 +137,9 @@ const FAQManagement = () => {
     } else {
       console.log("formData", formData);
       // const 
-      await createFAQ({...formData,type : "leaf"});
+
+      // await createFAQ({...formData,type : "leaf"});
+      await createFAQ({...formData});
     }
   };
 
