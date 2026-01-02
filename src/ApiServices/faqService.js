@@ -11,3 +11,10 @@ export const getAdminFAQTree = async (params = {}) => {
 export const createFAQ = async (data) => {
   return await axiosInstance.post(`${BASE_URL}/admin`, data);
 };
+
+export const updateFAQ = async (uniqueId, data) => {
+  return await axiosInstance.put(`${BASE_URL}/admin/${uniqueId}`, data);
+};
+
+
+// admin/:id

@@ -25,8 +25,11 @@ const FAQManagement = () => {
     is_active: statusToBooleanConverter(statusFilter),
   });
 
+  // console.log("faqResponse", faqResponse);
+
   /* ---------------- Backend-native data ---------------- */
   const faqRoots = faqResponse?.data || [];
+  // console.log("faqRoots", faqRoots)
 
   /* ---------------- Group roots by issue_type ---------------- */
   const faqRootsByIssueType = useMemo(() => {

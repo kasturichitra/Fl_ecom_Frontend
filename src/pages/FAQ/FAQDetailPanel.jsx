@@ -21,6 +21,9 @@ const FAQDetailPanel = ({ faq, onAddChild, onEdit, onDelete, onToggleStatus, onC
 
   const hasChildren = faq.children && faq.children.length > 0;
 
+  // console.log("faq", faq);
+  
+
   return (
     <div className="w-full lg:w-96 bg-white border-l border-gray-200 flex flex-col h-full overflow-hidden">
       {/* Header */}

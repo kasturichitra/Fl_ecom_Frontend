@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { createFAQ, getAdminFAQTree } from "../ApiServices/faqService";
+import { createFAQ, getAdminFAQTree, updateFAQ } from "../ApiServices/faqService";
 
 // Mock FAQ data structure matching backend schema
 const mockFAQData = {
@@ -349,63 +349,90 @@ export const useCreateFAQ = (options = {}) => {
 /**
  * Update an existing FAQ
  */
+// export const useUpdateFAQ = (options = {}) => {
+//   const queryClient = useQueryClient();
+
+//   return useMutation({
+//     mutationFn: async ({ question_id, data }) => {
+//       // Simulate API delay
+//       await new Promise((resolve) => setTimeout(resolve, 500));
+
+//       // Helper function to find and update FAQ
+//       const updateFAQRecursive = (faqs) => {
+//         for (let faq of faqs) {
+//           if (faq.question_id === question_id) {
+//             Object.assign(faq, {
+//               question_text: data.question_text !== undefined ? data.question_text : faq.question_text,
+//               answer_text: data.answer_text !== undefined ? data.answer_text : faq.answer_text,
+//               sub_category: data.sub_category !== undefined ? data.sub_category : faq.sub_category,
+//               priority: data.priority !== undefined ? data.priority : faq.priority,
+//               is_active: data.is_active !== undefined ? data.is_active : faq.is_active,
+//               escalation_allowed:
+//                 data.escalation_allowed !== undefined ? data.escalation_allowed : faq.escalation_allowed,
+//               escalation_label: data.escalation_label !== undefined ? data.escalation_label : faq.escalation_label,
+//               keywords: data.keywords !== undefined ? data.keywords : faq.keywords,
+//               version: faq.version + 1,
+//             });
+//             return faq;
+//           }
+//           if (faq.children && faq.children.length > 0) {
+//             const result = updateFAQRecursive(faq.children);
+//             if (result) return result;
+//           }
+//         }
+//         return null;
+//       };
+
+//       // Search through all issue types
+//       for (let issueType of faqDatabase.issue_types) {
+//         const updatedFAQ = updateFAQRecursive(issueType.faqs);
+//         if (updatedFAQ) {
+//           // Sort FAQs by priority
+//           issueType.faqs.sort((a, b) => a.priority - b.priority);
+//           return updatedFAQ;
+//         }
+//       }
+
+//       throw new Error("FAQ not found");
+//     },
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ["faqs"] });
+//       toast.success("FAQ updated successfully!");
+//       options.onSuccess?.();
+//     },
+//     onError: (error) => {
+//       toast.error(error.message || "Failed to update FAQ");
+//       options.onError?.();
+//     },
+//   });
+// };
+
+
 export const useUpdateFAQ = (options = {}) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ question_id, data }) => {
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 500));
+    mutationFn: ({ question_id, data }) =>
+      updateFAQ(question_id, {
+        question_text: data.question_text,
+        answer_text: data.answer_text,
+      }),
 
-      // Helper function to find and update FAQ
-      const updateFAQRecursive = (faqs) => {
-        for (let faq of faqs) {
-          if (faq.question_id === question_id) {
-            Object.assign(faq, {
-              question_text: data.question_text !== undefined ? data.question_text : faq.question_text,
-              answer_text: data.answer_text !== undefined ? data.answer_text : faq.answer_text,
-              sub_category: data.sub_category !== undefined ? data.sub_category : faq.sub_category,
-              priority: data.priority !== undefined ? data.priority : faq.priority,
-              is_active: data.is_active !== undefined ? data.is_active : faq.is_active,
-              escalation_allowed:
-                data.escalation_allowed !== undefined ? data.escalation_allowed : faq.escalation_allowed,
-              escalation_label: data.escalation_label !== undefined ? data.escalation_label : faq.escalation_label,
-              keywords: data.keywords !== undefined ? data.keywords : faq.keywords,
-              version: faq.version + 1,
-            });
-            return faq;
-          }
-          if (faq.children && faq.children.length > 0) {
-            const result = updateFAQRecursive(faq.children);
-            if (result) return result;
-          }
-        }
-        return null;
-      };
-
-      // Search through all issue types
-      for (let issueType of faqDatabase.issue_types) {
-        const updatedFAQ = updateFAQRecursive(issueType.faqs);
-        if (updatedFAQ) {
-          // Sort FAQs by priority
-          issueType.faqs.sort((a, b) => a.priority - b.priority);
-          return updatedFAQ;
-        }
-      }
-
-      throw new Error("FAQ not found");
-    },
     onSuccess: () => {
+      toast.success("FAQ updated successfully");
       queryClient.invalidateQueries({ queryKey: ["faqs"] });
-      toast.success("FAQ updated successfully!");
-      options.onSuccess?.();
+      options?.onSuccess?.();
     },
+
     onError: (error) => {
-      toast.error(error.message || "Failed to update FAQ");
-      options.onError?.();
+      toast.error("Failed to update FAQ", error.message);
+      options?.onError?.();
     },
+
+    onSettled: () => options?.onSettled?.(),
   });
 };
+
 
 /**
  * Delete a FAQ
@@ -529,9 +556,8 @@ export const useGetFlatFAQList = ({ excludeId = null } = {}) => {
             flatList.push({
               ...faq,
               level,
-              display: `${"  ".repeat(level)}${faq.question_text.substring(0, 60)}${
-                faq.question_text.length > 60 ? "..." : ""
-              }`,
+              display: `${"  ".repeat(level)}${faq.question_text.substring(0, 60)}${faq.question_text.length > 60 ? "..." : ""
+                }`,
             });
           }
           if (faq.children && faq.children.length > 0) {

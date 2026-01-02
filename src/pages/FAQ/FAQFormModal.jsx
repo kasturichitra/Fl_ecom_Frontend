@@ -82,9 +82,44 @@ const FAQFormModal = ({
     }
   };
 
+  // const validateForm = () => {
+  //   const newErrors = {};
+
+  //   if (!formData?.question_text.trim()) {
+  //     newErrors.question_text = "Question is required";
+  //   }
+
+  //   if (!formData?.answer_text.trim()) {
+  //     newErrors.answer_text = "Answer is required";
+  //   }
+
+  //   if (!formData?.issue_type.trim()) {
+  //     newErrors.issue_type = "Issue type is required";
+  //   }
+
+  //   if (!formData?.priority || formData?.priority < 1) {
+  //     newErrors.priority = "Priority must be a positive number";
+  //   }
+
+  //   if (!formData?.type.trim()) {
+  //     newErrors.type = "FAQ Level is required";
+  //   }
+
+  //   // Check for circular reference
+  //   if (formData?.parent_question_id && initialData) {
+  //     const isCircular = checkCircularReference(formData?.parent_question_id, initialData?.question_id);
+  //     if (isCircular) {
+  //       newErrors.parent_question_id = "Cannot select self or descendant as parent (circular reference)";
+  //     }
+  //   }
+
+  //   setErrors(newErrors);
+  //   return Object.keys(newErrors).length === 0;
+  // };
   const validateForm = () => {
     const newErrors = {};
 
+    // ✅ Always validate Question & Answer
     if (!formData.question_text.trim()) {
       newErrors.question_text = "Question is required";
     }
@@ -93,29 +128,30 @@ const FAQFormModal = ({
       newErrors.answer_text = "Answer is required";
     }
 
-    if (!formData.issue_type.trim()) {
-      newErrors.issue_type = "Issue type is required";
-    }
+    // ✅ Validate remaining fields ONLY in create mode
+    if (!isEditMode) {
+      if (!formData.issue_type?.trim()) {
+        newErrors.issue_type = "Issue type is required";
+      }
 
-    if (!formData.priority || formData.priority < 1) {
-      newErrors.priority = "Priority must be a positive number";
-    }
+      if (!formData.priority || formData.priority < 1) {
+        newErrors.priority = "Priority must be a positive number";
+      }
 
-    if (!formData.type.trim()) {
-      newErrors.type = "FAQ Level is required";
-    }
+      if (!formData.type?.trim()) {
+        newErrors.type = "FAQ Level is required";
+      }
 
-    // Check for circular reference
-    if (formData.parent_question_id && initialData) {
-      const isCircular = checkCircularReference(formData.parent_question_id, initialData.question_id);
-      if (isCircular) {
-        newErrors.parent_question_id = "Cannot select self or descendant as parent (circular reference)";
+      if (formData.type === "leaf" && !formData.parent_question_id) {
+        newErrors.parent_question_id = "Parent FAQ is required for Leaf FAQs";
       }
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+
 
   const checkCircularReference = (selectedParentId, currentFaqId) => {
     // If selecting self as parent
@@ -136,22 +172,22 @@ const FAQFormModal = ({
     return false;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
 
-    if (validateForm()) {
-      console.log("formData", formData)
+  //   if (validateForm()) {
+  //     console.log("formData", formData)
 
-      const { parent_question_id, ...rest } = formData;
+  //     const { parent_question_id, ...rest } = formData;
 
-      // const payload =
-      //   formData.type === "root"
-      //     ? rest
-      //     : { ...rest, parent_question_id };
+  //     // const payload =
+  //     //   formData.type === "root"
+  //     //     ? rest
+  //     //     : { ...rest, parent_question_id };
 
-      onSubmit(rest);
-    }
-  };
+  //     onSubmit(rest);
+  //   }
+  // };
 
   // Backend issue type enum values
   // const issueTypes = [
@@ -162,6 +198,31 @@ const FAQFormModal = ({
   //   { value: "account", label: "Account Issues" },
   //   { value: "general", label: "General Inquiry" },
   // ];
+
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) return;
+
+    // ✅ EDIT MODE → send only Question & Answer
+    if (isEditMode) {
+      onSubmit({
+        question_text: formData.question_text,
+        answer_text: formData.answer_text,
+      });
+      return;
+    }
+
+    // ✅ CREATE MODE → existing behavior (unchanged)
+    const { parent_question_id, ...rest } = formData;
+    onSubmit(
+      formData.type === "root"
+        ? rest
+        : { ...rest, parent_question_id }
+    );
+  };
+
 
   const FAQLevel = [
     { value: "leaf", label: "Leaf" },
@@ -225,265 +286,173 @@ const FAQFormModal = ({
               {errors.answer_text && <p className="mt-1 text-sm text-red-500">{errors.answer_text}</p>}
             </div>
 
-            {/* Issue Type */}
-            <div>
-              <label htmlFor="issue_type" className="block text-sm font-semibold text-gray-700 mb-2">
-                Issue Type <span className="text-red-500">*</span>
-              </label>
-              <select
-                id="issue_type"
-                name="issue_type"
-                value={formData.issue_type}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border ${errors.issue_type ? "border-red-500" : "border-gray-300"
-                  } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
-                disabled={isSubmitting}
-              >
-                <option value="">Select issue type...</option>
-                {issueTypes.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-              {errors.issue_type && <p className="mt-1 text-sm text-red-500">{errors.issue_type}</p>}
-            </div>
+            {
+              !isEditMode && (
+                <>
 
-
-            {/* Faq Level */}
-
-            <div>
-              <label htmlFor="issue_type" className="block text-sm font-semibold text-gray-700 mb-2">
-                Faq Level <span className="text-red-500">*</span>
-              </label>
-              <select
-                id="type"
-                name="type"
-                value={formData.type}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border ${errors.type ? "border-red-500" : "border-gray-300"
-                  } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
-                disabled={isSubmitting}
-              >
-                <option value="">Select issue type...</option>
-                {FAQLevel.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-              {errors.type && <p className="mt-1 text-sm text-red-500">{errors.type}</p>}
-            </div>
-
-            {/* Parent FAQ */}
-            {/* <div>
-              <label htmlFor="parent_question_id" className="block text-sm font-semibold text-gray-700 mb-2">
-                Parent FAQ
-              </label>
-              <select
-                id="parent_question_id"
-                name="parent_question_id"
-                value={formData.parent_question_id}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border ${
-                  errors.parent_question_id ? "border-red-500" : "border-gray-300"
-                } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
-                disabled={isSubmitting || !!prefilledParentId}
-              >
-                <option value="">None (Root FAQ)</option>
-                {flatFAQList
-                  .filter((faq) => faq.type !== "leaf") // Don't show leaf FAQs as parent options
-                  .map((faq) => (
-                    <option key={faq.question_id} value={faq.question_id}>
-                      {faq.display}
-                    </option>
-                  ))}
-              </select>
-              {errors.parent_question_id && <p className="mt-1 text-sm text-red-500">{errors.parent_question_id}</p>}
-              <p className="mt-1 text-xs text-gray-500">
-                Leave empty to create a root FAQ. Leaf FAQs cannot be selected as parents.
-              </p>
-            </div> */}
-
-            {/* Parent FAQ */}
-            {/* <div>
-              <label
-                htmlFor="parent_question_id"
-                className="block text-sm font-semibold text-gray-700 mb-2"
-              >
-                Parent FAQ
-              </label>
-
-              <select
-                id="parent_question_id"
-                name="parent_question_id"
-                value={formData.parent_question_id}
-                onChange={handleChange}
-                className={`w-full px-4 py-3 border ${errors.parent_question_id ? "border-red-500" : "border-gray-300"
-                  } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
-                disabled={isSubmitting}
-              >
-                <option value="">None (Root FAQ)</option>
-
-                {parentFaqOptions.map((faq) => (
-                  <option key={faq.value} value={faq.value}>
-                    {faq.label}
-                  </option>
-                ))}
-              </select>
-
-              {errors.parent_question_id && (
-                <p className="mt-1 text-sm text-red-500">
-                  {errors.parent_question_id}
-                </p>
-              )}
-
-              <p className="mt-1 text-xs text-gray-500">
-                Select a parent FAQ to nest this question. Leave empty to create a root FAQ.
-              </p>
-            </div> */}
-            {/* 
-            {formData.type === "leaf" && (
-              <div>
-                <label
-                  htmlFor="parent_question_id"
-                  className="block text-sm font-semibold text-gray-700 mb-2"
-                >
-                  Parent FAQ <span className="text-red-500">*</span>
-                </label>
-
-                <select
-                  id="parent_question_id"
-                  name="parent_question_id"
-                  value={formData.parent_question_id}
-                  onChange={handleChange}
-                  className={`w-full px-4 py-3 border ${errors.parent_question_id ? "border-red-500" : "border-gray-300"
-                    } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
-                  disabled={isSubmitting}
-                >
-                  <option value="">Select parent FAQ...</option>
-                  {parentFaqOptions.map((faq) => (
-                    <option key={faq.value} value={faq.value}>
-                      {faq.label}
-                    </option>
-                  ))}
-                </select>
-
-                {errors.parent_question_id && (
-                  <p className="mt-1 text-sm text-red-500">{errors.parent_question_id}</p>
-                )}
-              </div>
-            )} */}
-
-            <div>
-              <label
-                htmlFor="parent_question_id"
-                className="block text-sm font-semibold text-gray-700 mb-2"
-              >
-                Parent FAQ
-              </label>
-
-              <div className="relative group">
-                <select
-                  id="parent_question_id"
-                  name="parent_question_id"
-                  value={formData.parent_question_id}
-                  onChange={handleChange}
-                  disabled={formData.type === "root" || isSubmitting}
-                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent
-        ${formData.type === "root"
-                      ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                      : "border-gray-300"
-                    }`}
-                >
-                  <option value="">Select parent FAQ...</option>
-                  {parentFaqOptions.map((faq) => (
-                    <option key={faq.value} value={faq.value}>
-                      {faq.label}
-                    </option>
-                  ))}
-                </select>
-
-                {formData.type === "root" && (
-                  <div className="absolute left-0 -top-9 hidden group-hover:block bg-gray-900 text-white text-xs px-3 py-1 rounded shadow-lg whitespace-nowrap">
-                    Root FAQs do not have a parent
+                  {/* Issue Type */}
+                  <div>
+                    <label htmlFor="issue_type" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Issue Type <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="issue_type"
+                      name="issue_type"
+                      value={formData.issue_type}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-3 border ${errors.issue_type ? "border-red-500" : "border-gray-300"
+                        } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">Select issue type...</option>
+                      {issueTypes.map((type) => (
+                        <option key={type.value} value={type.value}>
+                          {type.label}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.issue_type && <p className="mt-1 text-sm text-red-500">{errors.issue_type}</p>}
                   </div>
-                )}
-              </div>
-
-              {errors.parent_question_id && (
-                <p className="mt-1 text-sm text-red-500">{errors.parent_question_id}</p>
-              )}
-            </div>
 
 
-            {/* Priority */}
-            <div>
-              <label htmlFor="priority" className="block text-sm font-semibold text-gray-700 mb-2">
-                Priority <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                id="priority"
-                name="priority"
-                value={formData.priority}
-                onChange={handleChange}
-                min="1"
-                className={`w-full px-4 py-3 border ${errors.priority ? "border-red-500" : "border-gray-300"
-                  } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
-                placeholder="Enter priority (lower = higher priority)"
-                disabled={isSubmitting}
-              />
-              {errors.priority && <p className="mt-1 text-sm text-red-500">{errors.priority}</p>}
-              <p className="mt-1 text-xs text-gray-500">Lower numbers appear first in the list</p>
-            </div>
+                  {/* Faq Level */}
 
-            {/* Checkboxes Row */}
-            <div className="flex gap-6">
-              {/* Active Status */}
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="is_active"
-                  name="is_active"
-                  checked={formData.is_active}
-                  onChange={handleChange}
-                  className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                  disabled={isSubmitting}
-                />
-                <label htmlFor="is_active" className="ml-2 text-sm font-medium text-gray-700">
-                  Active
-                </label>
-              </div>
+                  <div>
+                    <label htmlFor="issue_type" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Faq Level <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      id="type"
+                      name="type"
+                      value={formData.type}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-3 border ${errors.type ? "border-red-500" : "border-gray-300"
+                        } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                      disabled={isSubmitting}
+                    >
+                      <option value="">Select issue type...</option>
+                      {FAQLevel.map((type) => (
+                        <option key={type.value} value={type.value}>
+                          {type.label}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.type && <p className="mt-1 text-sm text-red-500">{errors.type}</p>}
+                  </div>
 
-              {/* Escalation Allowed */}
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="escalation_allowed"
-                  name="escalation_allowed"
-                  checked={formData.escalation_allowed}
-                  onChange={handleChange}
-                  className="w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
-                  disabled={isSubmitting}
-                />
-                <label htmlFor="escalation_allowed" className="ml-2 text-sm font-medium text-gray-700">
-                  Escalation Allowed
-                </label>
-              </div>
-            </div>
+                  {/* Parent FAQ */}
+                  <div>
+                    <label
+                      htmlFor="parent_question_id"
+                      className="block text-sm font-semibold text-gray-700 mb-2"
+                    >
+                      Parent FAQ
+                    </label>
 
-            {/* FAQ Type Info */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-800">
-                <strong>FAQ Type:</strong> {formData.parent_question_id ? "Child (Followup/Leaf)" : "Root"}
-              </p>
-              <p className="text-xs text-blue-600 mt-1">
-                {formData.parent_question_id
-                  ? "This FAQ will be nested under the selected parent. It will become a 'followup' if children are added, or remain a 'leaf' if it has no children."
-                  : "This FAQ will appear at the top level of the tree structure."}
-              </p>
-            </div>
+                    <div className="relative group">
+                      <select
+                        id="parent_question_id"
+                        name="parent_question_id"
+                        value={formData.parent_question_id}
+                        onChange={handleChange}
+                        disabled={formData.type === "root" || isSubmitting}
+                        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+        ${formData.type === "root"
+                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                            : "border-gray-300"
+                          }`}
+                      >
+                        <option value="">Select parent FAQ...</option>
+                        {parentFaqOptions.map((faq) => (
+                          <option key={faq.value} value={faq.value}>
+                            {faq.label}
+                          </option>
+                        ))}
+                      </select>
+
+                      {formData.type === "root" && (
+                        <div className="absolute left-0 -top-9 hidden group-hover:block bg-gray-900 text-white text-xs px-3 py-1 rounded shadow-lg whitespace-nowrap">
+                          Root FAQs do not have a parent
+                        </div>
+                      )}
+                    </div>
+
+                    {errors.parent_question_id && (
+                      <p className="mt-1 text-sm text-red-500">{errors.parent_question_id}</p>
+                    )}
+                  </div>
+
+
+                  {/* Priority */}
+                  <div>
+                    <label htmlFor="priority" className="block text-sm font-semibold text-gray-700 mb-2">
+                      Priority <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      id="priority"
+                      name="priority"
+                      value={formData.priority}
+                      onChange={handleChange}
+                      min="1"
+                      className={`w-full px-4 py-3 border ${errors.priority ? "border-red-500" : "border-gray-300"
+                        } rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                      placeholder="Enter priority (lower = higher priority)"
+                      disabled={isSubmitting}
+                    />
+                    {errors.priority && <p className="mt-1 text-sm text-red-500">{errors.priority}</p>}
+                    <p className="mt-1 text-xs text-gray-500">Lower numbers appear first in the list</p>
+                  </div>
+
+                  {/* Checkboxes Row */}
+                  <div className="flex gap-6">
+                    {/* Active Status */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="is_active"
+                        name="is_active"
+                        checked={formData.is_active}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                        disabled={isSubmitting}
+                      />
+                      <label htmlFor="is_active" className="ml-2 text-sm font-medium text-gray-700">
+                        Active
+                      </label>
+                    </div>
+
+                    {/* Escalation Allowed */}
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        id="escalation_allowed"
+                        name="escalation_allowed"
+                        checked={formData.escalation_allowed}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
+                        disabled={isSubmitting}
+                      />
+                      <label htmlFor="escalation_allowed" className="ml-2 text-sm font-medium text-gray-700">
+                        Escalation Allowed
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* FAQ Type Info */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm text-blue-800">
+                      <strong>FAQ Type:</strong> {formData.parent_question_id ? "Child (Followup/Leaf)" : "Root"}
+                    </p>
+                    <p className="text-xs text-blue-600 mt-1">
+                      {formData.parent_question_id
+                        ? "This FAQ will be nested under the selected parent. It will become a 'followup' if children are added, or remain a 'leaf' if it has no children."
+                        : "This FAQ will appear at the top level of the tree structure."}
+                    </p>
+                  </div>
+                </>
+              )
+            }
           </div>
         </form>
 
