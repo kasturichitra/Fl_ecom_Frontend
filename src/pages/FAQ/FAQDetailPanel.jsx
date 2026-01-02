@@ -22,7 +22,7 @@ const FAQDetailPanel = ({ faq, onAddChild, onEdit, onDelete, onToggleStatus, onC
   const hasChildren = faq.children && faq.children.length > 0;
 
   // console.log("faq", faq);
-  console.log("is_active", faq.is_active);
+  // console.log("is_active", faq.is_active);
 
   // console.log("onToggleStatus", onToggleStatus);
   

@@ -72,11 +72,11 @@ const FAQTreeNode = ({ faq, onSelect,onToggleStatus ,selectedId, level = 0 }) =>
         {/* Status & Escalation Indicators */}
         <div className="flex items-center gap-2 flex-shrink-0">
           {/* Escalation Eligible */}
-          {faq?.escalation_allowed && (
+          {/* {faq?.escalation_allowed && (
             <div className="flex items-center" title="Escalation Eligible">
               <AlertCircle size={16} className="text-amber-600" />
             </div>
-          )}
+          )} */}
 
           {/* Active/Inactive Status */}
           {/* <div className={`flex items-center`} title={faq?.is_active ? "Active" : "Inactive"}>
@@ -94,13 +94,13 @@ const FAQTreeNode = ({ faq, onSelect,onToggleStatus ,selectedId, level = 0 }) =>
               onToggleStatus(faq.question_id);
             }}
             title={faq?.is_active ? "Disable FAQ" : "Enable FAQ"}
-            className="p-1 rounded hover:bg-gray-200 transition"
+            className="p-1 rounded hover:bg-gray-200 transition hover:cursor-pointer"
           >
             {faq?.is_active ? (
               <Power size={16} className="text-green-600" />
             ) : (
               <PowerOff size={16} className="text-red-600" />
-            )}
+            )}  
           </button>
 
 
