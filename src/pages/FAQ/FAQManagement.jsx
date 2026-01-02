@@ -92,6 +92,27 @@ const FAQManagement = () => {
     },
   });
 
+  // const { mutateAsync: updateFAQ, isPending: isUpdating } = useUpdateFAQ({
+  //   onSuccess: (_, variables) => {
+  //     // ✅ Update selectedFAQ with latest values
+  //     setSelectedFAQ((prev) =>
+  //       prev && prev?.question_id === variables?.question_id
+  //         ? { ...prev, ...variables?.data }
+  //         : prev
+  //     );
+
+  //     // ✅ Update editingFAQ as well
+  //     setEditingFAQ((prev) =>
+  //       prev && prev?.question_id === variables?.question_id
+  //         ? { ...prev, ...variables?.data }
+  //         : prev
+  //     );
+
+  //     setShowFormModal(false);
+  //   },
+  // });
+
+
   const { mutateAsync: deleteFAQ, isPending: isDeleting } = useDeleteFAQ({
     onSuccess: () => setSelectedFAQ(null),
   });
@@ -116,10 +137,38 @@ const FAQManagement = () => {
     setShowFormModal(true);
   };
 
+  // const handleEdit = (faq) => {
+  //   setEditingFAQ(faq);
+  //   setShowFormModal(true);
+  // };
+
   const handleEdit = (faq) => {
-    setEditingFAQ(faq);
-    setShowFormModal(true);
+  // find latest version from current tree
+  const findLatestFAQ = (faqs) => {
+    for (const item of faqs) {
+      if (item.question_id === faq.question_id) return item;
+      if (item.children?.length) {
+        const found = findLatestFAQ(item.children);
+        if (found) return found;
+      }
+    }
+    return faq; // fallback
   };
+
+  let latestFAQ = faq;
+
+  for (const roots of Object.values(faqRootsByIssueType)) {
+    const found = findLatestFAQ(roots);
+    if (found) {
+      latestFAQ = found;
+      break;
+    }
+  }
+
+  setEditingFAQ(latestFAQ);   // ✅ pass fresh object
+  setShowFormModal(true);
+};
+
 
   const handleDelete = async (faq) => {
     if (window.confirm(`Delete "${faq.question_text}"?`)) {
@@ -142,7 +191,7 @@ const FAQManagement = () => {
       // const 
 
       // await createFAQ({...formData,type : "leaf"});
-      await createFAQ({...formData});
+      await createFAQ({ ...formData });
     }
   };
 
