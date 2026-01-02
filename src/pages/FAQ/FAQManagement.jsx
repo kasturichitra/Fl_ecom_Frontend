@@ -123,7 +123,32 @@ const FAQManagement = () => {
   const isActionLoading = isDeleting || isToggling;
 
   /* ---------------- Handlers ---------------- */
-  const handleSelectFAQ = (faq) => setSelectedFAQ(faq);
+  // const handleSelectFAQ = (faq) => setSelectedFAQ(faq);
+  const handleSelectFAQ = (faq) => {
+    const findLatestFAQ = (faqs) => {
+      for (const item of faqs) {
+        if (item.question_id === faq.question_id) return item;
+        if (item.children?.length) {
+          const found = findLatestFAQ(item.children);
+          if (found) return found;
+        }
+      }
+      return faq; // fallback
+    };
+
+    let latestFAQ = faq;
+
+    for (const roots of Object.values(faqRootsByIssueType)) {
+      const found = findLatestFAQ(roots);
+      if (found) {
+        latestFAQ = found;
+        break;
+      }
+    }
+
+    setSelectedFAQ(latestFAQ); // ✅ always fresh
+  };
+
 
   const handleAddNew = () => {
     setEditingFAQ(null);
@@ -143,31 +168,31 @@ const FAQManagement = () => {
   // };
 
   const handleEdit = (faq) => {
-  // find latest version from current tree
-  const findLatestFAQ = (faqs) => {
-    for (const item of faqs) {
-      if (item.question_id === faq.question_id) return item;
-      if (item.children?.length) {
-        const found = findLatestFAQ(item.children);
-        if (found) return found;
+    // find latest version from current tree
+    const findLatestFAQ = (faqs) => {
+      for (const item of faqs) {
+        if (item.question_id === faq.question_id) return item;
+        if (item.children?.length) {
+          const found = findLatestFAQ(item.children);
+          if (found) return found;
+        }
+      }
+      return faq; // fallback
+    };
+
+    let latestFAQ = faq;
+
+    for (const roots of Object.values(faqRootsByIssueType)) {
+      const found = findLatestFAQ(roots);
+      if (found) {
+        latestFAQ = found;
+        break;
       }
     }
-    return faq; // fallback
+
+    setEditingFAQ(latestFAQ);   // ✅ pass fresh object
+    setShowFormModal(true);
   };
-
-  let latestFAQ = faq;
-
-  for (const roots of Object.values(faqRootsByIssueType)) {
-    const found = findLatestFAQ(roots);
-    if (found) {
-      latestFAQ = found;
-      break;
-    }
-  }
-
-  setEditingFAQ(latestFAQ);   // ✅ pass fresh object
-  setShowFormModal(true);
-};
 
 
   const handleDelete = async (faq) => {
@@ -178,6 +203,19 @@ const FAQManagement = () => {
 
   const handleToggleStatus = async (question_id) => {
     await toggleFAQStatus(question_id);
+
+    // Update local state to reflect change immediately in UI
+    setSelectedFAQ((prev) =>
+      prev && prev.question_id === question_id
+        ? { ...prev, is_active: !prev.is_active }
+        : prev
+    );
+
+    setEditingFAQ((prev) =>
+      prev && prev.question_id === question_id
+        ? { ...prev, is_active: !prev.is_active }
+        : prev
+    );
   };
 
   const handleFormSubmit = async (formData) => {

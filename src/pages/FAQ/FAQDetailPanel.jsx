@@ -22,6 +22,9 @@ const FAQDetailPanel = ({ faq, onAddChild, onEdit, onDelete, onToggleStatus, onC
   const hasChildren = faq.children && faq.children.length > 0;
 
   // console.log("faq", faq);
+  console.log("is_active", faq.is_active);
+
+  // console.log("onToggleStatus", onToggleStatus);
   
 
   return (
@@ -179,7 +182,7 @@ const FAQDetailPanel = ({ faq, onAddChild, onEdit, onDelete, onToggleStatus, onC
             }
           `}
         >
-          {faq.is_active ? (
+          {/* {faq.is_active ? (
             <>
               <PowerOff size={18} />
               Disable FAQ
@@ -189,7 +192,21 @@ const FAQDetailPanel = ({ faq, onAddChild, onEdit, onDelete, onToggleStatus, onC
               <Power size={18} />
               Enable FAQ
             </>
-          )}
+          )} */}
+
+          {
+            faq.is_active ? (
+              <>
+                <PowerOff size={18} />
+                Disable FAQ
+              </>
+            ) : (
+              <>
+                <Power size={18} />
+                Enable FAQ
+              </>
+            )
+          }
         </button>
 
         {/* Delete Button */}
