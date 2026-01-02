@@ -242,7 +242,7 @@ const FAQManagement = () => {
   /* ---------------- UI ---------------- */
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-white shadow-sm border-b border-radius-xl">
         <PageHeader
           title="FAQ Management"
           subtitle="Manage hierarchical FAQ structure by issue type"
@@ -258,7 +258,7 @@ const FAQManagement = () => {
 
       <div className="flex-1 flex overflow-hidden">
         <div className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-5xl mx-auto space-y-6">
+          <div className="max-w-5xl mx-auto space-y-6  border-radius-3xl">
             {isLoading ? (
               <div className="text-center py-12">Loading FAQs…</div>
             ) : Object.keys(faqRootsByIssueType).length === 0 ? (
@@ -268,9 +268,9 @@ const FAQManagement = () => {
               </div>
             ) : (
               Object.entries(faqRootsByIssueType).map(([issue_type, rootFAQs]) => (
-                <div key={issue_type} className="bg-white rounded-xl border shadow-sm">
+                <div key={issue_type} className="bg-white  rounded-xl border shadow-sm">
                   <div
-                    className="flex items-center gap-3 p-4 cursor-pointer bg-indigo-50"
+                    className="flex items-center gap-3 p-4 cursor-pointer bg-indigo-50 rounded-t-xl"
                     onClick={() =>
                       setExpandedIssueTypes((p) => ({
                         ...p,
